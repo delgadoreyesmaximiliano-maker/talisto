@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+
+
+@layer base {
+  :root {
+    /* Brand: F9FAFA - 8ecfcd - 4366A5 - 0f113a */
+    --background: 180 14% 98%;
+    /* #F9FAFA */
+    --foreground: 236 59% 14%;
+    /* #0f113a */
+
+    --card: 0 0% 100%;
+    --card-foreground: 236 59% 14%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 236 59% 14%;
+
+    /* Primary: Deep Blue */
+    --primary: 236 59% 14%;
+    /* #0f113a */
+    --primary-foreground: 180 14% 98%;
+    /* #F9FAFA */
+
+    /* Secondary: Soft Blue */
+    --secondary: 218 42% 45%;
+    /* #4366A5 */
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted: Muted Teal (Lighter variant for backgrounds) */
+    --muted: 178 39% 92%;
+    --muted-foreground: 218 42% 45%;
+
+    /* Accent: Muted Teal */
+    --accent: 178 39% 68%;
+    /* #8ecfcd */
+    --accent-foreground: 236 59% 14%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 178 20% 85%;
+    --input: 178 20% 85%;
+    --ring: 218 42% 45%;
+
+    --radius: 0.5rem;
+
+    /* Sidebar matching brand (Dark Blue theme) */
+    --sidebar-background: 236 59% 14%;
+    /* Deep Blue #0f113a */
+    --sidebar-foreground: 180 14% 98%;
+    /* White #F9FAFA */
+    --sidebar-primary: 178 39% 68%;
+    /* Muted Teal #8ecfcd */
+    --sidebar-primary-foreground: 236 59% 14%;
+    --sidebar-accent: 218 42% 45%;
+    /* Soft Blue #4366A5 for hover */
+    --sidebar-accent-foreground: 180 14% 98%;
+    --sidebar-border: 236 50% 20%;
+    /* Slightly lighter blue for borders */
+    --sidebar-ring: 178 39% 68%;
+  }
+
+  .dark {
+    --background: 236 59% 14%;
+    /* #0f113a */
+    --foreground: 180 14% 98%;
+    /* #F9FAFA */
+
+    --card: 236 50% 18%;
+    --card-foreground: 180 14% 98%;
+
+    --popover: 236 50% 18%;
+    --popover-foreground: 180 14% 98%;
+
+    /* Primary: Soft Blue */
+    --primary: 218 42% 55%;
+    --primary-foreground: 180 14% 98%;
+
+    --secondary: 178 39% 45%;
+    --secondary-foreground: 180 14% 98%;
+
+    --muted: 236 50% 25%;
+    --muted-foreground: 178 39% 75%;
+
+    --accent: 218 42% 45%;
+    --accent-foreground: 180 14% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 180 14% 98%;
+
+    --border: 236 40% 25%;
+    --input: 236 40% 25%;
+    --ring: 218 42% 55%;
+
+    --sidebar-background: 236 59% 11%;
+    --sidebar-foreground: 180 14% 98%;
+    --sidebar-primary: 218 42% 55%;
+    --sidebar-primary-foreground: 180 14% 98%;
+    --sidebar-accent: 236 50% 20%;
+    --sidebar-accent-foreground: 180 14% 98%;
+    --sidebar-border: 236 40% 20%;
+    --sidebar-ring: 218 42% 55%;
+  }
+}
