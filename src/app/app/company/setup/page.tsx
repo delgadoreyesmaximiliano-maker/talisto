@@ -55,27 +55,31 @@ export default function CompanySetupPage() {
                 return
             }
 
-            const { data: companyData, error: companyError } = await supabase
+            // Step 1: Generate a UUID for the new company
+            const companyId = crypto.randomUUID()
+
+            // Step 2: Insert the company with explicit ID (no .select() to avoid RLS SELECT conflict)
+            const { error: companyError } = await supabase
                 .from('companies')
                 .insert([
                     {
+                        id: companyId,
                         name: formData.name,
                         industry: formData.industry as any,
                         plan: 'basic',
                         settings: {}
                     }
                 ] as any)
-                .select()
-                .single()
 
             if (companyError) throw companyError
 
+            // Step 3: Now create the user profile linked to the company
             const { error: userError } = await supabase
                 .from('users')
                 .upsert({
                     id: user.id,
                     email: user.email,
-                    company_id: (companyData as any).id,
+                    company_id: companyId,
                     role: 'admin'
                 } as any)
 

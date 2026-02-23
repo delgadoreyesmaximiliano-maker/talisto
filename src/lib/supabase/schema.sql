@@ -12,7 +12,7 @@ CREATE TABLE companies (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name VARCHAR(200) NOT NULL,
   rut VARCHAR(20) UNIQUE,
-  industry VARCHAR(50) NOT NULL CHECK (industry IN ('ecommerce', 'saas', 'retail', 'marketing', 'restaurant', 'services')),
+  industry VARCHAR(50) NOT NULL CHECK (industry IN ('ecommerce', 'saas', 'retail', 'marketing', 'restaurant', 'services', 'manufacturing', 'health', 'education', 'other')),
   plan VARCHAR(20) DEFAULT 'basic' CHECK (plan IN ('basic', 'pro', 'enterprise')),
   created_at TIMESTAMP DEFAULT NOW(),
   settings JSONB DEFAULT '{}'::jsonb
