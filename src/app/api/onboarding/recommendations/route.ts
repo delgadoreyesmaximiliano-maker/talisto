@@ -2,6 +2,17 @@ import { createGroq } from '@ai-sdk/groq';
 import { generateText } from 'ai';
 import { createClient } from '@supabase/supabase-js';
 
+// BUG #2 FIX: Warn at startup if SERVICE_ROLE_KEY is missing.
+// To fix: go to Vercel → Settings → Environment Variables and add SUPABASE_SERVICE_ROLE_KEY.
+// Without it, the anon key is used and RLS will block inserts for users without an active session.
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.warn(
+        'WARNING: SUPABASE_SERVICE_ROLE_KEY not set. ' +
+        'Falling back to ANON_KEY — RLS may block inserts in ai_recommendations. ' +
+        'Fix: Vercel → Settings → Environment Variables → add SUPABASE_SERVICE_ROLE_KEY.'
+    );
+}
+
 export async function POST(req: Request) {
     try {
         const body = await req.json();
@@ -38,16 +49,37 @@ export async function POST(req: Request) {
       }
     `;
 
-        // Usamos generateText y parseo manual ya que Groq falla con json_schema en este modelo
-        const { text } = await generateText({
-            model: groq('llama-3.3-70b-versatile'),
-            system: systemPrompt,
-            prompt: "Genera el JSON de recomendaciones estratégicas ahora.",
-        });
+        // BUG #4 FIX: Wrap Groq call with a 15-second timeout to avoid infinite spinners.
+        const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Groq timeout after 15s')), 15000)
+        );
+
+        let text: string;
+        try {
+            const result = await Promise.race([
+                generateText({
+                    model: groq('llama-3.3-70b-versatile'),
+                    system: systemPrompt,
+                    prompt: "Genera el JSON de recomendaciones estratégicas ahora.",
+                }),
+                timeoutPromise,
+            ]);
+            text = result.text;
+        } catch (timeoutErr) {
+            const err = timeoutErr as Error;
+            if (err.message === 'Groq timeout after 15s') {
+                console.error('Groq timed out after 15 seconds.');
+                return new Response(
+                    JSON.stringify({ error: 'La IA tardó demasiado. Intenta de nuevo.' }),
+                    { status: 408, headers: { 'Content-Type': 'application/json' } }
+                );
+            }
+            throw timeoutErr;
+        }
 
         // Limpiar posible markdown wrapper de la respuesta de Groq
         const cleanJson = text.replace(/```json\n?/, '').replace(/```/, '').trim();
-        let parsedResult;
+        let parsedResult: { recommendations: Array<{ type: string; title: string; description: string }> };
 
         try {
             parsedResult = JSON.parse(cleanJson);
@@ -61,15 +93,14 @@ export async function POST(req: Request) {
             throw new Error('No recommendations generated');
         }
 
-        // Inicializamos cliente de admin para bypassear RLS al guardar (ya que el user quizás aún no actualiza su token)
-        // Opcional: usar service_role key si está en env
+        // BUG #2 FIX: Use service role key to bypass RLS, with explicit fallback warning above.
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         );
 
         // Insertar en la BD
-        const recommendationsToInsert = parsedResult.recommendations.map((rec: any) => ({
+        const recommendationsToInsert = parsedResult.recommendations.map((rec) => ({
             company_id: companyId,
             type: rec.type,
             title: rec.title,
@@ -91,9 +122,10 @@ export async function POST(req: Request) {
             headers: { 'Content-Type': 'application/json' },
         });
 
-    } catch (error: any) {
-        console.error('Onboarding API Error:', error);
-        return new Response(JSON.stringify({ error: error.message || 'Failed to generate recommendations' }), {
+    } catch (error: unknown) {
+        const err = error as Error;
+        console.error('Onboarding API Error:', err);
+        return new Response(JSON.stringify({ error: err.message || 'Failed to generate recommendations' }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
         });

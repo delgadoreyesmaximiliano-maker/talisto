@@ -21,7 +21,7 @@ export function ChatInterface({ contextData }: ChatInterfaceProps) {
     const transport = useMemo(() => new DefaultChatTransport({
         api: '/api/chat',
         body: { data: contextData },
-    }), []) // eslint-disable-line react-hooks/exhaustive-deps
+    }), [contextData])
 
     const industry = contextData?.profile?.industry || 'negocio';
     const actividad = contextData?.profile?.settings?.actividad || '';

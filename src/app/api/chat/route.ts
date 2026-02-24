@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { messages, data } = body;
-    const { profile, sales, inventory } = data || {};
+    const { profile, recentSales: sales, inventory } = data || {};
 
     const industry = profile?.industry || 'PyME';
     const actividad = profile?.settings?.actividad || 'No especificada';
