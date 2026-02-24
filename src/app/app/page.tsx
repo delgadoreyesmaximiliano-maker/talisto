@@ -39,6 +39,15 @@ export default async function AppDashboard() {
         redirect('/app/company/setup')
     }
 
+    // Obtener rubro e info de la empresa para personalizar dashboard
+    const { data: companyData } = await supabase
+        .from('companies')
+        .select('industry, settings, name')
+        .eq('id', companyId)
+        .single<{ industry: string | null; settings: Record<string, unknown> | null; name: string | null }>()
+
+    const industry = companyData?.industry ?? 'other'
+
     // FIX #5: Manejo de errores en queries críticas
     // 1. Fetch Sales Data
     const { data: salesData, error: salesError } = await supabase
@@ -182,6 +191,40 @@ export default async function AppDashboard() {
 
     const dbRecommendations = (aiRecommendationsData as AiRecommendation[]) || []
 
+    // --- Configuración dinámica por rubro ---
+    const welcomeMessages: Record<string, string> = {
+        restaurant: 'Aquí tienes el resumen de tu restaurant para hoy.',
+        ecommerce: 'Aquí tienes el rendimiento de tu tienda online.',
+        retail: 'Aquí tienes el estado de tu comercio para hoy.',
+        saas: 'Aquí tienes las métricas de tu SaaS para hoy.',
+        marketing: 'Aquí tienes el rendimiento de tu agencia.',
+        services: 'Aquí tienes el estado de tus proyectos y clientes.',
+        manufacturing: 'Aquí tienes el estado de tu producción.',
+        other: 'Aquí tienes el resumen de tu negocio para hoy.',
+    }
+
+    const kpiConfig: Record<string, { label: string; secondaryLabel: string }> = {
+        restaurant: { label: 'Ventas del Día', secondaryLabel: 'Ticket Promedio' },
+        ecommerce: { label: 'Ventas Online', secondaryLabel: 'Conversión' },
+        retail: { label: 'Ventas Totales', secondaryLabel: 'Ingreso Mensual' },
+        saas: { label: 'MRR', secondaryLabel: 'Churn Rate' },
+        services: { label: 'Proyectos Activos', secondaryLabel: 'Horas Facturadas' },
+        default: { label: 'Ventas Totales', secondaryLabel: 'Ingreso Mensual' },
+    }
+
+    const aiSectionTitle: Record<string, string> = {
+        restaurant: '🍽️ Insights para tu Restaurant',
+        ecommerce: '🛒 Insights para tu Tienda Online',
+        retail: '🏪 Insights para tu Comercio',
+        saas: '🚀 Insights para tu SaaS',
+        services: '💼 Insights para tus Servicios',
+        default: '✨ Recomendaciones de IA',
+    }
+
+    const currentKpi = kpiConfig[industry] ?? kpiConfig.default
+    const welcomeSubtitle = welcomeMessages[industry] ?? welcomeMessages.other
+    const currentAiTitle = aiSectionTitle[industry] ?? aiSectionTitle.default
+
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Header section */}
@@ -191,7 +234,7 @@ export default async function AppDashboard() {
                         Bienvenido, {user.email?.split('@')[0]}
                     </h1>
                     <p className="text-slate-500 mt-1 font-medium">
-                        Aquí tienes el resumen de tu negocio para hoy.
+                        {welcomeSubtitle}
                     </p>
                 </div>
                 <div className="flex gap-2">
@@ -219,7 +262,7 @@ export default async function AppDashboard() {
                         </span>
                     </div>
                     <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Ventas Totales</p>
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{currentKpi.label}</p>
                         <h2 className="text-2xl font-black text-white mt-1" style={{ fontFamily: "'Outfit', sans-serif" }}>
                             ${totalRevenue.toLocaleString('es-CL')}
                         </h2>
@@ -244,7 +287,7 @@ export default async function AppDashboard() {
                         </span>
                     </div>
                     <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Ingreso Mensual</p>
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{currentKpi.secondaryLabel}</p>
                         <h2 className="text-2xl font-black text-white mt-1" style={{ fontFamily: "'Outfit', sans-serif" }}>
                             ${totalMrr.toLocaleString('es-CL')}
                         </h2>
@@ -309,7 +352,7 @@ export default async function AppDashboard() {
                         <Sparkles className="w-6 h-6 fill-white" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-extrabold text-slate-900" style={{ fontFamily: "'Outfit', sans-serif" }}>Recomendaciones de IA</h2>
+                        <h2 className="text-xl font-extrabold text-slate-900" style={{ fontFamily: "'Outfit', sans-serif" }}>{currentAiTitle}</h2>
                         <p className="text-slate-500 text-sm font-medium">Analizamos tus datos para encontrar oportunidades</p>
                     </div>
                 </div>

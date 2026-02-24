@@ -171,7 +171,10 @@ export default function CompanySetupPage() {
                 })
             })
 
-            if (!aiRes.ok) {
+            if (aiRes.status === 408) {
+                setLoadingMessage('La IA tardó demasiado, pero tu cuenta está lista.')
+                await new Promise(resolve => setTimeout(resolve, 2000))
+            } else if (!aiRes.ok) {
                 console.warn('AI Recommendations failed, but onboarding completed', await aiRes.text())
             }
 
@@ -358,7 +361,7 @@ export default function CompanySetupPage() {
                         )}
 
                         {step === 3 && (
-                            <div className="space-y-6 animate-in slide-in-from-right duration-300 flex-1 flex flex-col">
+                            <form onSubmit={handleSubmit} className="space-y-6 animate-in slide-in-from-right duration-300 flex-1 flex flex-col">
                                 <div className="space-y-2 mb-4">
                                     <h3 className="text-2xl font-black text-slate-900" style={{ fontFamily: "'Outfit', sans-serif" }}>¿De qué tamaño es tu equipo?</h3>
                                     <p className="text-slate-500 text-sm">Nos ayuda a saber si necesitas módulos de colaboración.</p>
@@ -392,16 +395,16 @@ export default function CompanySetupPage() {
                                 </div>
 
                                 <div className="flex gap-4 pt-4 mt-auto">
-                                    <Button variant="outline" onClick={prevStep} className="h-14 px-6 border-slate-200 text-slate-500 font-bold rounded-2xl hover:bg-slate-50">Atrás</Button>
+                                    <Button type="button" variant="outline" onClick={prevStep} className="h-14 px-6 border-slate-200 text-slate-500 font-bold rounded-2xl hover:bg-slate-50">Atrás</Button>
                                     <Button
-                                        onClick={handleSubmit}
+                                        type="submit"
                                         disabled={!formData.tamano_equipo || loading}
                                         className="flex-1 h-14 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40 active:scale-95 transition-all text-base"
                                     >
                                         Finalizar y Analizar <Sparkles className="ml-2 w-5 h-5 fill-white" />
                                     </Button>
                                 </div>
-                            </div>
+                            </form>
                         )}
                     </div>
                 </div>
