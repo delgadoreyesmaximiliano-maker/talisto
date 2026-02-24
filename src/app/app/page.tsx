@@ -1,8 +1,21 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DollarSign, Users, Package, TrendingUp, ArrowUpRight, ArrowDownRight, Clock, Sparkles, ShoppingBag, Target, ArrowRight } from 'lucide-react'
+import { DollarSign, Users, Package, TrendingUp, ArrowUpRight, ArrowDownRight, Sparkles, ShoppingBag, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import { DownloadReportButton } from './components/download-report-button'
+
+interface SaleRow { amount: number; created_at: string }
+interface CustomerRow { mrr: number | null; status: string }
+interface ProductRow { id: string; name: string; stock_current: number; stock_minimum: number }
+interface RecentSaleRow { id: string; amount: number; created_at: string; source: string | null }
+interface AiRecommendation {
+    id: string
+    title: string
+    description: string
+    type: 'opportunity' | 'attention' | string
+    created_at: string
+}
 
 export default async function AppDashboard() {
     const supabase = createClient()
@@ -20,40 +33,62 @@ export default async function AppDashboard() {
         .eq('id', user.id)
         .single()
 
-    const companyId = (userProfile as any)?.company_id
+    const companyId = (userProfile as { company_id: string } | null)?.company_id
 
     if (!companyId) {
         redirect('/app/company/setup')
     }
 
+    // FIX #5: Manejo de errores en queries críticas
     // 1. Fetch Sales Data
-    const { data: sales } = await supabase
+    const { data: salesData, error: salesError } = await supabase
         .from('sales')
         .select('amount, created_at')
         .eq('company_id', companyId)
-
-    const totalRevenue = (sales as any[])?.reduce((acc, sale) => acc + Number(sale.amount), 0) || 0
-    const salesCount = sales?.length || 0
+        .returns<SaleRow[]>()
 
     // 2. Fetch Customers Data
-    const { data: customersData } = await supabase
+    const { data: customersData, error: customersError } = await supabase
         .from('customers')
         .select('mrr, status')
         .eq('company_id', companyId)
-
-    const customers = (customersData as any[]) || []
-    const activeCustomers = customers.filter(c => c.status === 'active').length || 0
-    const totalMrr = customers.reduce((acc, c) => acc + Number(c.mrr || 0), 0) || 0
+        .returns<CustomerRow[]>()
 
     // 3. Fetch Inventory Data
-    const { data: productsData } = await supabase
+    const { data: productsData, error: productsError } = await supabase
         .from('products')
         .select('id, name, stock_current, stock_minimum')
         .eq('company_id', companyId)
+        .returns<ProductRow[]>()
 
-    const products = (productsData as any[]) || []
-    const activeProductsCount = products.length || 0
-    const lowStockProducts = products.filter(p => p.stock_current <= p.stock_minimum) || []
+    // Si alguna query crítica falla, mostramos error amigable
+    const criticalError = salesError || customersError || productsError
+    if (criticalError) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center p-8">
+                <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center">
+                    <AlertCircle className="w-8 h-8 text-red-400" />
+                </div>
+                <h2 className="text-xl font-bold text-slate-800">Error al cargar los datos</h2>
+                <p className="text-slate-500 text-sm max-w-md">
+                    No pudimos obtener la información de tu negocio. Por favor recarga la página o contacta soporte si el problema persiste.
+                </p>
+                <p className="text-xs text-slate-400 font-mono bg-slate-50 px-3 py-1 rounded-lg">
+                    {criticalError.message}
+                </p>
+            </div>
+        )
+    }
+
+    const sales: SaleRow[] = salesData || []
+    const customers: CustomerRow[] = customersData || []
+    const products: ProductRow[] = productsData || []
+
+    const totalRevenue = sales.reduce((acc, sale) => acc + Number(sale.amount), 0)
+    const activeCustomers = customers.filter(c => c.status === 'active').length
+    const totalMrr = customers.reduce((acc, c) => acc + Number(c.mrr || 0), 0)
+    const activeProductsCount = products.length
+    const lowStockProducts = products.filter(p => p.stock_current <= p.stock_minimum)
 
     // 4. Prepare monthly sales chart data
     const monthlySales: { [key: string]: number } = {}
@@ -61,10 +96,10 @@ export default async function AppDashboard() {
 
     monthNames.forEach((_, i) => { monthlySales[i.toString()] = 0 })
 
-        ; (sales as any[])?.forEach(sale => {
-            const month = new Date(sale.created_at).getMonth()
-            monthlySales[month.toString()] = (monthlySales[month.toString()] || 0) + Number(sale.amount)
-        })
+    sales.forEach(sale => {
+        const month = new Date(sale.created_at).getMonth()
+        monthlySales[month.toString()] = (monthlySales[month.toString()] || 0) + Number(sale.amount)
+    })
 
     const chartData = monthNames.map((name, i) => ({
         name,
@@ -73,15 +108,79 @@ export default async function AppDashboard() {
 
     const maxChartValue = Math.max(...chartData.map(d => d.value), 1)
 
+    // FIX #4: Detectar dinámicamente el mes con mayor valor
+    const maxValueIndex = chartData.reduce(
+        (maxIdx, d, i) => (d.value > chartData[maxIdx].value ? i : maxIdx),
+        0
+    )
+
+    // FIX #1: Campo `source` en lugar de `channel`
     // 5. Recent sales
     const { data: recentSalesData } = await supabase
         .from('sales')
-        .select('id, amount, created_at, channel')
+        .select('id, amount, created_at, source')
         .eq('company_id', companyId)
         .order('created_at', { ascending: false })
         .limit(5)
+        .returns<RecentSaleRow[]>()
 
-    const recentSales = (recentSalesData as any[]) || []
+    const recentSales: RecentSaleRow[] = recentSalesData || []
+
+    // TAREA 2: Generar recomendaciones de IA dinámicas desde los datos existentes
+    // (sin query extra — usamos products y sales ya cargados)
+    type DynamicRecommendation = {
+        id: string
+        type: 'opportunity' | 'attention'
+        label: string
+        title: string
+        description: string
+        actionLabel: string
+        actionHref: string
+    }
+
+    const dynamicRecommendations: DynamicRecommendation[] = []
+
+    // Recomendación 1: Stock crítico → "Atención"
+    if (lowStockProducts.length > 0) {
+        const criticalProduct = lowStockProducts[0] as ProductRow
+        dynamicRecommendations.push({
+            id: 'low-stock',
+            type: 'attention',
+            label: 'Atención',
+            title: `Stock crítico: "${criticalProduct.name}"`,
+            description: `Tienes ${lowStockProducts.length} producto${lowStockProducts.length > 1 ? 's' : ''} con stock bajo el mínimo. Sin reposición podrías perder ventas en los próximos días.`,
+            actionLabel: 'Ver Inventario',
+            actionHref: '/app/inventory',
+        })
+    }
+
+    // Recomendación 2: Ventas recientes altas → "Oportunidad"
+    const recentRevenue = recentSales.reduce((acc, s) => acc + Number(s.amount), 0)
+    const avgRecentSale = recentSales.length > 0 ? recentRevenue / recentSales.length : 0
+    if (recentSales.length >= 3 && avgRecentSale > 0) {
+        dynamicRecommendations.push({
+            id: 'recent-sales-momentum',
+            type: 'opportunity',
+            label: 'Oportunidad',
+            title: 'Momentum de ventas activo',
+            description: `Tus últimas ${recentSales.length} ventas suman $${recentRevenue.toLocaleString('es-CL')}. Es buen momento para activar una campaña o contactar clientes inactivos.`,
+            actionLabel: 'Ver Ventas',
+            actionHref: '/app/sales',
+        })
+    }
+
+    // Si no hay recomendaciones dinámicas, intentar con la tabla de BD
+    const { data: aiRecommendationsData } = dynamicRecommendations.length === 0
+        ? await supabase
+            .from('ai_recommendations')
+            .select('id, title, description, type, created_at')
+            .eq('company_id', companyId)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false })
+            .limit(2)
+        : { data: null }
+
+    const dbRecommendations = (aiRecommendationsData as AiRecommendation[]) || []
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
@@ -96,10 +195,8 @@ export default async function AppDashboard() {
                     </p>
                 </div>
                 <div className="flex gap-2">
-                    <button className="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-sm hover:scale-105 transition-all active:scale-95 shadow-lg shadow-slate-900/20 flex items-center gap-2">
-                        Descargar Reporte
-                        <ArrowDownRight className="w-4 h-4" />
-                    </button>
+                    {/* FIX #2: Botón Descargar Reporte con funcionalidad real (Client Component) */}
+                    <DownloadReportButton sales={recentSales} />
                     <Link href="/app/ai-insights" className="px-5 py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:scale-105 transition-all active:scale-95 shadow-lg shadow-emerald-500/20 flex items-center gap-2">
                         Preguntar a IA
                         <Sparkles className="w-4 h-4 fill-white text-white" />
@@ -196,14 +293,15 @@ export default async function AppDashboard() {
                         </div>
                     ) : (
                         <div className="mt-4 flex items-center gap-2 text-emerald-600 bg-emerald-50 p-2 rounded-xl border border-emerald-100">
-                            <CheckCircleIcon className="w-4 h-4" />
+                            {/* FIX #3: CheckCircle2 de lucide-react en lugar de componente local */}
+                            <CheckCircle2 className="w-4 h-4" />
                             <span className="text-xs font-bold">Stock Saludable</span>
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* AI Recommendations - NEW PREMIUM SECTION */}
+            {/* TAREA 2: AI Insights widgets dinámicos */}
             <div className="bg-gradient-to-br from-emerald-50 to-white rounded-3xl p-8 border border-emerald-100 shadow-sm relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-200/20 rounded-full blur-3xl -mr-32 -mt-32" />
                 <div className="flex items-center gap-4 mb-6">
@@ -216,30 +314,72 @@ export default async function AppDashboard() {
                     </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6 relative z-10">
-                    <div className="bg-white p-6 rounded-2xl border-l-4 border-emerald-500 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full uppercase tracking-tighter">Oportunidad</span>
-                            <span className="text-slate-400 text-[10px] font-medium">Hace 2 horas</span>
-                        </div>
-                        <h3 className="font-bold text-slate-900 mb-2">Aumenta stock de "Vino Reserva"</h3>
-                        <p className="text-sm text-slate-500 mb-4">Las ventas de este producto han subido un 35% este fin de semana. Es probable que te quedes sin stock en 4 días.</p>
-                        <button className="text-emerald-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
-                            Crear Orden de Compra <ArrowRight className="w-4 h-4" />
-                        </button>
+                {dynamicRecommendations.length > 0 ? (
+                    // Recomendaciones generadas dinámicamente desde los datos del negocio
+                    <div className="grid md:grid-cols-2 gap-6 relative z-10">
+                        {dynamicRecommendations.map((rec) => (
+                            <div key={rec.id} className={`bg-white p-6 rounded-2xl border-l-4 shadow-sm hover:shadow-md transition-shadow ${rec.type === 'opportunity' ? 'border-emerald-500' : 'border-amber-500'
+                                }`}>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-tighter ${rec.type === 'opportunity' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                                        }`}>
+                                        {rec.label}
+                                    </span>
+                                    <span className="text-slate-400 text-[10px] font-medium">Ahora</span>
+                                </div>
+                                <h3 className="font-bold text-slate-900 mb-2">{rec.title}</h3>
+                                <p className="text-sm text-slate-500 mb-4">{rec.description}</p>
+                                <Link
+                                    href={rec.actionHref}
+                                    className={`font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all ${rec.type === 'opportunity' ? 'text-emerald-600' : 'text-amber-600'
+                                        }`}
+                                >
+                                    {rec.actionLabel} <ArrowRight className="w-4 h-4" />
+                                </Link>
+                            </div>
+                        ))}
                     </div>
-                    <div className="bg-white p-6 rounded-2xl border-l-4 border-amber-500 shadow-sm hover:shadow-md transition-shadow">
-                        <div className="flex items-center gap-2 mb-3">
-                            <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full uppercase tracking-tighter">Atención</span>
-                            <span className="text-slate-400 text-[10px] font-medium">Hace 5 horas</span>
-                        </div>
-                        <h3 className="font-bold text-slate-900 mb-2">Margen bajo en Categoría "Lácteos"</h3>
-                        <p className="text-sm text-slate-500 mb-4">Tus costos de proveedor subieron pero tus precios siguen iguales. Tu margen bajó del 25% al 18%.</p>
-                        <button className="text-amber-600 font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all">
-                            Ajustar Precios <ArrowRight className="w-4 h-4" />
-                        </button>
+                ) : dbRecommendations.length > 0 ? (
+                    // Fallback: recomendaciones desde la tabla ai_recommendations de BD
+                    <div className="grid md:grid-cols-2 gap-6 relative z-10">
+                        {dbRecommendations.map((rec: AiRecommendation) => {
+                            const isOpportunity = rec.type === 'opportunity'
+                            const timeAgo = getTimeAgo(new Date(rec.created_at))
+                            return (
+                                <div key={rec.id} className={`bg-white p-6 rounded-2xl border-l-4 shadow-sm hover:shadow-md transition-shadow ${isOpportunity ? 'border-emerald-500' : 'border-amber-500'
+                                    }`}>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-tighter ${isOpportunity ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                                            }`}>
+                                            {isOpportunity ? 'Oportunidad' : 'Atención'}
+                                        </span>
+                                        <span className="text-slate-400 text-[10px] font-medium">{timeAgo}</span>
+                                    </div>
+                                    <h3 className="font-bold text-slate-900 mb-2">{rec.title}</h3>
+                                    <p className="text-sm text-slate-500 mb-4">{rec.description}</p>
+                                    <Link href="/app/ai-insights" className={`font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all ${isOpportunity ? 'text-emerald-600' : 'text-amber-600'
+                                        }`}>
+                                        Consultar a IA <ArrowRight className="w-4 h-4" />
+                                    </Link>
+                                </div>
+                            )
+                        })}
                     </div>
-                </div>
+                ) : (
+                    // Empty state elegante cuando no hay ninguna recomendación
+                    <div className="text-center py-10 relative z-10">
+                        <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Sparkles className="w-8 h-8 text-emerald-400" />
+                        </div>
+                        <p className="font-bold text-slate-700 mb-1">Todo en orden</p>
+                        <p className="text-sm text-slate-400 max-w-sm mx-auto">
+                            No hay alertas activas. La IA monitoriza continuamente tus datos y te avisará cuando detecte oportunidades o riesgos.
+                        </p>
+                        <Link href="/app/ai-insights" className="mt-4 inline-flex items-center gap-1 text-emerald-600 font-bold text-sm hover:gap-2 transition-all">
+                            Consultar al asistente IA <ArrowRight className="w-4 h-4" />
+                        </Link>
+                    </div>
+                )}
             </div>
 
             {/* Main Content Area: Chart and Recent Activity */}
@@ -261,6 +401,8 @@ export default async function AppDashboard() {
                         <div className="flex items-end gap-3 h-64 mt-4">
                             {chartData.map((d, i) => {
                                 const height = maxChartValue > 0 ? (d.value / maxChartValue) * 100 : 0
+                                // FIX #4: Colorear dinámicamente el mes con mayor valor
+                                const isMax = i === maxValueIndex && d.value > 0
                                 return (
                                     <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
                                         <div className="relative w-full flex flex-col items-center justify-end h-full">
@@ -270,9 +412,9 @@ export default async function AppDashboard() {
                                                 </div>
                                             )}
                                             <div
-                                                className={`w-full rounded-2xl transition-all duration-700 h-0 group-hover:brightness-110 shadow-lg ${i === 1 || i === 4 || i === 9
-                                                        ? 'bg-gradient-to-t from-emerald-600 to-emerald-400 shadow-emerald-500/20'
-                                                        : 'bg-slate-200'
+                                                className={`w-full rounded-2xl transition-all duration-700 h-0 group-hover:brightness-110 shadow-lg ${isMax
+                                                    ? 'bg-gradient-to-t from-emerald-600 to-emerald-400 shadow-emerald-500/20'
+                                                    : 'bg-slate-200'
                                                     }`}
                                                 style={{ height: `${Math.max(height, 4)}%` }}
                                             />
@@ -313,8 +455,9 @@ export default async function AppDashboard() {
                                                 <p className="text-sm font-bold text-slate-900 truncate">
                                                     ${Number(sale.amount).toLocaleString('es-CL')}
                                                 </p>
+                                                {/* FIX #1: sale.source en lugar de sale.channel */}
                                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                                    {sale.channel || 'Directo'}
+                                                    {sale.source || 'Directo'}
                                                 </p>
                                             </div>
                                             <div className="text-right">
@@ -327,35 +470,15 @@ export default async function AppDashboard() {
                                         </div>
                                     )
                                 })}
-                                <button className="w-full py-3 bg-slate-50 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors mt-2">
+                                <Link href="/app/sales" className="w-full py-3 bg-slate-50 rounded-2xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors mt-2 flex items-center justify-center">
                                     Ver Todo el Historial
-                                </button>
+                                </Link>
                             </div>
                         )}
                     </CardContent>
                 </Card>
             </div>
         </div>
-    )
-}
-
-function CheckCircleIcon(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <polyline points="22 4 12 14.01 9 11.01" />
-        </svg>
     )
 }
 

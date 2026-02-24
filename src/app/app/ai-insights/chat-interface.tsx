@@ -2,12 +2,13 @@
 'use client'
 
 import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Send, Bot, User, Sparkles } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 
 interface ChatInterfaceProps {
@@ -15,19 +16,27 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ contextData }: ChatInterfaceProps) {
-    const { messages, input, handleInputChange, handleSubmit, status } = useChat({
+    const [inputValue, setInputValue] = useState('')
+
+    const transport = useMemo(() => new DefaultChatTransport({
         api: '/api/chat',
-        body: {
-            data: contextData
-        },
-        initialMessages: [
+        body: { data: contextData },
+    }), []) // eslint-disable-line react-hooks/exhaustive-deps
+
+    const industry = contextData?.profile?.industry || 'negocio';
+    const actividad = contextData?.profile?.settings?.actividad || '';
+    const welcomeMessage = `¡Hola! 👋 Soy Tali, tu asistente de negocios con IA. Veo que tienes un negocio especializado en **${industry}**${actividad ? ` (Actividad: ${actividad})` : ''}. ¿En qué te puedo ayudar hoy?`;
+
+    const { messages, sendMessage, status } = useChat({
+        transport,
+        messages: [
             {
                 id: 'welcome',
-                role: 'assistant',
-                content: '¡Hola! 🇨🇱 Soy tu asistente de inventario y ventas con Inteligencia Artificial. He revisado tus datos actuales. ¿En qué te puedo ayudar hoy? ¿Quieres saber qué productos están con stock bajo o qué se ha vendido más?',
-                parts: [{ type: 'text', text: '¡Hola! 🇨🇱 Soy tu asistente de inventario y ventas con Inteligencia Artificial. He revisado tus datos actuales. ¿En qué te puedo ayudar hoy? ¿Quieres saber qué productos están con stock bajo o qué se ha vendido más?' }],
+                role: 'assistant' as const,
+                content: welcomeMessage,
+                parts: [{ type: 'text' as const, text: welcomeMessage, state: 'done' as const }],
             }
-        ]
+        ],
     })
 
     const isLoading = status === 'submitted' || status === 'streaming'
@@ -41,14 +50,22 @@ export function ChatInterface({ contextData }: ChatInterfaceProps) {
     }, [messages])
 
     const getMessageText = (m: any): string => {
-        if (typeof m.content === 'string') return m.content
+        if (typeof m.content === 'string' && m.content) return m.content
         if (Array.isArray(m.parts)) {
             return m.parts
                 .filter((p: any) => p.type === 'text')
-                .map((p: any) => p.text)
+                .map((p: any) => p.text || '')
                 .join('')
         }
         return ''
+    }
+
+    const handleFormSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        const text = inputValue.trim()
+        if (!text || isLoading) return
+        sendMessage({ text })
+        setInputValue('')
     }
 
     return (
@@ -65,19 +82,20 @@ export function ChatInterface({ contextData }: ChatInterfaceProps) {
                         {messages.map((m: any) => (
                             <div
                                 key={m.id}
-                                className={`flex items-start gap-3 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-                                    }`}
+                                className={`flex items-start gap-3 ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                             >
-                                <div className={`p-2 rounded-full flex-shrink-0 ${m.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                                <div className={`p-2 rounded-full flex-shrink-0 ${m.role === 'user'
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'bg-muted text-muted-foreground'
                                     }`}>
-                                    {m.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4 text-amber-500" />}
+                                    {m.role === 'user'
+                                        ? <User className="w-4 h-4" />
+                                        : <Bot className="w-4 h-4 text-amber-500" />}
                                 </div>
-                                <div
-                                    className={`rounded-xl px-4 py-3 text-sm max-w-[85%] ${m.role === 'user'
-                                        ? 'bg-primary text-primary-foreground rounded-tr-sm'
-                                        : 'bg-muted/50 border text-foreground rounded-tl-sm prose prose-sm prose-p:leading-snug max-w-none dark:prose-invert'
-                                        }`}
-                                >
+                                <div className={`rounded-xl px-4 py-3 text-sm max-w-[85%] ${m.role === 'user'
+                                    ? 'bg-primary text-primary-foreground rounded-tr-sm'
+                                    : 'bg-muted/50 border text-foreground rounded-tl-sm prose prose-sm prose-p:leading-snug max-w-none dark:prose-invert'
+                                    }`}>
                                     {m.role === 'user' ? (
                                         getMessageText(m)
                                     ) : (
@@ -101,17 +119,17 @@ export function ChatInterface({ contextData }: ChatInterfaceProps) {
             </CardContent>
             <CardFooter className="p-4 border-t bg-muted/10">
                 <form
-                    onSubmit={handleSubmit}
+                    onSubmit={handleFormSubmit}
                     className="flex w-full items-center space-x-2"
                 >
                     <Input
-                        value={input}
-                        onChange={handleInputChange}
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
                         placeholder="Escribe tu consulta aquí..."
                         className="flex-1 bg-background"
                         disabled={isLoading}
                     />
-                    <Button type="submit" size="icon" disabled={isLoading || !input?.trim()}>
+                    <Button type="submit" size="icon" disabled={isLoading || !inputValue.trim()}>
                         <Send className="h-4 w-4" />
                         <span className="sr-only">Enviar</span>
                     </Button>

@@ -15,11 +15,21 @@ export default async function AIInsightsPage() {
 
     const { data: userProfile } = await supabase
         .from('users')
-        .select('company_id')
+        .select(`
+            company_id,
+            companies (
+                industry,
+                settings
+            )
+        `)
         .eq('id', user.id)
         .single()
 
     const companyId = (userProfile as any)?.company_id
+    const profile = {
+        industry: (userProfile as any)?.companies?.industry,
+        settings: (userProfile as any)?.companies?.settings
+    }
 
     let inventoryData: any[] = []
     let salesData: any[] = []
@@ -46,6 +56,7 @@ export default async function AIInsightsPage() {
     }
 
     const contextData = {
+        profile,
         inventory: inventoryData,
         recentSales: salesData,
         totalProducts: inventoryData.length,

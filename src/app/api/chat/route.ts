@@ -1,5 +1,5 @@
 import { createGroq } from '@ai-sdk/groq';
-import { streamText } from 'ai';
+import { streamText, convertToModelMessages } from 'ai';
 
 export async function POST(req: Request) {
   console.log("=== API CHAT HIT ===");
@@ -11,44 +11,47 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { messages, data } = body;
+    const { profile, sales, inventory } = data || {};
 
-    const sanitizedMessages = (messages || []).map((m: { role?: string; content: unknown; parts?: Array<{ type: string; text?: string }> }) => {
-      let content = '';
-      if (typeof m.content === 'string') {
-        content = m.content;
-      } else if (Array.isArray(m.parts)) {
-        content = m.parts
-          .filter((p) => p.type === 'text')
-          .map((p) => p.text || '')
-          .join('');
-      } else {
-        content = String(m.content ?? '');
-      }
-      return {
-        role: m.role || 'user',
-        content,
-      };
-    });
+    const industry = profile?.industry || 'PyME';
+    const actividad = profile?.settings?.actividad || 'No especificada';
+    const equipo = profile?.settings?.tamano_equipo || 'No especificado';
+    const totalSales = sales?.length || 0;
+    const totalRevenue = sales?.reduce((acc: number, s: any) => acc + Number(s.amount), 0) || 0;
+    const criticalStock = inventory?.filter((p: any) => p.stock_current <= p.stock_minimum).length || 0;
 
     const systemPrompt = `
-      Eres un analista experto en negocios, inventario y ventas para una aplicación chilena llamada Talisto SaaS.
-      Tu objetivo es ayudar al usuario proporcionándole análisis claros, accionables y directos basados en sus datos de inventario y ventas actuales.
-      Prioriza recomendar qué productos debe reabastecer basándote en un "Stock Crítico" (stock_current <= stock_minimum).
-      Mantén tus respuestas profesionales, en español chileno corto.
-
-      Contexto actual:
-      ${data ? JSON.stringify(data) : "{}"}
+      Eres un excelente asistente de negocios experto para PyMEs chilenas llamado Tali. 
+      Trabajas en Talisto SaaS.
+      
+      Estás ayudando a resolver dudas de negocio a una empresa con las siguientes características:
+      - Rubro: ${industry}
+      - Actividad principal: ${actividad}
+      - Tamaño del equipo: ${equipo}
+      
+      Métricas en tiempo real:
+      - Ventas totales registradas: ${totalSales}
+      - Ingresos totales generados: $${totalRevenue.toLocaleString('es-CL')}
+      - Productos en estado crítico (Stock bajo el mínimo): ${criticalStock}
+      
+      REGLAS DE ORO:
+      1. Responde siempre en español chileno, tono profesional, amigable y muy directo.
+      2. No uses saludos largos.
+      3. Usa los datos reales del negocio mencionados arriba para dar recomendaciones hiper-específicas, NO genéricas de internet.
+      4. Menciona el rubro y la actividad del usuario cuando tenga sentido para dar mayor valor a tus ideas.
+      5. Si el usuario te pregunta por algo que no está relacionado con la gestión de su negocio, responde amablemente que tu especialidad es el éxito de su empresa y desvía la conversación.
     `;
 
-    console.log('Messages count:', sanitizedMessages.length);
+    // Convert UI messages to model messages
+    const modelMessages = await convertToModelMessages(messages || []);
 
     const result = streamText({
       model: groq('llama-3.3-70b-versatile'),
       system: systemPrompt,
-      messages: sanitizedMessages,
+      messages: modelMessages,
     });
 
-    return result.toDataStreamResponse();
+    return result.toUIMessageStreamResponse();
   } catch (error: unknown) {
     const err = error as { message?: string };
     console.error('Groq API Error Detail:', err?.message || error);
