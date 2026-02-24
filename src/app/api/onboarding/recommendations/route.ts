@@ -1,6 +1,5 @@
 import { createGroq } from '@ai-sdk/groq';
-import { generateObject } from 'ai';
-import { z } from 'zod';
+import { generateText } from 'ai';
 import { createClient } from '@supabase/supabase-js';
 
 export async function POST(req: Request) {
@@ -25,24 +24,40 @@ export async function POST(req: Request) {
       
       Las recomendaciones deben ser extremadamente específicas para este tipo de negocio.
       Usa español chileno profesional pero directo. No uses saludos.
+
+      MUY IMPORTANTE: Tu respuesta final debe ser EXCLUSIVAMENTE un bloque JSON válido con el siguiente formato exacto. No incluyas markdown (como \`\`\`json), ni saludos, ni ningún otro texto antes o después. 
+
+      {
+        "recommendations": [
+          {
+            "type": "opportunity", // puede ser "opportunity", "critical", o "suggestion"
+            "title": "título corto de máximo 6 palabras",
+            "description": "descripción detallada de máximo 2 oraciones"
+          }
+        ]
+      }
     `;
 
-        // Usamos generateObject para asegurar un formato estricto JSON
-        const { object } = await generateObject({
+        // Usamos generateText y parseo manual ya que Groq falla con json_schema en este modelo
+        const { text } = await generateText({
             model: groq('llama-3.3-70b-versatile'),
             system: systemPrompt,
-            schema: z.object({
-                recommendations: z.array(z.object({
-                    type: z.enum(['opportunity', 'critical', 'suggestion']),
-                    title: z.string().describe('Título corto de la recomendación, máximo 6 palabras'),
-                    description: z.string().describe('Descripción detallada de por qué este KPI/estrategia es clave, máximo 2 oraciones')
-                })).length(5, "Debe generar exactamente 5 recomendaciones")
-            }),
-            prompt: "Genera las recomendaciones ahora.",
+            prompt: "Genera el JSON de recomendaciones estratégicas ahora.",
         });
 
+        // Limpiar posible markdown wrapper de la respuesta de Groq
+        const cleanJson = text.replace(/```json\n?/, '').replace(/```/, '').trim();
+        let parsedResult;
+
+        try {
+            parsedResult = JSON.parse(cleanJson);
+        } catch (e) {
+            console.error("Groq JSON parsing failed. Output was:", text);
+            throw new Error("Invalid output format from AI");
+        }
+
         // Validar el array
-        if (!object.recommendations || object.recommendations.length === 0) {
+        if (!parsedResult.recommendations || parsedResult.recommendations.length === 0) {
             throw new Error('No recommendations generated');
         }
 
@@ -54,7 +69,7 @@ export async function POST(req: Request) {
         );
 
         // Insertar en la BD
-        const recommendationsToInsert = object.recommendations.map(rec => ({
+        const recommendationsToInsert = parsedResult.recommendations.map((rec: any) => ({
             company_id: companyId,
             type: rec.type,
             title: rec.title,
@@ -71,7 +86,7 @@ export async function POST(req: Request) {
             throw new Error('Failed to save recommendations');
         }
 
-        return new Response(JSON.stringify({ success: true, count: object.recommendations.length }), {
+        return new Response(JSON.stringify({ success: true, count: parsedResult.recommendations.length }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         });
