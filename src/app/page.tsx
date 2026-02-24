@@ -1,33 +1,36 @@
 import Link from 'next/link'
-import { Package, ShoppingCart, Users, Sparkles, BarChart3, Shield, Zap, ArrowRight, Check } from 'lucide-react'
+import { ArrowRight, Check, BarChart3, Bot, Plug, Zap } from 'lucide-react'
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#F9FAFA]">
-      {/* Navigation */}
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]" style={{ fontFamily: "'Inter', sans-serif" }}>
+      {/* ============ NAVIGATION ============ */}
       <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0f113a] to-[#4366A5] flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-xl font-bold text-[#0f113a] tracking-tight">Talisto.</span>
-            </div>
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-sm text-gray-600 hover:text-[#0f113a] transition-colors">Funciones</a>
-              <a href="#pricing" className="text-sm text-gray-600 hover:text-[#0f113a] transition-colors">Planes</a>
-              <a href="#testimonials" className="text-sm text-gray-600 hover:text-[#0f113a] transition-colors">Testimonios</a>
+            <span className="text-2xl font-extrabold bg-gradient-to-r from-emerald-500 to-emerald-400 bg-clip-text text-transparent tracking-tight" style={{ fontFamily: "'Outfit', sans-serif" }}>
+              TALISTO
+            </span>
+            <div className="hidden md:flex items-center gap-2">
+              <a href="#funcionalidades" className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all">
+                Funcionalidades
+              </a>
+              <a href="#precios" className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all">
+                Precios
+              </a>
+              <a href="#como-funciona" className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all">
+                Cómo Funciona
+              </a>
             </div>
             <div className="flex items-center gap-3">
-              <Link href="/login" className="text-sm font-medium text-[#0f113a] hover:text-[#4366A5] transition-colors">
+              <Link href="/login" className="hidden sm:inline-flex px-4 py-2 text-sm font-semibold text-slate-700 border-2 border-slate-200 rounded-xl hover:border-emerald-500 hover:text-emerald-600 transition-all">
                 Iniciar Sesión
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-[#0f113a] rounded-lg hover:bg-[#1a1d4a] transition-all duration-200 shadow-sm hover:shadow-md"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300"
               >
-                Comenzar Gratis
+                Empezar Gratis
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -35,362 +38,316 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-to-br from-[#8ecfcd]/20 via-[#4366A5]/10 to-transparent rounded-full blur-3xl" />
-          <div className="absolute top-40 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-[#4366A5]/10 to-transparent rounded-full blur-3xl" />
+      {/* ============ HERO SECTION ============ */}
+      <section className="relative pt-24 pb-20 overflow-hidden" style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1a2642 50%, #1E293B 100%)' }}>
+        {/* Animated radial glow */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-[-50%] right-[-50%] w-[200%] h-[200%] opacity-100" style={{ background: 'radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%)', animation: 'spin 20s linear infinite' }} />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 text-xs font-medium text-[#4366A5] bg-[#4366A5]/10 rounded-full border border-[#4366A5]/20">
-              <Sparkles className="w-3.5 h-3.5" />
-              Potenciado con Inteligencia Artificial
-            </div>
-
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#0f113a] tracking-tight leading-[1.1]">
-              Gestiona tu negocio{' '}
-              <span className="relative">
-                <span className="bg-gradient-to-r from-[#4366A5] to-[#8ecfcd] bg-clip-text text-transparent">
-                  de forma inteligente
-                </span>
-                <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 300 12" fill="none">
-                  <path d="M2 8C50 2 100 2 150 6C200 10 250 4 298 8" stroke="#8ecfcd" strokeWidth="3" strokeLinecap="round" opacity="0.5" />
-                </svg>
-              </span>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-20">
+          <div className="text-center text-white">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style={{ fontFamily: "'Outfit', sans-serif" }}>
+              Tu negocio,<br />
+              <span className="text-emerald-400">todo listo, todo claro</span>
             </h1>
-
-            <p className="mt-8 text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Inventario, ventas, CRM y sugerencias de IA — todo en una plataforma diseñada
-              para PyMEs chilenas que quieren crecer sin complicaciones.
+            <p className="text-lg sm:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Conecta todas tus fuentes de datos, genera dashboards automáticos y recibe
+              recomendaciones inteligentes para tomar las mejores decisiones.
             </p>
 
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold text-white bg-[#0f113a] rounded-xl hover:bg-[#1a1d4a] transition-all duration-300 shadow-lg shadow-[#0f113a]/25 hover:shadow-xl hover:shadow-[#0f113a]/30 hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-white bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300"
               >
                 Empezar Gratis
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <a
-                href="#features"
-                className="inline-flex items-center gap-2 px-8 py-3.5 text-base font-medium text-[#0f113a] bg-white rounded-xl border border-gray-200 hover:border-[#8ecfcd] hover:bg-[#8ecfcd]/5 transition-all duration-200"
+                href="#funcionalidades"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-base font-semibold text-white bg-white/10 border border-white/30 rounded-xl hover:bg-white/20 transition-all duration-300"
               >
-                Ver Funciones
+                Ver Demo
               </a>
             </div>
 
-            <p className="mt-4 text-xs text-gray-400">
-              Sin tarjeta de crédito · Setup en 2 minutos · Cancela cuando quieras
-            </p>
-          </div>
-
-          {/* Dashboard Preview Mock */}
-          <div className="mt-16 max-w-5xl mx-auto">
-            <div className="relative rounded-xl border border-gray-200 bg-white shadow-2xl shadow-gray-200/50 overflow-hidden">
-              <div className="flex items-center gap-1.5 px-4 py-3 bg-gray-50 border-b border-gray-100">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                <div className="w-3 h-3 rounded-full bg-green-400" />
-                <span className="ml-3 text-xs text-gray-400">app.talisto.cl</span>
-              </div>
-              <div className="p-6 sm:p-8">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  {[
-                    { label: 'Ingresos', value: '$4.250.000', color: 'from-[#0f113a] to-[#4366A5]' },
-                    { label: 'MRR', value: '$890.000', color: 'from-emerald-500 to-emerald-600' },
-                    { label: 'Clientes', value: '+127', color: 'from-[#4366A5] to-[#8ecfcd]' },
-                    { label: 'Productos', value: '84', color: 'from-amber-500 to-orange-500' },
-                  ].map((stat) => (
-                    <div key={stat.label} className="rounded-lg border border-gray-100 p-4">
-                      <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
-                      <p className={`text-xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
-                        {stat.value}
-                      </p>
-                    </div>
-                  ))}
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-8 mt-16 sm:mt-20 max-w-4xl mx-auto">
+              {[
+                { value: '15+', label: 'Horas ahorradas/semana' },
+                { value: '10-30%', label: 'Aumento en ganancias' },
+                { value: '24/7', label: 'IA analizando datos' },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <div className="text-3xl sm:text-5xl font-bold text-emerald-400" style={{ fontFamily: "'Outfit', sans-serif" }}>{stat.value}</div>
+                  <div className="text-gray-400 mt-2 text-sm sm:text-base">{stat.label}</div>
                 </div>
-                {/* Mini chart bars */}
-                <div className="flex items-end gap-1.5 h-24">
-                  {[40, 65, 45, 80, 55, 90, 70, 85, 60, 95, 75, 88].map((h, i) => (
-                    <div
-                      key={i}
-                      className="flex-1 rounded-t-sm bg-gradient-to-t from-[#4366A5] to-[#8ecfcd] opacity-80"
-                      style={{ height: `${h}%` }}
-                    />
-                  ))}
-                </div>
-                <div className="flex justify-between mt-2 text-[10px] text-gray-400">
-                  <span>Ene</span><span>Feb</span><span>Mar</span><span>Abr</span><span>May</span><span>Jun</span>
-                  <span>Jul</span><span>Ago</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dic</span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-24 bg-white">
+      {/* ============ FEATURES SECTION ============ */}
+      <section id="funcionalidades" className="py-20 sm:py-24" style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1a2642 50%, #1E293B 100%)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <p className="text-sm font-semibold text-[#4366A5] uppercase tracking-wider mb-3">Funcionalidades</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#0f113a]">
-              Todo lo que tu negocio necesita
-            </h2>
-            <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
-              Cada módulo trabaja en conjunto para darte una visión completa de tu operación.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              {
-                icon: Package,
-                title: 'Inventario Inteligente',
-                desc: 'Control de stock en tiempo real con alertas automáticas cuando tus productos llegan al mínimo.',
-                gradient: 'from-blue-500/10 to-cyan-500/10',
-                iconColor: 'text-blue-600',
-              },
-              {
-                icon: ShoppingCart,
-                title: 'Gestión de Ventas',
-                desc: 'Registra ventas, visualiza tendencias y lleva el control de tu flujo de caja sin complicaciones.',
-                gradient: 'from-emerald-500/10 to-green-500/10',
-                iconColor: 'text-emerald-600',
-              },
-              {
-                icon: Users,
-                title: 'CRM Completo',
-                desc: 'Gestiona clientes, proyectos y relaciones comerciales desde un solo lugar centralizado.',
-                gradient: 'from-violet-500/10 to-purple-500/10',
-                iconColor: 'text-violet-600',
-              },
-              {
-                icon: Sparkles,
-                title: 'Sugerencias con IA',
-                desc: 'Chatea con tu asistente de IA que analiza tus datos en tiempo real y te da recomendaciones accionables.',
-                gradient: 'from-amber-500/10 to-orange-500/10',
-                iconColor: 'text-amber-600',
-              },
-              {
-                icon: BarChart3,
-                title: 'Dashboard en Vivo',
-                desc: 'Métricas clave, gráficos de rendimiento y alertas de stock bajo — todo al instante.',
-                gradient: 'from-rose-500/10 to-pink-500/10',
-                iconColor: 'text-rose-600',
-              },
-              {
-                icon: Shield,
-                title: 'Seguridad Empresarial',
-                desc: 'Row Level Security en cada tabla. Tus datos están aislados y protegidos a nivel de base de datos.',
-                gradient: 'from-slate-500/10 to-gray-500/10',
-                iconColor: 'text-slate-600',
-              },
+              { icon: '📊', title: 'Dashboards Automáticos', desc: 'Conecta tus fuentes y genera reportes profesionales al instante' },
+              { icon: '🤖', title: 'Recomendaciones IA', desc: 'La IA analiza tus datos y te dice exactamente qué hacer' },
+              { icon: '🔌', title: 'Multi-Integración', desc: 'Excel, Shopify, Mercado Libre, Bsale y más en un solo lugar' },
             ].map((feature) => (
               <div
                 key={feature.title}
-                className="group relative p-6 rounded-2xl border border-gray-100 hover:border-[#8ecfcd]/50 bg-white hover:shadow-lg hover:shadow-[#8ecfcd]/10 transition-all duration-300"
+                className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               >
-                <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${feature.gradient} mb-4`}>
-                  <feature.icon className={`w-6 h-6 ${feature.iconColor}`} />
-                </div>
-                <h3 className="text-lg font-semibold text-[#0f113a] mb-2">{feature.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{feature.desc}</p>
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-bold mb-3" style={{ fontFamily: "'Outfit', sans-serif" }}>{feature.title}</h3>
+                <p className="text-gray-600">{feature.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-24 bg-[#F9FAFA]">
+      {/* ============ CÓMO FUNCIONA ============ */}
+      <section id="como-funciona" className="py-20 sm:py-24" style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1a2642 50%, #1E293B 100%)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <p className="text-sm font-semibold text-[#4366A5] uppercase tracking-wider mb-3">Planes</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#0f113a]">
-              Simple y transparente
-            </h2>
-            <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
-              Empieza gratis y escala cuando lo necesites. Sin sorpresas.
-            </p>
+            <h2 className="text-3xl sm:text-5xl font-bold text-white mb-4" style={{ fontFamily: "'Outfit', sans-serif" }}>¿Cómo funciona?</h2>
+            <p className="text-lg sm:text-xl text-gray-300">De datos dispersos a decisiones claras en 4 pasos</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Free Plan */}
-            <div className="relative rounded-2xl border border-gray-200 bg-white p-8">
-              <h3 className="text-lg font-semibold text-[#0f113a]">Starter</h3>
-              <p className="text-sm text-gray-500 mt-1">Para emprendedores que comienzan</p>
-              <div className="mt-6">
-                <span className="text-4xl font-bold text-[#0f113a]">$0</span>
-                <span className="text-gray-500">/mes</span>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { icon: '🔌', step: 1, title: 'Conectas', desc: 'Sube Excel, conecta Shopify, Mercado Libre, Bsale. Todo en 5 minutos.' },
+              { icon: '📊', step: 2, title: 'Dashboard Automático', desc: 'Se crea solo según tu industria. Ventas, inventario, KPIs, todo listo.' },
+              { icon: '🤖', step: 3, title: 'IA Recomienda', desc: 'Analiza 24/7 y te dice qué hacer: ordenar stock, hacer promos, crear combos.' },
+              { icon: '⚡', step: 4, title: 'Ejecutas', desc: 'Con 1 click: crear órdenes, aplicar descuentos, enviar emails. Todo desde Talisto.' },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
+                  <div className="text-5xl sm:text-6xl mb-4">{item.icon}</div>
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-emerald-500 text-white text-xl sm:text-2xl font-bold flex items-center justify-center mx-auto mb-4">
+                    {item.step}
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-bold mb-3" style={{ fontFamily: "'Outfit', sans-serif" }}>{item.title}</h3>
+                  <p className="text-gray-600 text-sm">{item.desc}</p>
+                </div>
               </div>
-              <ul className="mt-8 space-y-3">
-                {['Hasta 50 productos', 'Registro de ventas', '1 usuario', 'Dashboard básico'].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                    <Check className="w-4 h-4 text-[#8ecfcd] flex-shrink-0" />
-                    {f}
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              href="/signup"
+              className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300"
+            >
+              Probar Gratis Ahora
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <p className="text-gray-300 text-sm mt-4">✓ Sin tarjeta de crédito • ✓ Setup en 10 minutos • ✓ Cancela cuando quieras</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ PRICING SECTION ============ */}
+      <section id="precios" className="py-20 sm:py-24" style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1a2642 50%, #1E293B 100%)' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-5xl font-bold text-white mb-4" style={{ fontFamily: "'Outfit', sans-serif" }}>Precios transparentes</h2>
+            <p className="text-lg sm:text-xl text-gray-300">Elige el plan perfecto para tu empresa</p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Plan Básico */}
+            <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>Básico</h3>
+                <p className="text-gray-600 text-sm mb-4">Para empezar</p>
+                <div className="text-5xl font-bold text-[#0F172A] mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>$35.000</div>
+                <div className="text-gray-600">CLP/mes</div>
+              </div>
+              <ul className="space-y-3 mb-8">
+                {['1 usuario', '3 fuentes de datos', '5 dashboards', '10 recomendaciones IA/mes', 'Datos hasta 1 año', 'Soporte por email'].map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <span className="text-emerald-500 text-xl leading-none">✓</span>
+                    <span className="text-sm">{f}</span>
                   </li>
                 ))}
               </ul>
               <Link
                 href="/signup"
-                className="mt-8 block text-center px-6 py-2.5 text-sm font-medium text-[#0f113a] bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="block w-full text-center px-6 py-3 text-sm font-semibold text-[#0F172A] bg-white border-2 border-slate-200 rounded-xl hover:border-emerald-500 hover:text-emerald-600 transition-all"
               >
-                Comenzar Gratis
+                Empezar Gratis
               </Link>
             </div>
 
-            {/* Pro Plan - Highlighted */}
-            <div className="relative rounded-2xl border-2 border-[#4366A5] bg-white p-8 shadow-xl shadow-[#4366A5]/10">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r from-[#4366A5] to-[#8ecfcd] rounded-full">
-                  Más Popular
+            {/* Plan Pro - DESTACADO */}
+            <div className="relative bg-white rounded-2xl p-8 border-4 border-emerald-500 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 sm:-mt-4 sm:mb-0">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                <span className="bg-emerald-500 text-white px-6 py-1.5 rounded-full font-bold text-sm shadow-lg whitespace-nowrap">
+                  ⭐ MÁS POPULAR
                 </span>
               </div>
-              <h3 className="text-lg font-semibold text-[#0f113a]">Pro</h3>
-              <p className="text-sm text-gray-500 mt-1">Para negocios en crecimiento</p>
-              <div className="mt-6">
-                <span className="text-4xl font-bold text-[#0f113a]">$29.990</span>
-                <span className="text-gray-500">/mes</span>
+              <div className="text-center mb-6 pt-2">
+                <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>Pro</h3>
+                <p className="text-gray-600 text-sm mb-4">Para crecer</p>
+                <div className="text-5xl font-bold text-emerald-500 mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>$75.000</div>
+                <div className="text-gray-600">CLP/mes</div>
               </div>
-              <ul className="mt-8 space-y-3">
-                {['Productos ilimitados', 'CRM completo', 'Hasta 5 usuarios', 'Sugerencias con IA', 'Soporte prioritario'].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                    <Check className="w-4 h-4 text-[#4366A5] flex-shrink-0" />
-                    {f}
+              <ul className="space-y-3 mb-8">
+                {['5 usuarios', 'Fuentes ilimitadas', 'Dashboards ilimitados', 'Recomendaciones IA ilimitadas', 'Datos históricos completos', 'Acciones con 1 click', 'Alertas automáticas', 'Soporte prioritario'].map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <span className="text-emerald-500 text-xl leading-none font-bold">✓</span>
+                    <span className="text-sm font-semibold">{f}</span>
                   </li>
                 ))}
               </ul>
               <Link
                 href="/signup"
-                className="mt-8 block text-center px-6 py-2.5 text-sm font-medium text-white bg-[#0f113a] rounded-lg hover:bg-[#1a1d4a] transition-colors shadow-sm"
+                className="block w-full text-center px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-xl shadow-md shadow-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/40 transition-all"
               >
-                Empezar con Pro
+                Empezar Gratis
               </Link>
             </div>
 
-            {/* Enterprise Plan */}
-            <div className="relative rounded-2xl border border-gray-200 bg-white p-8">
-              <h3 className="text-lg font-semibold text-[#0f113a]">Enterprise</h3>
-              <p className="text-sm text-gray-500 mt-1">Para operaciones grandes</p>
-              <div className="mt-6">
-                <span className="text-4xl font-bold text-[#0f113a]">$79.990</span>
-                <span className="text-gray-500">/mes</span>
+            {/* Plan Enterprise */}
+            <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>Enterprise</h3>
+                <p className="text-gray-600 text-sm mb-4">Personalizado</p>
+                <div className="text-5xl font-bold text-[#0F172A] mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>Custom</div>
+                <div className="text-gray-600">Desde $150k/mes</div>
               </div>
-              <ul className="mt-8 space-y-3">
-                {['Todo en Pro', 'Usuarios ilimitados', 'Integraciones API', 'SLA garantizado', 'Onboarding dedicado'].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                    <Check className="w-4 h-4 text-[#8ecfcd] flex-shrink-0" />
-                    {f}
+              <ul className="space-y-3 mb-8">
+                {['Todo de Pro +', 'Usuarios ilimitados', 'Integraciones personalizadas', 'IA entrenada para tu negocio', 'Análisis multi-sucursal', 'Gerente de cuenta dedicado', 'Soporte 24/7', 'Onboarding personalizado'].map((f) => (
+                  <li key={f} className="flex items-start gap-2">
+                    <span className="text-emerald-500 text-xl leading-none">✓</span>
+                    <span className="text-sm">{f}</span>
                   </li>
                 ))}
               </ul>
               <Link
                 href="/signup"
-                className="mt-8 block text-center px-6 py-2.5 text-sm font-medium text-[#0f113a] bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                className="block w-full text-center px-6 py-3 text-sm font-semibold text-[#0F172A] bg-white border-2 border-slate-200 rounded-xl hover:border-emerald-500 hover:text-emerald-600 transition-all"
               >
                 Contactar Ventas
               </Link>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <p className="text-sm font-semibold text-[#4366A5] uppercase tracking-wider mb-3">Testimonios</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#0f113a]">
-              Negocios que ya confían en Talisto
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                quote: 'Talisto nos ayudó a reducir las pérdidas de inventario en un 40%. La alerta de stock bajo es un salvavidas.',
-                name: 'Carolina Muñoz',
-                role: 'Dueña, Tienda Natural Vida',
-              },
-              {
-                quote: 'El asistente de IA me da insights que antes solo podía obtener contratando un analista. Increíble relación precio-valor.',
-                name: 'Andrés Soto',
-                role: 'Gerente, Distribuidora Lagos',
-              },
-              {
-                quote: 'Pasamos de usar Excel a Talisto en un día. La curva de aprendizaje es casi cero y el soporte es excelente.',
-                name: 'María José Reyes',
-                role: 'CFO, Importadora del Sur',
-              },
-            ].map((t) => (
-              <div key={t.name} className="rounded-2xl border border-gray-100 p-6 bg-white hover:shadow-md transition-shadow">
-                <div className="flex gap-1 mb-4">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <svg key={s} className="w-4 h-4 text-amber-400 fill-current" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <p className="text-sm text-gray-600 leading-relaxed italic">&ldquo;{t.quote}&rdquo;</p>
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-sm font-semibold text-[#0f113a]">{t.name}</p>
-                  <p className="text-xs text-gray-500">{t.role}</p>
-                </div>
-              </div>
-            ))}
+          <div className="text-center mt-12">
+            <p className="text-white text-lg mb-2">✓ Prueba gratis 14 días • ✓ Sin tarjeta de crédito • ✓ Cancela cuando quieras</p>
+            <p className="text-gray-400 text-sm">Todos los precios incluyen IVA</p>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-[#0f113a] relative overflow-hidden">
-        <div className="absolute inset-0 -z-0">
-          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#4366A5]/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-[#8ecfcd]/10 rounded-full blur-3xl" />
-        </div>
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">
-            ¿Listo para transformar tu negocio?
-          </h2>
-          <p className="mt-4 text-lg text-gray-300 max-w-xl mx-auto">
-            Únete a cientos de PyMEs chilenas que ya usan Talisto para crecer de forma inteligente.
-          </p>
-          <Link
-            href="/signup"
-            className="inline-flex items-center gap-2 mt-8 px-8 py-3.5 text-base font-semibold text-[#0f113a] bg-white rounded-xl hover:bg-gray-100 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-          >
-            Crear Cuenta Gratis
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+      {/* ============ CTA FINAL ============ */}
+      <section className="py-20 sm:py-24" style={{ background: 'linear-gradient(135deg, #0F172A 0%, #1a2642 50%, #1E293B 100%)' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative overflow-hidden rounded-3xl p-10 sm:p-16 text-center" style={{ background: 'linear-gradient(135deg, #10B981 0%, #059669 50%, #047857 100%)' }}>
+            {/* Decorative circles */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full -ml-48 -mb-48" />
+
+            <div className="relative z-10">
+              <h2 className="text-3xl sm:text-5xl font-bold text-white mb-6" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                ¿Listo para tener todo listo?
+              </h2>
+              <p className="text-xl sm:text-2xl text-white/90 mb-10 max-w-2xl mx-auto">
+                Únete a cientos de empresas chilenas que ya toman mejores decisiones con Talisto
+              </p>
+              <Link
+                href="/signup"
+                className="inline-flex items-center gap-2 bg-white text-emerald-700 px-10 sm:px-16 py-4 sm:py-5 rounded-xl font-bold text-lg sm:text-xl hover:scale-105 transition-transform shadow-2xl"
+              >
+                Empezar Gratis Ahora
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              <p className="text-white/90 text-sm sm:text-base mt-6 font-medium">
+                ✓ Setup en 10 minutos &nbsp;•&nbsp; ✓ Sin tarjeta de crédito &nbsp;•&nbsp; ✓ Cancela cuando quieras
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 bg-[#0a0c2e] border-t border-white/5">
+      {/* ============ FOOTER ============ */}
+      <footer className="bg-[#0F172A] text-gray-300 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#4366A5] to-[#8ecfcd] flex items-center justify-center">
-                <Zap className="w-3 h-3 text-white" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+            {/* Logo + Description */}
+            <div className="sm:col-span-2 lg:col-span-1">
+              <div className="text-3xl font-extrabold bg-gradient-to-r from-emerald-500 to-emerald-400 bg-clip-text text-transparent mb-4" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                TALISTO
               </div>
-              <span className="text-sm font-semibold text-white/80">Talisto.</span>
+              <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+                Tu negocio, todo listo, todo claro. La plataforma que une tus datos y te dice qué hacer.
+              </p>
             </div>
-            <div className="flex items-center gap-6 text-sm text-gray-400">
-              <a href="#features" className="hover:text-white transition-colors">Funciones</a>
-              <a href="#pricing" className="hover:text-white transition-colors">Planes</a>
-              <Link href="/login" className="hover:text-white transition-colors">Acceder</Link>
+
+            {/* Producto */}
+            <div>
+              <h4 className="font-bold text-white text-lg mb-5" style={{ fontFamily: "'Outfit', sans-serif" }}>Producto</h4>
+              <ul className="space-y-3">
+                {['Funcionalidades', 'Precios', 'Integraciones', 'Ver Demo', 'Casos de Éxito'].map((item) => (
+                  <li key={item}>
+                    <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors text-sm hover:translate-x-1 inline-block">
+                      → {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="text-xs text-gray-500">
-              © 2025 Talisto. Hecho con 💙 en Chile.
-            </p>
+
+            {/* Empresa */}
+            <div>
+              <h4 className="font-bold text-white text-lg mb-5" style={{ fontFamily: "'Outfit', sans-serif" }}>Empresa</h4>
+              <ul className="space-y-3">
+                {['Sobre Nosotros', 'Blog', 'Carreras', 'Contacto', 'Prensa'].map((item) => (
+                  <li key={item}>
+                    <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors text-sm hover:translate-x-1 inline-block">
+                      → {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h4 className="font-bold text-white text-lg mb-5" style={{ fontFamily: "'Outfit', sans-serif" }}>Legal & Soporte</h4>
+              <ul className="space-y-3">
+                {['Términos y Condiciones', 'Política de Privacidad', 'Centro de Ayuda', 'API Docs', 'Estado del Sistema'].map((item) => (
+                  <li key={item}>
+                    <a href="#" className="text-gray-400 hover:text-emerald-400 transition-colors text-sm hover:translate-x-1 inline-block">
+                      → {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="border-t border-gray-700 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="text-sm text-gray-400">
+              © 2025 <span className="text-white font-semibold">Talisto SpA</span>. Todos los derechos reservados.
+            </div>
+            <div className="flex gap-6 text-sm items-center">
+              <span className="text-gray-400">🇨🇱 Hecho en Chile con ❤️</span>
+              <a href="mailto:hola@talisto.cl" className="text-emerald-400 hover:text-emerald-300 transition font-semibold">
+                hola@talisto.cl
+              </a>
+            </div>
           </div>
         </div>
       </footer>
     </div>
   )
 }
+

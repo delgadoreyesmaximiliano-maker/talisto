@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,7 +15,7 @@ interface ChatInterfaceProps {
 }
 
 export function ChatInterface({ contextData }: ChatInterfaceProps) {
-    const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    const { messages, input, handleInputChange, handleSubmit, status } = useChat({
         api: '/api/chat',
         body: {
             data: contextData
@@ -24,10 +24,13 @@ export function ChatInterface({ contextData }: ChatInterfaceProps) {
             {
                 id: 'welcome',
                 role: 'assistant',
-                content: '¡Hola! 🇨🇱 Soy tu asistente de inventario y ventas con Inteligencia Artificial. He revisado tus datos actuales. ¿En qué te puedo ayudar hoy? ¿Quieres saber qué productos están con stock bajo o qué se ha vendido más?'
+                content: '¡Hola! 🇨🇱 Soy tu asistente de inventario y ventas con Inteligencia Artificial. He revisado tus datos actuales. ¿En qué te puedo ayudar hoy? ¿Quieres saber qué productos están con stock bajo o qué se ha vendido más?',
+                parts: [{ type: 'text', text: '¡Hola! 🇨🇱 Soy tu asistente de inventario y ventas con Inteligencia Artificial. He revisado tus datos actuales. ¿En qué te puedo ayudar hoy? ¿Quieres saber qué productos están con stock bajo o qué se ha vendido más?' }],
             }
         ]
     })
+
+    const isLoading = status === 'submitted' || status === 'streaming'
 
     // Auto-scroll to bottom
     const scrollRef = useRef<HTMLDivElement>(null)
@@ -36,6 +39,17 @@ export function ChatInterface({ contextData }: ChatInterfaceProps) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight
         }
     }, [messages])
+
+    const getMessageText = (m: any): string => {
+        if (typeof m.content === 'string') return m.content
+        if (Array.isArray(m.parts)) {
+            return m.parts
+                .filter((p: any) => p.type === 'text')
+                .map((p: any) => p.text)
+                .join('')
+        }
+        return ''
+    }
 
     return (
         <Card className="flex flex-col h-[600px] border-2 border-primary/10 shadow-lg">
@@ -48,7 +62,6 @@ export function ChatInterface({ contextData }: ChatInterfaceProps) {
             <CardContent className="flex-1 p-4 overflow-hidden">
                 <ScrollArea ref={scrollRef} className="h-full pr-4">
                     <div className="flex flex-col gap-4 pb-4">
-                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {messages.map((m: any) => (
                             <div
                                 key={m.id}
@@ -66,9 +79,9 @@ export function ChatInterface({ contextData }: ChatInterfaceProps) {
                                         }`}
                                 >
                                     {m.role === 'user' ? (
-                                        m.content
+                                        getMessageText(m)
                                     ) : (
-                                        <ReactMarkdown>{m.content}</ReactMarkdown>
+                                        <ReactMarkdown>{getMessageText(m)}</ReactMarkdown>
                                     )}
                                 </div>
                             </div>
@@ -98,7 +111,7 @@ export function ChatInterface({ contextData }: ChatInterfaceProps) {
                         className="flex-1 bg-background"
                         disabled={isLoading}
                     />
-                    <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
+                    <Button type="submit" size="icon" disabled={isLoading || !input?.trim()}>
                         <Send className="h-4 w-4" />
                         <span className="sr-only">Enviar</span>
                     </Button>
