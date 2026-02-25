@@ -2,8 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, Settings, Package, ShoppingCart, Sparkles, Plug, Zap, ChevronRight } from "lucide-react"
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { getTrialStatus, getTrialUrgencyClasses } from '@/lib/utils/trial'
+import type { TrialStatus } from '@/types/database'
 
+import { LayoutDashboard, Users, Settings, Package, ShoppingCart, Sparkles, Plug, Zap, ChevronRight } from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
@@ -53,11 +57,71 @@ const navItems = [
 
 export function AppSidebar() {
     const pathname = usePathname()
+    // Trial logic implementation
+    const [trialStatus, setTrialStatus] = useState<TrialStatus>({
+        daysRemaining: 14,
+        isActive: true,
+        isExpired: false,
+        isExpiringSoon: false,
+        expiryDate: null,
+        message: 'Calculando...',
+        urgencyLevel: 'none',
+    })
+
+    useEffect(() => {
+        const supabase = createClient()
+
+        async function loadTrialStatus() {
+            try {
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) return
+
+                const { data: user, error: userError } = await supabase
+                    .from('users')
+                    .select(`
+                        company_id,
+                        companies (
+                            trial_ends_at,
+                            plan_status
+                        )
+                    `)
+                    .eq('id', session.user.id)
+                    .single()
+
+                if (userError) {
+                    console.error('Error loading trial status:', userError)
+                    return
+                }
+
+                const userObj = user as any;
+                if (userObj?.companies) {
+                    const companiesData = userObj.companies;
+                    const company = Array.isArray(companiesData) ? companiesData[0] : companiesData;
+                    if (company) {
+                        const status = getTrialStatus(
+                            company.trial_ends_at as string | null,
+                            company.plan_status as any
+                        )
+                        setTrialStatus(status)
+                    }
+                }
+            } catch (error) {
+                console.error('Trial status fetch failed:', error)
+            }
+        }
+
+        loadTrialStatus()
+        // Refresh every 5 minutes
+        const interval = setInterval(loadTrialStatus, 5 * 60 * 1000)
+        return () => clearInterval(interval)
+    }, [])
 
     const isActive = (url: string) => {
         if (url === '/app') return pathname === '/app'
         return pathname.startsWith(url)
     }
+
+    const urgencyClasses = getTrialUrgencyClasses(trialStatus.urgencyLevel)
 
     return (
         <Sidebar className="border-r-slate-800">
@@ -144,9 +208,11 @@ export function AppSidebar() {
                     <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-1">Tu Plan</p>
                     <p className="text-xs font-bold text-white mb-2">Plan Pro (Trial)</p>
                     <div className="w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                        <div className="w-3/4 h-full bg-emerald-500" />
+                        <div className={`h-full transition-all duration-1000 ${urgencyClasses.bar} ${urgencyClasses.pulse_bar ? 'animate-pulse' : ''}`} style={{ width: `${Math.max(5, (trialStatus.daysRemaining / 14) * 100)}%` }} />
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-2">12 días restantes</p>
+                    <p className={`text-[10px] mt-2 transition-colors ${urgencyClasses.text} ${trialStatus.isExpiringSoon ? 'animate-pulse' : ''}`}>
+                        {trialStatus.message}
+                    </p>
                 </div>
             </SidebarFooter>
         </Sidebar>

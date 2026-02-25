@@ -123,6 +123,10 @@ export default function CompanySetupPage() {
 
             // 1. Crear empresa y usuario
             const companyId = crypto.randomUUID()
+            const trialStartDate = new Date()
+            const trialEndDate = new Date(trialStartDate)
+            trialEndDate.setDate(trialEndDate.getDate() + 14) // 14-day trial
+
             const settings = {
                 actividad: formData.actividad,
                 tamano_equipo: formData.tamano_equipo,
@@ -137,6 +141,8 @@ export default function CompanySetupPage() {
                         name: formData.name,
                         industry: formData.industry,
                         plan: 'basic',
+                        plan_status: 'trial',
+                        trial_ends_at: trialEndDate.toISOString(),
                         settings: settings
                     }
                 ] as any)

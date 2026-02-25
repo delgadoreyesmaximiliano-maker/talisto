@@ -16,6 +16,10 @@ export interface Database {
                     rut: string | null
                     industry: 'ecommerce' | 'saas' | 'retail' | 'marketing' | 'restaurant' | 'services'
                     plan: 'basic' | 'pro' | 'enterprise'
+                    plan_status: 'trial' | 'active' | 'expired' | 'cancelled'
+                    trial_ends_at: string | null
+                    subscription_started_at: string | null
+                    last_payment_date: string | null
                     created_at: string
                     settings: Json
                 }
@@ -25,6 +29,10 @@ export interface Database {
                     rut?: string | null
                     industry: 'ecommerce' | 'saas' | 'retail' | 'marketing' | 'restaurant' | 'services'
                     plan?: 'basic' | 'pro' | 'enterprise'
+                    plan_status?: 'trial' | 'active' | 'expired' | 'cancelled'
+                    trial_ends_at?: string | null
+                    subscription_started_at?: string | null
+                    last_payment_date?: string | null
                     created_at?: string
                     settings?: Json
                 }
@@ -34,6 +42,10 @@ export interface Database {
                     rut?: string | null
                     industry?: 'ecommerce' | 'saas' | 'retail' | 'marketing' | 'restaurant' | 'services'
                     plan?: 'basic' | 'pro' | 'enterprise'
+                    plan_status?: 'trial' | 'active' | 'expired' | 'cancelled'
+                    trial_ends_at?: string | null
+                    subscription_started_at?: string | null
+                    last_payment_date?: string | null
                     created_at?: string
                     settings?: Json
                 }
@@ -369,3 +381,13 @@ export type IntegrationUpdate = Database['public']['Tables']['integrations']['Up
 export type AIRecommendation = Database['public']['Tables']['ai_recommendations']['Row']
 export type AIRecommendationInsert = Database['public']['Tables']['ai_recommendations']['Insert']
 export type AIRecommendationUpdate = Database['public']['Tables']['ai_recommendations']['Update']
+
+export type TrialStatus = {
+    daysRemaining: number;
+    isActive: boolean;
+    isExpired: boolean;
+    isExpiringSoon: boolean; // < 3 days remaining
+    expiryDate: Date | null;
+    message: string;
+    urgencyLevel: 'none' | 'low' | 'medium' | 'high' | 'critical';
+};
