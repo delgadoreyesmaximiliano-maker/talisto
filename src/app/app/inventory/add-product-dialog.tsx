@@ -17,6 +17,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog'
 import { Plus } from 'lucide-react'
+import { toast } from 'sonner'
 
 export function AddProductDialog() {
     const [open, setOpen] = useState(false)
@@ -40,12 +41,18 @@ export function AddProductDialog() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        if (!formData.name || !formData.sku) {
+            toast.warning('⚠️ Completa todos los campos obligatorios')
+            return
+        }
+
         setLoading(true)
 
         // 1. Get user to find company_id
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
-            alert("No authenticated user found.")
+            toast.error("No authenticated user found.")
             setLoading(false)
             return
         }
@@ -59,7 +66,7 @@ export function AddProductDialog() {
         const companyId = (userProfile as any)?.company_id
 
         if (!companyId) {
-            alert("No company profile linked to this user.")
+            toast.error("No company profile linked to this user.")
             setLoading(false)
             return
         }
@@ -90,10 +97,11 @@ export function AddProductDialog() {
                 stock_current: '0',
                 stock_minimum: '0',
             })
+            toast.success('✅ Producto creado exitosamente')
             router.refresh()
         } else {
             console.error(error)
-            alert("Error saving product")
+            toast.error('❌ Error al crear producto. Intenta de nuevo.')
         }
     }
 

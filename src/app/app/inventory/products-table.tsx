@@ -33,6 +33,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { toast } from 'sonner'
 
 export function ProductsTable() {
     const supabase = createClient()
@@ -78,14 +79,21 @@ export function ProductsTable() {
     const handleDelete = async () => {
         if (!productToDelete) return
 
-        await supabase
+        const { error } = await supabase
             .from('products')
             .delete()
             .eq('id', productToDelete.id)
 
         setDeleteDialogOpen(false)
         setProductToDelete(null)
-        fetchProducts()
+
+        if (!error) {
+            toast.success('🗑️ Producto eliminado')
+            fetchProducts()
+        } else {
+            toast.error('❌ Error al eliminar. Intenta de nuevo.')
+            console.error(error)
+        }
     }
 
     const filteredProducts = products.filter(p =>
@@ -159,20 +167,21 @@ export function ProductsTable() {
                                     <TableCell>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
                                                     <span className="sr-only">Open menu</span>
                                                     <MoreHorizontal className="h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                                                <DropdownMenuItem onClick={() => alert("Función Editar en progreso!")}>
+                                                <DropdownMenuItem onClick={(e) => { e.stopPropagation(); alert("Función Editar en progreso!"); }}>
                                                     <Edit className="mr-2 h-4 w-4" /> Editar Producto
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem
                                                     className="text-destructive focus:bg-destructive/10 focus:text-destructive"
-                                                    onClick={() => {
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
                                                         setProductToDelete(product)
                                                         setDeleteDialogOpen(true)
                                                     }}

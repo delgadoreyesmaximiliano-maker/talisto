@@ -105,13 +105,38 @@ export function ChatInterface({ contextData }: ChatInterfaceProps) {
                             </div>
                         ))}
                         {isLoading && (
-                            <div className="flex items-start gap-3">
-                                <div className="p-2 rounded-full bg-muted flex-shrink-0">
-                                    <Bot className="w-4 h-4 text-amber-500 animate-pulse" />
+                            <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200 animate-in fade-in duration-300">
+                                {/* Typing dots animation */}
+                                <div className="flex gap-1">
+                                    <div
+                                        className="w-2 h-2 rounded-full animate-bounce"
+                                        style={{
+                                            backgroundColor: '#10B981',
+                                            animationDelay: '0ms',
+                                            animationDuration: '1s'
+                                        }}
+                                    />
+                                    <div
+                                        className="w-2 h-2 rounded-full animate-bounce"
+                                        style={{
+                                            backgroundColor: '#10B981',
+                                            animationDelay: '150ms',
+                                            animationDuration: '1s'
+                                        }}
+                                    />
+                                    <div
+                                        className="w-2 h-2 rounded-full animate-bounce"
+                                        style={{
+                                            backgroundColor: '#10B981',
+                                            animationDelay: '300ms',
+                                            animationDuration: '1s'
+                                        }}
+                                    />
                                 </div>
-                                <div className="bg-muted/50 border text-muted-foreground rounded-xl rounded-tl-sm px-4 py-3 text-sm">
-                                    <span className="animate-pulse">Analizando tus datos...</span>
-                                </div>
+
+                                <span className="text-sm text-gray-600 font-medium">
+                                    Tali está pensando...
+                                </span>
                             </div>
                         )}
                     </div>

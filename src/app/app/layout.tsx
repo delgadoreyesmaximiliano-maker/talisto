@@ -44,7 +44,7 @@ export default async function AppLayout({
                     )}
                 </main>
             </SidebarProvider>
-            <Toaster position="bottom-right" richColors closeButton />
+            <Toaster position="bottom-right" richColors expand={false} duration={3000} theme="light" closeButton />
         </>
     );
 }
