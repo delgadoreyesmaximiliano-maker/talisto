@@ -21,6 +21,7 @@ const config: Config = {
 				'surface-dark': '#1c2721',
 				'border-dark': '#283930',
 				'primary-dark': '#0fa862',
+				whatsapp: '#25D366',
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'

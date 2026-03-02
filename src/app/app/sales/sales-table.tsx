@@ -242,6 +242,8 @@ export function SalesTable() {
                                 <TableHead
                                     className="text-secondary font-medium cursor-pointer select-none hover:text-white transition-colors"
                                     onClick={() => toggleSort('created_at')}
+                                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('created_at'))}
+                                    role="button" tabIndex={0}
                                 >
                                     Fecha <SortIcon col="created_at" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
@@ -252,6 +254,8 @@ export function SalesTable() {
                                 <TableHead
                                     className="text-right text-secondary font-medium cursor-pointer select-none hover:text-white transition-colors"
                                     onClick={() => toggleSort('amount')}
+                                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('amount'))}
+                                    role="button" tabIndex={0}
                                 >
                                     Monto Total <SortIcon col="amount" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>

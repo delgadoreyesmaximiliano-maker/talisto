@@ -1,7 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 import { AddProductDialog } from './add-product-dialog'
 import { ProductsTable } from './products-table'
 import { ExportButton } from './export-button'
+import { ReceiveStockDialog } from './receive-stock-dialog'
 
 export default function InventoryPage() {
     return (
@@ -15,13 +16,14 @@ export default function InventoryPage() {
                 </div>
                 <div className="flex items-center gap-2">
                     <ExportButton />
+                    <ReceiveStockDialog />
                     <AddProductDialog />
                 </div>
             </div>
 
             <Card className="glass-panel border-none shadow-sm rounded-3xl overflow-hidden">
                 <CardHeader className="border-b border-border-dark px-8 py-6">
-                    <CardTitle className="text-lg font-extrabold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>Lista de Productos</CardTitle>
+                    <p className="text-lg font-extrabold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>Lista de Productos</p>
                     <CardDescription className="text-secondary font-medium">
                         Una lista de todos tus productos dados de alta.
                     </CardDescription>

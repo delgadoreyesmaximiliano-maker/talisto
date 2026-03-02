@@ -3,7 +3,7 @@
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { Bot, User, Send, Sparkles, Loader2 } from 'lucide-react'
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import {
     BarChart,
@@ -32,14 +32,26 @@ const formatTooltipValue = (value: any) => [`$${Number(value ?? 0).toLocaleStrin
 
 export function ChatClient() {
     const [inputValue, setInputValue] = useState('')
+    const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
     // Context data is now fetched server-side in /api/chat — no client data needed
     const transport = useMemo(() => new DefaultChatTransport({
         api: '/api/chat',
     }), [])
 
+    const handleError = useCallback(async (error: Error) => {
+        // Try to parse the error body for a user-friendly message
+        try {
+            const body = JSON.parse(error.message)
+            setErrorMessage(body?.error || 'Ocurrió un error. Intenta de nuevo.')
+        } catch {
+            setErrorMessage('Ocurrió un error. Intenta de nuevo.')
+        }
+    }, [])
+
     const { messages, sendMessage, status } = useChat({
         transport,
+        onError: handleError,
         messages: [
             {
                 id: 'welcome',
@@ -75,6 +87,7 @@ export function ChatClient() {
         e.preventDefault()
         const text = inputValue.trim()
         if (!text || isLoading) return
+        setErrorMessage(null)
         sendMessage({ text })
         setInputValue('')
     }
@@ -195,6 +208,18 @@ export function ChatClient() {
                         </div>
                     </div>
                 ))}
+
+                {/* Rate limit / error message */}
+                {errorMessage && (
+                    <div className="flex w-full justify-start">
+                        <div className="glass-panel border-red-500/30 rounded-2xl px-6 py-4 flex items-center gap-3 bg-red-500/5 max-w-4xl w-full">
+                            <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 border border-red-500/40">
+                                <Bot className="w-4 h-4 text-red-400" />
+                            </div>
+                            <p className="text-sm text-red-400">{errorMessage}</p>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Input Area — naturally at the bottom, no fixed positioning */}

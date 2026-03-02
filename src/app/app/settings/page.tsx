@@ -7,8 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { User, Lock, Building2, Save } from 'lucide-react'
+import { User, Lock, Building2, Save, MessageSquareMore, CheckCircle2 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 
 export default function SettingsPage() {
@@ -22,6 +23,20 @@ export default function SettingsPage() {
         newPassword: '',
         confirmPassword: '',
     })
+
+    const [greenApiConfig, setGreenApiConfig] = useState({
+        instanceId: '',
+        apiToken: '',
+    })
+    const [whatsappPreferences, setWhatsappPreferences] = useState({
+        time: '08:00',
+        includeKpis: true,
+        includeStock: true,
+        includeSuggestions: true
+    })
+    const [greenApiLoading, setGreenApiLoading] = useState(false)
+    const [testPhone, setTestPhone] = useState('')
+    const [testLoading, setTestLoading] = useState(false)
 
     useEffect(() => {
         async function loadProfile() {
@@ -38,16 +53,38 @@ export default function SettingsPage() {
                 if ((profile as any)?.company_id) {
                     const { data: companyData } = await supabase
                         .from('companies')
-                        .select('name, industry, plan')
+                        .select('id, name, industry, plan, green_api_instance_id, green_api_token, whatsapp_report_time, whatsapp_report_preferences')
                         .eq('id', (profile as any).company_id)
                         .single()
-                    setCompany(companyData)
+
+                    const cData: any = companyData
+                    setCompany(cData)
+                    if (cData) {
+                        setGreenApiConfig({
+                            instanceId: cData.green_api_instance_id || '',
+                            apiToken: cData.green_api_token || '',
+                        })
+
+                        if (cData.whatsapp_report_time) {
+                            setWhatsappPreferences(prev => ({ ...prev, time: cData.whatsapp_report_time }))
+                        }
+
+                        if (cData.whatsapp_report_preferences) {
+                            const prefs = cData.whatsapp_report_preferences
+                            setWhatsappPreferences(prev => ({
+                                ...prev,
+                                includeKpis: prefs.include_kpis ?? true,
+                                includeStock: prefs.include_critical_stock ?? true,
+                                includeSuggestions: prefs.include_suggestions ?? true
+                            }))
+                        }
+                    }
                 }
             }
             setProfileLoading(false)
         }
         loadProfile()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleChangePassword = async (e: React.FormEvent) => {
@@ -73,6 +110,66 @@ export default function SettingsPage() {
             setPasswords({ newPassword: '', confirmPassword: '' })
         }
         setLoading(false)
+    }
+
+    const handleTestGreenApi = async () => {
+        const cleaned = testPhone.replace(/[\s\-\(\)]/g, '')
+        if (!cleaned || !/^\+?\d{8,15}$/.test(cleaned)) {
+            toast.error('Número inválido. Usa formato internacional (ej: +56912345678)')
+            return
+        }
+
+        setTestLoading(true)
+        try {
+            const res = await fetch('/api/whatsapp/test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone: testPhone })
+            })
+
+            const data = await res.json()
+            if (res.ok && data.success) {
+                toast.success('Mensaje de prueba enviado exitosamente a WhatsApp')
+                setTestPhone('')
+            } else {
+                toast.error(data.error || 'Error al enviar mensaje de prueba')
+            }
+        } catch {
+            toast.error('Ocurrió un error de red al intentar enviar la prueba')
+        } finally {
+            setTestLoading(false)
+        }
+    }
+
+    const handleSaveGreenApi = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!company?.id) return
+
+        setGreenApiLoading(true)
+
+        const updatePayload: any = {
+            green_api_instance_id: greenApiConfig.instanceId.trim(),
+            green_api_token: greenApiConfig.apiToken.trim(),
+            whatsapp_report_time: whatsappPreferences.time,
+            whatsapp_report_preferences: {
+                include_kpis: whatsappPreferences.includeKpis,
+                include_critical_stock: whatsappPreferences.includeStock,
+                include_suggestions: whatsappPreferences.includeSuggestions
+            }
+        }
+
+        const { error } = await supabase
+            .from('companies')
+            // @ts-expect-error - Supabase strict typing resolves to never due to nested types
+            .update(updatePayload)
+            .eq('id', company.id)
+
+        if (error) {
+            toast.error('Error al guardar credenciales de WhatsApp')
+        } else {
+            toast.success('Credenciales de WhatsApp guardadas exitosamente')
+        }
+        setGreenApiLoading(false)
     }
 
     const planLabels: Record<string, string> = {
@@ -195,6 +292,148 @@ export default function SettingsPage() {
                             <div className="space-y-1.5">
                                 <Label className="text-xs text-secondary">Plan</Label>
                                 <p className="text-sm font-medium text-white">{planLabels[company.plan] || company.plan}</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* WhatsApp Integration Info */}
+            {company && (
+                <Card className="bg-surface-dark border-border-dark">
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-whatsapp/10 flex items-center justify-center">
+                                    <MessageSquareMore className="w-5 h-5 text-whatsapp" />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-lg text-white">Integración WhatsApp (API)</CardTitle>
+                                    <CardDescription className="text-secondary">Automatiza los mensajes de la plataforma</CardDescription>
+                                </div>
+                            </div>
+                            {company.green_api_instance_id && (
+                                <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center gap-1.5 text-xs font-bold">
+                                    <CheckCircle2 className="w-3.5 h-3.5" /> Vinculado
+                                </div>
+                            )}
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSaveGreenApi} className="space-y-4">
+                            <p className="text-sm text-secondary mb-4">
+                                Utiliza las credenciales de Green-API para habilitar que Tali automatice la comunicación con tus proveedores y envíe el reporte matutino al administrador de la cuenta.
+                            </p>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label htmlFor="idInstance" className="text-white">ID Instance</Label>
+                                    <Input
+                                        id="idInstance"
+                                        placeholder="Ej: 1101000000"
+                                        value={greenApiConfig.instanceId}
+                                        onChange={(e) => setGreenApiConfig({ ...greenApiConfig, instanceId: e.target.value })}
+                                        className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50 font-mono"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="apiToken" className="text-white">API Token Instance</Label>
+                                    <Input
+                                        id="apiToken"
+                                        type="password"
+                                        placeholder="Ej: 4e2c..."
+                                        value={greenApiConfig.apiToken}
+                                        onChange={(e) => setGreenApiConfig({ ...greenApiConfig, apiToken: e.target.value })}
+                                        className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50 font-mono"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="pt-4 border-t border-border-dark/50 space-y-4">
+                                <div>
+                                    <h4 className="text-sm font-bold text-white mb-1">Preferencias del Reporte Diario</h4>
+                                    <p className="text-xs text-secondary">Configura a qué hora y qué información incluirá el reporte que Tali te enviará cada mañana.</p>
+                                </div>
+                                <div className="grid gap-6 sm:grid-cols-2">
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="reportTime" className="text-white text-xs">Hora de Recepción (GMT-3)</Label>
+                                            <Input
+                                                id="reportTime"
+                                                type="time"
+                                                value={whatsappPreferences.time}
+                                                onChange={(e) => setWhatsappPreferences({ ...whatsappPreferences, time: e.target.value })}
+                                                className="bg-background-dark border-border-dark/50 text-white w-full sm:w-32 focus-visible:ring-primary/50"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3 bg-background-dark/50 p-4 rounded-lg border border-border-dark/30">
+                                        <Label className="text-white text-xs block mb-2">Información a Incluir</Label>
+                                        <div className="flex items-center gap-3">
+                                            <Checkbox
+                                                id="pref-kpis"
+                                                checked={whatsappPreferences.includeKpis}
+                                                onCheckedChange={(v: boolean) => setWhatsappPreferences({ ...whatsappPreferences, includeKpis: v })}
+                                                className="border-border-dark data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                                            />
+                                            <label htmlFor="pref-kpis" className="text-sm text-white cursor-pointer">Resumen y KPIs Financieros</label>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <Checkbox
+                                                id="pref-stock"
+                                                checked={whatsappPreferences.includeStock}
+                                                onCheckedChange={(v: boolean) => setWhatsappPreferences({ ...whatsappPreferences, includeStock: v })}
+                                                className="border-border-dark data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                                            />
+                                            <label htmlFor="pref-stock" className="text-sm text-white cursor-pointer">Alertas de Stock Crítico</label>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <Checkbox
+                                                id="pref-suggestions"
+                                                checked={whatsappPreferences.includeSuggestions}
+                                                onCheckedChange={(v: boolean) => setWhatsappPreferences({ ...whatsappPreferences, includeSuggestions: v })}
+                                                className="border-border-dark data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                                            />
+                                            <label htmlFor="pref-suggestions" className="text-sm text-white cursor-pointer">Sugerencias Estratégicas (IA)</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="pt-2 flex items-center justify-between border-b border-border-dark/50 pb-6">
+                                <Button type="submit" disabled={greenApiLoading} className="gap-2 bg-white text-black hover:bg-gray-200 font-bold">
+                                    <Save className="w-4 h-4" />
+                                    {greenApiLoading ? 'Guardando...' : 'Guardar Credenciales'}
+                                </Button>
+                            </div>
+                        </form>
+
+                        {/* Test Connection Section */}
+                        <div className="pt-6 space-y-4">
+                            <h4 className="text-sm font-bold text-white">Probar Conexión</h4>
+                            <p className="text-xs text-secondary">Asegúrate de haber guardado tus credenciales primero. Envía un WhatsApp de prueba a tu número para verificar que la integración funciona.</p>
+                            <div className="flex items-end gap-3 max-w-md">
+                                <div className="space-y-2 flex-1">
+                                    <Label htmlFor="testPhone" className="text-white text-xs">Tu número de celular (con código de país)</Label>
+                                    <Input
+                                        id="testPhone"
+                                        type="tel"
+                                        placeholder="Ej: 56912345678"
+                                        value={testPhone}
+                                        onChange={(e) => setTestPhone(e.target.value)}
+                                        className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                                    />
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    onClick={handleTestGreenApi}
+                                    disabled={testLoading || !testPhone}
+                                    aria-label="Enviar mensaje de prueba por WhatsApp"
+                                    className="gap-2 border-border-dark bg-whatsapp/10 text-whatsapp hover:bg-whatsapp/20 font-bold"
+                                >
+                                    <MessageSquareMore className="w-4 h-4" aria-hidden="true" />
+                                    {testLoading ? 'Enviando...' : 'Enviar Test'}
+                                </Button>
                             </div>
                         </div>
                     </CardContent>

@@ -14,8 +14,9 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { MoreHorizontal, Search, Trash, Edit, RefreshCcw, Package, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react'
+import { MoreHorizontal, Search, Trash, Edit, RefreshCcw, Package, ArrowUp, ArrowDown, ArrowUpDown, ShoppingCart } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
+import { SupplierOrderDialog } from '@/components/supplier-order-dialog'
 import { Label } from '@/components/ui/label'
 import {
     Dialog,
@@ -64,9 +65,15 @@ export function ProductsTable() {
     const [searchQuery, setSearchQuery] = useState('')
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [productToDelete, setProductToDelete] = useState<any>(null)
+
+    // Edit states
     const [editDialogOpen, setEditDialogOpen] = useState(false)
     const [editProduct, setEditProduct] = useState<any>(null)
     const [editLoading, setEditLoading] = useState(false)
+
+    // Order states
+    const [orderProduct, setOrderProduct] = useState<any>(null)
+    const [userIndustry, setUserIndustry] = useState<string>('other')
     const [editForm, setEditForm] = useState({
         name: '', sku: '', category: '', price_sale: '', price_cost: '', stock_current: '0', stock_minimum: '0',
     })
@@ -99,11 +106,13 @@ export function ProductsTable() {
 
         const { data: userProfile } = await supabase
             .from('users')
-            .select('company_id')
+            .select('company_id, companies(industry)')
             .eq('id', user.id)
             .single()
 
         const companyId = (userProfile as any)?.company_id
+        const ind = (userProfile as any)?.companies?.industry || 'other'
+        setUserIndustry(ind)
 
         if (companyId) {
             const { data } = await supabase
@@ -268,6 +277,8 @@ export function ProductsTable() {
                                 <TableHead
                                     className="text-secondary font-medium cursor-pointer select-none hover:text-white transition-colors"
                                     onClick={() => toggleSort('name')}
+                                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('name'))}
+                                    role="button" tabIndex={0}
                                 >
                                     Nombre <SortIcon col="name" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
@@ -276,12 +287,16 @@ export function ProductsTable() {
                                 <TableHead
                                     className="text-secondary font-medium text-right cursor-pointer select-none hover:text-white transition-colors"
                                     onClick={() => toggleSort('price_sale')}
+                                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('price_sale'))}
+                                    role="button" tabIndex={0}
                                 >
                                     Precio <SortIcon col="price_sale" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
                                 <TableHead
                                     className="text-secondary font-medium text-right cursor-pointer select-none hover:text-white transition-colors"
                                     onClick={() => toggleSort('stock_current')}
+                                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('stock_current'))}
+                                    role="button" tabIndex={0}
                                 >
                                     Stock <SortIcon col="stock_current" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
@@ -307,7 +322,16 @@ export function ProductsTable() {
                                     <TableCell className="text-right text-secondary">{product.stock_current}</TableCell>
                                     <TableCell>
                                         {product.stock_current <= product.stock_minimum ? (
-                                            <Badge variant="destructive" className="bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/20">Stock Crítico</Badge>
+                                            <Badge
+                                                variant="destructive"
+                                                className="bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/20 cursor-pointer"
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    setOrderProduct(product)
+                                                }}
+                                            >
+                                                Stock Crítico (Click para ordenar)
+                                            </Badge>
                                         ) : (
                                             <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20">En Stock</Badge>
                                         )}
@@ -321,6 +345,16 @@ export function ProductsTable() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+
+                                                {product.stock_current <= product.stock_minimum && !['saas', 'services', 'marketing'].includes(userIndustry) && (
+                                                    <DropdownMenuItem
+                                                        className="text-amber-500 focus:text-amber-500 focus:bg-amber-500/10 font-bold"
+                                                        onClick={(e) => { e.stopPropagation(); setOrderProduct(product); }}
+                                                    >
+                                                        <ShoppingCart className="mr-2 h-4 w-4" /> Ordenar a proveedor
+                                                    </DropdownMenuItem>
+                                                )}
+
                                                 <DropdownMenuItem onClick={(e) => { e.stopPropagation(); openEditDialog(product); }}>
                                                     <Edit className="mr-2 h-4 w-4" /> Editar Producto
                                                 </DropdownMenuItem>
@@ -444,6 +478,13 @@ export function ProductsTable() {
                     </form>
                 </DialogContent>
             </Dialog>
+
+            <SupplierOrderDialog
+                open={!!orderProduct}
+                onOpenChange={(isOpen) => !isOpen && setOrderProduct(null)}
+                products={orderProduct ? [orderProduct] : []}
+                industry={userIndustry}
+            />
         </div>
     )
 }

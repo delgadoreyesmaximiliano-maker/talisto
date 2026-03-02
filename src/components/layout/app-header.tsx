@@ -25,7 +25,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ThemeToggle } from '@/components/layout/theme-toggle'
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Bell, Search, User, Package, ShoppingBag, Users, AlertTriangle, TrendingUp, X } from 'lucide-react'
+import { Bell, Search, User, Package, ShoppingBag, Users, AlertTriangle, TrendingUp, X, ShoppingCart } from 'lucide-react'
+import { SupplierOrderDialog } from '@/components/supplier-order-dialog'
 
 interface Notification {
     id: string
@@ -53,6 +54,9 @@ export function AppHeader() {
     const [searchQuery, setSearchQuery] = useState('')
     const [searchOpen, setSearchOpen] = useState(false)
     const [logoutOpen, setLogoutOpen] = useState(false)
+    const [supplierOrderOpen, setSupplierOrderOpen] = useState(false)
+    const [criticalProductsList, setCriticalProductsList] = useState<{ name: string; stock_current: number; stock_minimum: number }[]>([])
+    const [userIndustry, setUserIndustry] = useState('')
     const searchRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null)
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -65,7 +69,7 @@ export function AppHeader() {
             setUser(user)
         }
         getUser()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     // Fetch notifications (stock alerts, sales today)
@@ -75,11 +79,13 @@ export function AppHeader() {
         const fetchNotifications = async () => {
             const { data: userProfile } = await supabase
                 .from('users')
-                .select('company_id')
+                .select('company_id, companies(industry)')
                 .eq('id', user.id)
                 .single()
 
             const companyId = (userProfile as any)?.company_id
+            const industry = (userProfile as any)?.companies?.industry || ''
+            setUserIndustry(industry)
             if (!companyId) return
 
             const notifs: Notification[] = []
@@ -89,10 +95,10 @@ export function AppHeader() {
                 .from('products')
                 .select('name, stock_current, stock_minimum')
                 .eq('company_id', companyId)
-                .filter('stock_current', 'lte', 'stock_minimum' as any)
+            // Filter client-side since Supabase doesn't support comparing column vs column easily without RPC
 
-            // Filter client-side since Supabase doesn't support column-to-column comparison easily
             const criticalProducts = (lowStock || []).filter((p: any) => p.stock_current <= p.stock_minimum)
+            setCriticalProductsList(criticalProducts)
 
             if (criticalProducts.length > 0) {
                 notifs.push({
@@ -130,7 +136,7 @@ export function AppHeader() {
         }
 
         fetchNotifications()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user])
 
     // Debounce cleanup
@@ -220,9 +226,9 @@ export function AppHeader() {
                                             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-primary/10 text-secondary hover:text-white transition-colors"
                                         >
                                             {link.href.includes('inventory') ? <Package className="w-4 h-4 shrink-0" /> :
-                                             link.href.includes('sales') ? <ShoppingBag className="w-4 h-4 shrink-0" /> :
-                                             link.href.includes('crm') ? <Users className="w-4 h-4 shrink-0" /> :
-                                             <Search className="w-4 h-4 shrink-0" />}
+                                                link.href.includes('sales') ? <ShoppingBag className="w-4 h-4 shrink-0" /> :
+                                                    link.href.includes('crm') ? <Users className="w-4 h-4 shrink-0" /> :
+                                                        <Search className="w-4 h-4 shrink-0" />}
                                             <span className="text-sm font-medium">{link.label}</span>
                                         </button>
                                     ))
@@ -263,12 +269,27 @@ export function AppHeader() {
                                 <DropdownMenuItem
                                     key={notif.id}
                                     className="rounded-xl flex items-start gap-3 p-3 cursor-pointer hover:bg-white/5 transition-all"
-                                    onClick={() => notif.href && router.push(notif.href)}
+                                    onSelect={(e) => {
+                                        if (notif.id === 'low-stock' && !['saas', 'services', 'marketing'].includes(userIndustry)) {
+                                            // Let Radix close the dropdown before opening dialog to avoid pointer-events block
+                                            setTimeout(() => setSupplierOrderOpen(true), 200)
+                                        } else if (notif.href) {
+                                            router.push(notif.href)
+                                        }
+                                    }}
                                 >
                                     <div className="mt-0.5 shrink-0">{notif.icon}</div>
-                                    <div>
+                                    <div className="flex-1 min-w-0">
                                         <p className="text-white text-sm font-medium">{notif.title}</p>
                                         <p className="text-secondary text-xs mt-0.5">{notif.description}</p>
+                                        {notif.id === 'low-stock' && !['saas', 'services', 'marketing'].includes(userIndustry) && (
+                                            <span
+                                                className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-amber-400 bg-amber-500/10 rounded-lg px-2 py-1 transition-colors"
+                                            >
+                                                <ShoppingCart className="w-3 h-3" aria-hidden="true" />
+                                                Click para ordenar a proveedor
+                                            </span>
+                                        )}
                                     </div>
                                 </DropdownMenuItem>
                             ))
@@ -305,7 +326,10 @@ export function AppHeader() {
                             <DropdownMenuSeparator className="bg-border-dark mx-1" />
                             <DropdownMenuItem
                                 className="rounded-xl flex items-center justify-start p-3 cursor-pointer bg-transparent text-red-500 hover:bg-red-500/10 hover:text-red-400 font-bold transition-all"
-                                onClick={() => setLogoutOpen(true)}
+                                onSelect={(e) => {
+                                    e.preventDefault()
+                                    setLogoutOpen(true)
+                                }}
                             >
                                 <span className="w-full text-left">Cerrar Sesión</span>
                             </DropdownMenuItem>
@@ -336,6 +360,13 @@ export function AppHeader() {
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
+
+                <SupplierOrderDialog
+                    open={supplierOrderOpen}
+                    onOpenChange={setSupplierOrderOpen}
+                    products={criticalProductsList}
+                    industry={userIndustry}
+                />
             </div>
         </header>
     )

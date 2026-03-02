@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DollarSign, Users, Package, TrendingUp, ArrowUpRight, ArrowDownRight, Sparkles, ShoppingBag, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react'
+import { DollarSign, Users, Package, TrendingUp, ArrowUpRight, ArrowDownRight, Sparkles, ShoppingBag, ArrowRight, CheckCircle2, AlertCircle, Bell } from 'lucide-react'
 import Link from 'next/link'
 import { DownloadReportButton } from './components/download-report-button'
 
@@ -321,36 +321,63 @@ export default async function AppDashboard() {
                         </div>
                     </div>
 
-                    {/* MRR */}
-                    <div className="relative overflow-hidden group glass-panel p-5 rounded-2xl">
-                        <div className="flex items-center justify-between mb-2">
-                            <p className="text-xs font-bold text-secondary">{currentKpi.secondaryLabel}</p>
-                        </div>
-                        <h2 className="text-3xl font-black text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                            ${totalMrr.toLocaleString('es-CL')}
-                        </h2>
-                        <div className="mt-4 h-12 w-full flex items-end justify-between gap-1 opacity-50">
-                            {last7RevenueHeights.map((h, i) => (
-                                <div key={i} className="w-full bg-gradient-to-t from-purple-500/10 to-purple-500 rounded-t-sm" style={{ height: `${h}%` }} />
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Customers / Users */}
-                    <div className="relative overflow-hidden group glass-panel p-5 rounded-2xl">
-                        <div className="flex items-center justify-between mb-2">
-                            <p className="text-xs font-bold text-secondary">Clientes Activos</p>
-                        </div>
-                        <h2 className="text-3xl font-black text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                            {activeCustomers}
-                        </h2>
-                        <div className="mt-4 h-12 w-full flex items-center gap-2 opacity-60">
-                            <div className="flex-1 h-1.5 bg-primary/20 rounded-full overflow-hidden">
-                                <div className="h-full bg-primary rounded-full" style={{ width: `${Math.min(100, activeCustomers * 10)}%` }} />
+                    {/* MRR / Ticket Promedio */}
+                    {['saas', 'services', 'marketing'].includes(industry) ? (
+                        <div className="relative overflow-hidden group glass-panel p-5 rounded-2xl">
+                            <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs font-bold text-secondary">MRR</p>
                             </div>
-                            <span className="text-[10px] text-secondary font-bold shrink-0">{activeCustomers} activos</span>
+                            <h2 className="text-3xl font-black text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                                ${totalMrr.toLocaleString('es-CL')}
+                            </h2>
+                            <div className="mt-4 h-12 w-full flex items-end justify-between gap-1 opacity-50">
+                                {last7RevenueHeights.map((h, i) => (
+                                    <div key={i} className="w-full bg-gradient-to-t from-purple-500/10 to-purple-500 rounded-t-sm" style={{ height: `${h}%` }} />
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="relative overflow-hidden group glass-panel p-5 rounded-2xl">
+                            <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs font-bold text-secondary">Ticket Promedio</p>
+                            </div>
+                            <h2 className="text-3xl font-black text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                                ${sales.length > 0 ? Math.round(totalRevenue / sales.length).toLocaleString('es-CL') : '0'}
+                            </h2>
+                        </div>
+                    )}
+
+                    {/* Customers / Users  vs Products */}
+                    {['saas', 'services', 'marketing'].includes(industry) ? (
+                        <div className="relative overflow-hidden group glass-panel p-5 rounded-2xl">
+                            <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs font-bold text-secondary">Clientes Activos</p>
+                            </div>
+                            <h2 className="text-3xl font-black text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                                {activeCustomers}
+                            </h2>
+                            <div className="mt-4 h-12 w-full flex items-center gap-2 opacity-60">
+                                <div className="flex-1 h-1.5 bg-primary/20 rounded-full overflow-hidden">
+                                    <div className="h-full bg-primary rounded-full" style={{ width: `${Math.min(100, activeCustomers * 10)}%` }} />
+                                </div>
+                                <span className="text-[10px] text-secondary font-bold shrink-0">{activeCustomers} activos</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="relative overflow-hidden group glass-panel p-5 rounded-2xl">
+                            <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs font-bold text-secondary">Productos en Catálogo</p>
+                            </div>
+                            <h2 className="text-3xl font-black text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                                {activeProductsCount}
+                            </h2>
+                            <div className="mt-4 h-12 w-full flex items-center gap-2 opacity-60">
+                                <Link href="/app/inventory" className="text-xs font-bold text-primary hover:text-white transition-colors">
+                                    Gestionar inventario →
+                                </Link>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Center Column: Charts and Map (6 cols width) */}
@@ -442,30 +469,35 @@ export default async function AppDashboard() {
                 {/* Right Column: Other Stats & Activity (3 cols width) */}
                 <div className="lg:col-span-3 space-y-6">
                     {/* Top Selling Products proxy or Inventory Status */}
-                    <div className="glass-panel p-5 rounded-2xl border border-border-dark">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Estado de Stock</h3>
-                        </div>
+                    {!['saas', 'services', 'marketing'].includes(industry) && (
+                        <div className="glass-panel p-5 rounded-2xl border border-border-dark">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Estado de Stock</h3>
+                            </div>
 
-                        {lowStockProducts.length > 0 ? (
-                            <div className="space-y-3">
-                                {lowStockProducts.slice(0, 3).map(p => (
-                                    <div key={p.id} className="flex justify-between items-center text-sm">
-                                        <span className="text-secondary truncate pr-2">{p.name}</span>
-                                        <span className="text-red-400 font-bold bg-red-400/10 px-2 py-0.5 rounded">{p.stock_current} u.</span>
-                                    </div>
-                                ))}
-                                {lowStockProducts.length > 3 && (
-                                    <div className="text-xs text-center text-secondary pt-2">Y {lowStockProducts.length - 3} más...</div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="flex items-center gap-2 text-primary p-3 bg-primary/5 rounded-xl text-sm font-bold">
-                                <CheckCircle2 className="w-4 h-4" />
-                                Stock Saludable
-                            </div>
-                        )}
-                    </div>
+                            {lowStockProducts.length > 0 ? (
+                                <div className="space-y-3">
+                                    {lowStockProducts.slice(0, 3).map(p => (
+                                        <div key={p.id} className="flex justify-between items-center text-sm">
+                                            <span className="text-secondary truncate pr-2">{p.name}</span>
+                                            <span className="text-red-400 font-bold bg-red-400/10 px-2 py-0.5 rounded">{p.stock_current} u.</span>
+                                        </div>
+                                    ))}
+                                    {lowStockProducts.length > 3 && (
+                                        <div className="text-xs text-center text-secondary pt-2">Y {lowStockProducts.length - 3} más...</div>
+                                    )}
+                                    <p className="text-xs text-amber-500 pt-2 text-center bg-amber-500/10 rounded-lg p-2 mt-2">
+                                        💡 Usa la <Bell className="w-3 h-3 inline pb-0.5" /> campana de notificaciones arriba para ordenar
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2 text-primary p-3 bg-primary/5 rounded-xl text-sm font-bold">
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    Stock Saludable
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Recent Activities */}
                     <div className="glass-panel p-5 rounded-2xl border border-border-dark flex-1 flex flex-col">

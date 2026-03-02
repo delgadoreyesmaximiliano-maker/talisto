@@ -184,6 +184,8 @@ export function CustomersTable() {
                                 <TableHead
                                     className="text-secondary font-medium cursor-pointer select-none hover:text-white transition-colors"
                                     onClick={() => toggleSort('name')}
+                                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('name'))}
+                                    role="button" tabIndex={0}
                                 >
                                     Cliente <SortIcon col="name" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
@@ -192,12 +194,16 @@ export function CustomersTable() {
                                 <TableHead
                                     className="text-right text-secondary font-medium cursor-pointer select-none hover:text-white transition-colors"
                                     onClick={() => toggleSort('mrr')}
+                                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('mrr'))}
+                                    role="button" tabIndex={0}
                                 >
                                     MRR <SortIcon col="mrr" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
                                 <TableHead
                                     className="text-right text-secondary font-medium cursor-pointer select-none hover:text-white transition-colors"
                                     onClick={() => toggleSort('last_activity')}
+                                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('last_activity'))}
+                                    role="button" tabIndex={0}
                                 >
                                     Última Actividad <SortIcon col="last_activity" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>

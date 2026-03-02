@@ -1,12 +1,25 @@
 import { createGroq } from '@ai-sdk/groq';
 import { streamText, convertToModelMessages } from 'ai';
 import { createClient } from '@/lib/supabase/server';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
-// In-memory rate limit: 20 requests per user per minute.
-// Resets on each deploy — sufficient for MVP. Upgrade to Upstash Redis for persistence.
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
-const RATE_LIMIT = 20
-const WINDOW_MS = 60 * 1000
+// Upstash Redis rate limit: 20 requests per user per minute (sliding window).
+// Persists across deploys and serverless instances.
+// Requires UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in .env.local
+let ratelimit: Ratelimit | null = null;
+if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+  const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
+  ratelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(20, '1 m'),
+    analytics: true,
+    prefix: 'talisto:ratelimit:chat',
+  });
+}
 
 export async function POST(req: Request) {
   // Auth guard: verify user is authenticated
@@ -20,19 +33,24 @@ export async function POST(req: Request) {
     });
   }
 
-  // Rate limit check
-  const now = Date.now()
-  const userLimit = rateLimitMap.get(user.id)
-  if (userLimit && now < userLimit.resetAt) {
-    if (userLimit.count >= RATE_LIMIT) {
-      return new Response(JSON.stringify({ error: 'Demasiadas solicitudes. Espera 1 minuto.' }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json' },
-      })
+  // Rate limit check (skipped gracefully if Upstash is not configured)
+  if (ratelimit) {
+    const { success, limit, remaining, reset } = await ratelimit.limit(user.id);
+    if (!success) {
+      const retryAfterSec = Math.ceil((reset - Date.now()) / 1000);
+      return new Response(
+        JSON.stringify({ error: `Demasiadas solicitudes. Intenta de nuevo en ${retryAfterSec}s.` }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-RateLimit-Limit': String(limit),
+            'X-RateLimit-Remaining': String(remaining),
+            'Retry-After': String(retryAfterSec),
+          },
+        }
+      );
     }
-    userLimit.count++
-  } else {
-    rateLimitMap.set(user.id, { count: 1, resetAt: now + WINDOW_MS })
   }
 
   // Security: fetch company_id from DB using the authenticated user — never trust client body

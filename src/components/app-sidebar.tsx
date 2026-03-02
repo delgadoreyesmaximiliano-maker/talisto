@@ -21,7 +21,18 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-const navItems = [
+type Industry = 'ecommerce' | 'saas' | 'retail' | 'marketing' | 'restaurant' | 'services' | string
+
+interface NavItem {
+    title: string
+    url: string
+    icon: React.ElementType
+    special?: boolean
+    /** Industries that should NOT see this item. Empty = visible for all. */
+    hideFor?: Industry[]
+}
+
+const navItems: NavItem[] = [
     {
         title: "Dashboard",
         url: "/app",
@@ -36,22 +47,21 @@ const navItems = [
         title: "Inventario",
         url: "/app/inventory",
         icon: Package,
+        // Digital/service businesses don't manage physical stock
+        hideFor: ['saas', 'services', 'marketing'],
     },
     {
-        title: "CRM (Clientes)",
+        title: "Clientes",
         url: "/app/crm",
         icon: Users,
+        // Restaurants track tables/orders, not recurring customer subscriptions
+        hideFor: ['restaurant'],
     },
     {
         title: "Asistente IA",
         url: "/app/ai",
         icon: Bot,
-        special: true
-    },
-    {
-        title: "Insights IA",
-        url: "/app/ai-insights",
-        icon: LineChart,
+        special: true,
     },
     {
         title: "Integraciones",
@@ -64,11 +74,12 @@ export function AppSidebar() {
     const pathname = usePathname()
     const [trialStatus, setTrialStatus] = useState<TrialStatus | null>(null)
     const [isPaidPlan, setIsPaidPlan] = useState(false)
+    const [industry, setIndustry] = useState<Industry>('')
 
     useEffect(() => {
         const supabase = createClient()
 
-        async function loadTrialStatus() {
+        async function loadSidebarData() {
             try {
                 const { data: { session } } = await supabase.auth.getSession()
                 if (!session) return
@@ -79,17 +90,19 @@ export function AppSidebar() {
                         company_id,
                         companies (
                             trial_ends_at,
-                            plan_status
+                            plan_status,
+                            industry
                         )
                     `)
                     .eq('id', session.user.id)
                     .single()
 
                 if (userError) {
-                    console.error('Error loading trial status:', userError)
+                    console.error('Error loading sidebar data:', userError)
                     return
                 }
 
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const userObj = user as any;
                 if (userObj?.companies) {
                     const companiesData = userObj.companies;
@@ -97,20 +110,22 @@ export function AppSidebar() {
                     if (company) {
                         const status = getTrialStatus(
                             company.trial_ends_at as string | null,
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             company.plan_status as any
                         )
                         setTrialStatus(status)
                         setIsPaidPlan(company.plan_status === 'active')
+                        setIndustry(company.industry || '')
                     }
                 }
             } catch (error) {
-                console.error('Trial status fetch failed:', error)
+                console.error('Sidebar data fetch failed:', error)
             }
         }
 
-        loadTrialStatus()
+        loadSidebarData()
         // Refresh every 5 minutes
-        const interval = setInterval(loadTrialStatus, 5 * 60 * 1000)
+        const interval = setInterval(loadSidebarData, 5 * 60 * 1000)
         return () => clearInterval(interval)
     }, [])
 
@@ -118,6 +133,13 @@ export function AppSidebar() {
         if (url === '/app') return pathname === '/app'
         return pathname.startsWith(url)
     }
+
+    // Filter nav items based on the company's industry
+    const visibleNavItems = navItems.filter(item => {
+        if (!item.hideFor || item.hideFor.length === 0) return true
+        if (!industry) return true // show all while industry is loading
+        return !item.hideFor.includes(industry)
+    })
 
     const urgencyClasses = getTrialUrgencyClasses(trialStatus?.urgencyLevel ?? 'none')
 
@@ -141,7 +163,7 @@ export function AppSidebar() {
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu className="gap-1">
-                            {navItems.map((item) => (
+                            {visibleNavItems.map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton
                                         asChild
