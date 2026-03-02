@@ -8,11 +8,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { User, Lock, Building2, Save } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 
 export default function SettingsPage() {
     const supabase = createClient()
     const [loading, setLoading] = useState(false)
+    const [profileLoading, setProfileLoading] = useState(true)
     const [user, setUser] = useState<any>(null)
     const [company, setCompany] = useState<any>(null)
 
@@ -42,8 +44,10 @@ export default function SettingsPage() {
                     setCompany(companyData)
                 }
             }
+            setProfileLoading(false)
         }
         loadProfile()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const handleChangePassword = async (e: React.FormEvent) => {
@@ -72,9 +76,9 @@ export default function SettingsPage() {
     }
 
     const planLabels: Record<string, string> = {
-        basic: 'Starter (Gratis)',
-        pro: 'Pro',
-        enterprise: 'Enterprise',
+        basic: 'Básico ($35.000/mes)',
+        pro: 'Pro ($75.000/mes)',
+        enterprise: 'Enterprise ($150.000+/mes)',
     }
 
     const industryLabels: Record<string, string> = {
@@ -90,37 +94,75 @@ export default function SettingsPage() {
         other: 'Otro',
     }
 
+    if (profileLoading) {
+        return (
+            <div className="space-y-6 max-w-2xl">
+                <div>
+                    <Skeleton className="h-9 w-48 mb-2" />
+                    <Skeleton className="h-4 w-72" />
+                </div>
+                <div className="rounded-xl border border-border-dark bg-surface-dark p-6 space-y-4">
+                    <div className="flex items-center gap-3">
+                        <Skeleton className="w-10 h-10 rounded-lg" />
+                        <div className="space-y-1">
+                            <Skeleton className="h-5 w-20" />
+                            <Skeleton className="h-3 w-40" />
+                        </div>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                </div>
+                <div className="rounded-xl border border-border-dark bg-surface-dark p-6 space-y-4">
+                    <div className="flex items-center gap-3">
+                        <Skeleton className="w-10 h-10 rounded-lg" />
+                        <div className="space-y-1">
+                            <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-3 w-48" />
+                        </div>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-3">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="space-y-6 max-w-2xl">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">Configuración</h1>
-                <p className="text-muted-foreground">
+                <h1 className="text-3xl font-bold tracking-tight text-white">Configuración</h1>
+                <p className="text-secondary">
                     Administra tu cuenta y preferencias.
                 </p>
             </div>
 
             {/* Profile Info */}
-            <Card>
+            <Card className="bg-surface-dark border-border-dark">
                 <CardHeader>
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                             <User className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <CardTitle className="text-lg">Perfil</CardTitle>
-                            <CardDescription>Tu información de cuenta</CardDescription>
+                            <CardTitle className="text-lg text-white">Perfil</CardTitle>
+                            <CardDescription className="text-secondary">Tu información de cuenta</CardDescription>
                         </div>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-1.5">
-                            <Label className="text-xs text-muted-foreground">Correo electrónico</Label>
-                            <p className="text-sm font-medium">{user?.email || '—'}</p>
+                            <Label className="text-xs text-secondary">Correo electrónico</Label>
+                            <p className="text-sm font-medium text-white">{user?.email || '—'}</p>
                         </div>
                         <div className="space-y-1.5">
-                            <Label className="text-xs text-muted-foreground">ID de usuario</Label>
-                            <p className="text-sm font-mono text-muted-foreground truncate">{user?.id || '—'}</p>
+                            <Label className="text-xs text-secondary">ID de usuario</Label>
+                            <p className="text-sm font-mono text-secondary truncate">{user?.id || '—'}</p>
                         </div>
                     </div>
                 </CardContent>
@@ -128,31 +170,31 @@ export default function SettingsPage() {
 
             {/* Company Info */}
             {company && (
-                <Card>
+                <Card className="bg-surface-dark border-border-dark">
                     <CardHeader>
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center">
                                 <Building2 className="w-5 h-5 text-secondary" />
                             </div>
                             <div>
-                                <CardTitle className="text-lg">Empresa</CardTitle>
-                                <CardDescription>Información de tu negocio</CardDescription>
+                                <CardTitle className="text-lg text-white">Empresa</CardTitle>
+                                <CardDescription className="text-secondary">Información de tu negocio</CardDescription>
                             </div>
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid gap-4 sm:grid-cols-3">
                             <div className="space-y-1.5">
-                                <Label className="text-xs text-muted-foreground">Nombre</Label>
-                                <p className="text-sm font-medium">{company.name}</p>
+                                <Label className="text-xs text-secondary">Nombre</Label>
+                                <p className="text-sm font-medium text-white">{company.name}</p>
                             </div>
                             <div className="space-y-1.5">
-                                <Label className="text-xs text-muted-foreground">Rubro</Label>
-                                <p className="text-sm font-medium">{industryLabels[company.industry] || company.industry}</p>
+                                <Label className="text-xs text-secondary">Rubro</Label>
+                                <p className="text-sm font-medium text-white">{industryLabels[company.industry] || company.industry}</p>
                             </div>
                             <div className="space-y-1.5">
-                                <Label className="text-xs text-muted-foreground">Plan</Label>
-                                <p className="text-sm font-medium">{planLabels[company.plan] || company.plan}</p>
+                                <Label className="text-xs text-secondary">Plan</Label>
+                                <p className="text-sm font-medium text-white">{planLabels[company.plan] || company.plan}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -160,22 +202,22 @@ export default function SettingsPage() {
             )}
 
             {/* Change Password */}
-            <Card>
+            <Card className="bg-surface-dark border-border-dark">
                 <CardHeader>
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                            <Lock className="w-5 h-5 text-amber-600" />
+                            <Lock className="w-5 h-5 text-amber-500" />
                         </div>
                         <div>
-                            <CardTitle className="text-lg">Cambiar Contraseña</CardTitle>
-                            <CardDescription>Actualiza tu clave de acceso</CardDescription>
+                            <CardTitle className="text-lg text-white">Cambiar Contraseña</CardTitle>
+                            <CardDescription className="text-secondary">Actualiza tu clave de acceso</CardDescription>
                         </div>
                     </div>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleChangePassword} className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="newPassword">Nueva contraseña</Label>
+                            <Label htmlFor="newPassword" className="text-white">Nueva contraseña</Label>
                             <Input
                                 id="newPassword"
                                 type="password"
@@ -183,10 +225,11 @@ export default function SettingsPage() {
                                 value={passwords.newPassword}
                                 onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
                                 required
+                                className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
+                            <Label htmlFor="confirmPassword" className="text-white">Confirmar contraseña</Label>
                             <Input
                                 id="confirmPassword"
                                 type="password"
@@ -194,9 +237,10 @@ export default function SettingsPage() {
                                 value={passwords.confirmPassword}
                                 onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
                                 required
+                                className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
                             />
                         </div>
-                        <Button type="submit" disabled={loading} className="gap-2">
+                        <Button type="submit" disabled={loading} className="gap-2 bg-primary text-background-dark hover:bg-primary/90 font-bold">
                             <Save className="w-4 h-4" />
                             {loading ? 'Guardando...' : 'Actualizar Contraseña'}
                         </Button>

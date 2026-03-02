@@ -76,47 +76,60 @@
     --sidebar-ring: 161 68% 40%;
   }
 
-
   .dark {
-    --background: 222 47% 11%;
-    /* #0F172A */
+    /* Dark Elegance Theme */
+    --background: 146 17% 8%;
+    /* #111814 */
     --foreground: 210 40% 98%;
-    /* #F8FAFC */
 
-    --card: 217 33% 17%;
-    /* #1E293B */
+    --card: 147 16% 13%;
+    /* surface #1c2721 */
     --card-foreground: 210 40% 98%;
 
-    --popover: 217 33% 17%;
+    --popover: 147 16% 13%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 161 68% 40%;
-    /* Emerald */
-    --primary-foreground: 210 40% 98%;
+    --primary: 150 86% 50%;
+    /* Emerald #13ec80 */
+    --primary-foreground: 146 17% 8%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 150 16% 66%;
+    /* text-secondary #9db9ab */
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 217 33% 20%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 148 17% 19%;
+    /* border-dark */
+    --muted-foreground: 150 16% 66%;
 
-    --accent: 217 33% 20%;
-    --accent-foreground: 161 68% 40%;
+    --accent: 148 17% 19%;
+    --accent-foreground: 150 86% 50%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 33% 25%;
-    --input: 217 33% 25%;
-    --ring: 161 68% 40%;
+    --border: 148 17% 19%;
+    /* border-dark #283930 */
+    --input: 148 17% 19%;
+    --ring: 150 86% 50%;
 
-    --sidebar-background: 222 47% 9%;
+    /* Sidebar matching the surface */
+    --sidebar-background: 146 17% 8%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 161 68% 40%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 217 33% 15%;
-    --sidebar-accent-foreground: 161 68% 40%;
-    --sidebar-border: 217 33% 15%;
-    --sidebar-ring: 161 68% 40%;
+    --sidebar-primary: 150 86% 50%;
+    --sidebar-primary-foreground: 146 17% 8%;
+    --sidebar-accent: 148 17% 19%;
+    --sidebar-accent-foreground: 150 86% 50%;
+    --sidebar-border: 148 17% 19%;
+    --sidebar-ring: 150 86% 50%;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-surface-dark/40 backdrop-blur-md border border-border-dark/50;
   }
 }

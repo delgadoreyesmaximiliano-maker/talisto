@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createClient } from '@/lib/supabase/server'
-import { ChatInterface } from './chat-interface'
+import { CfoDashboard } from './cfo-dashboard'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { InfoIcon, Sparkles } from 'lucide-react'
 
@@ -64,14 +64,14 @@ export default async function AIInsightsPage() {
     }
 
     return (
-        <div className="space-y-6 max-w-5xl mx-auto">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                    <Sparkles className="h-8 w-8 text-amber-500" />
-                    Sugerencias de IA
+        <div className="space-y-6 max-w-7xl mx-auto">
+            {/* Header */}
+            <div className="space-y-2">
+                <h1 className="text-4xl font-bold text-white">
+                    💼 Tu CFO Virtual
                 </h1>
-                <p className="text-muted-foreground mt-1">
-                    Chatea con tu asistente de Inteligencia Artificial. Obtendrá acceso a tus datos de inventario y ventas para darte consejos perspicaces.
+                <p className="text-lg text-gray-400">
+                    Navega por el tiempo para analizar tu negocio. La IA genera insights automáticamente.
                 </p>
             </div>
 
@@ -83,7 +83,7 @@ export default async function AIInsightsPage() {
                 </AlertDescription>
             </Alert>
 
-            <ChatInterface contextData={contextData} />
+            <CfoDashboard contextData={contextData} />
         </div>
     )
 }

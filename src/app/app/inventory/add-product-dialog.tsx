@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -22,6 +22,7 @@ import { toast } from 'sonner'
 export function AddProductDialog() {
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const submittingRef = useRef(false)
     const router = useRouter()
     const supabase = createClient()
 
@@ -41,18 +42,52 @@ export function AddProductDialog() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (submittingRef.current) return
+        submittingRef.current = true
 
-        if (!formData.name || !formData.sku) {
-            toast.warning('⚠️ Completa todos los campos obligatorios')
+        if (!formData.name) {
+            toast.warning('El nombre del producto es obligatorio')
+            submittingRef.current = false
+            return
+        }
+
+        const priceSale = formData.price_sale ? parseFloat(formData.price_sale) : null
+        const priceCost = formData.price_cost ? parseFloat(formData.price_cost) : null
+        const stockCurrent = parseInt(formData.stock_current) || 0
+        const stockMinimum = parseInt(formData.stock_minimum) || 0
+
+        if (priceSale !== null && priceSale < 0) {
+            toast.error('El precio de venta no puede ser negativo')
+            submittingRef.current = false
+            return
+        }
+        if (priceCost !== null && priceCost < 0) {
+            toast.error('El costo de compra no puede ser negativo')
+            submittingRef.current = false
+            return
+        }
+        if (stockCurrent < 0) {
+            toast.error('El stock inicial no puede ser negativo')
+            submittingRef.current = false
+            return
+        }
+        if (stockMinimum < 0) {
+            toast.error('El stock mínimo no puede ser negativo')
+            submittingRef.current = false
+            return
+        }
+        if (stockMinimum > stockCurrent) {
+            toast.error('El stock mínimo no puede ser mayor al stock inicial')
+            submittingRef.current = false
             return
         }
 
         setLoading(true)
 
-        // 1. Get user to find company_id
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
-            toast.error("No authenticated user found.")
+            toast.error('No se encontró usuario autenticado')
+            submittingRef.current = false
             setLoading(false)
             return
         }
@@ -66,7 +101,8 @@ export function AddProductDialog() {
         const companyId = (userProfile as any)?.company_id
 
         if (!companyId) {
-            toast.error("No company profile linked to this user.")
+            toast.error('No hay empresa vinculada a este usuario')
+            submittingRef.current = false
             setLoading(false)
             return
         }
@@ -77,13 +113,14 @@ export function AddProductDialog() {
                 name: formData.name,
                 sku: formData.sku || null,
                 category: formData.category || null,
-                price_sale: formData.price_sale ? parseFloat(formData.price_sale) : null,
-                price_cost: formData.price_cost ? parseFloat(formData.price_cost) : null,
-                stock_current: parseInt(formData.stock_current) || 0,
-                stock_minimum: parseInt(formData.stock_minimum) || 0,
+                price_sale: priceSale,
+                price_cost: priceCost,
+                stock_current: stockCurrent,
+                stock_minimum: stockMinimum,
             }
         ] as any)
 
+        submittingRef.current = false
         setLoading(false)
 
         if (!error) {
@@ -97,71 +134,71 @@ export function AddProductDialog() {
                 stock_current: '0',
                 stock_minimum: '0',
             })
-            toast.success('✅ Producto creado exitosamente')
+            toast.success('Producto creado exitosamente')
             router.refresh()
         } else {
-            console.error(error)
-            toast.error('❌ Error al crear producto. Intenta de nuevo.')
+            console.error('Error al crear producto:', error?.message || error)
+            toast.error('Error al crear producto. Intenta de nuevo.')
         }
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button>
+                <Button className="bg-primary text-background-dark hover:bg-primary-dark font-bold shadow-[0_0_15px_rgba(19,236,128,0.2)]">
                     <Plus className="mr-2 h-4 w-4" /> Agregar Producto
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] bg-background-dark border-border-dark text-white">
                 <DialogHeader>
-                    <DialogTitle>Nuevo Producto</DialogTitle>
-                    <DialogDescription>
+                    <DialogTitle className="text-xl font-bold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>Nuevo Producto</DialogTitle>
+                    <DialogDescription className="text-secondary">
                         Ingresa los datos del nuevo artículo para añadirlo al inventario.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="name">Nombre del Producto *</Label>
-                            <Input id="name" name="name" placeholder="Ej. Monitor LG" value={formData.name} onChange={handleChange} required />
+                            <Label htmlFor="name" className="text-white">Nombre del Producto *</Label>
+                            <Input id="name" name="name" placeholder="Ej. Monitor LG" value={formData.name} onChange={handleChange} required autoFocus className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="sku">SKU / Código</Label>
-                                <Input id="sku" name="sku" placeholder="MON-001" value={formData.sku} onChange={handleChange} />
+                                <Label htmlFor="sku" className="text-white">SKU / Código</Label>
+                                <Input id="sku" name="sku" placeholder="MON-001" value={formData.sku} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="category">Categoría</Label>
-                                <Input id="category" name="category" placeholder="Pantallas" value={formData.category} onChange={handleChange} />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="price_sale">Precio Venta ($)</Label>
-                                <Input id="price_sale" name="price_sale" type="number" step="0.01" value={formData.price_sale} onChange={handleChange} />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="price_cost">Costo Compra ($)</Label>
-                                <Input id="price_cost" name="price_cost" type="number" step="0.01" value={formData.price_cost} onChange={handleChange} />
+                                <Label htmlFor="category" className="text-white">Categoría</Label>
+                                <Input id="category" name="category" placeholder="Pantallas" value={formData.category} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="stock_current">Stock Inicial</Label>
-                                <Input id="stock_current" name="stock_current" type="number" value={formData.stock_current} onChange={handleChange} />
+                                <Label htmlFor="price_sale" className="text-white">Precio Venta ($)</Label>
+                                <Input id="price_sale" name="price_sale" type="number" step="0.01" min="0" value={formData.price_sale} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="stock_minimum">Alerta Stock Crítico</Label>
-                                <Input id="stock_minimum" name="stock_minimum" type="number" value={formData.stock_minimum} onChange={handleChange} />
+                                <Label htmlFor="price_cost" className="text-white">Costo Compra ($)</Label>
+                                <Input id="price_cost" name="price_cost" type="number" step="0.01" min="0" value={formData.price_cost} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="stock_current" className="text-white">Stock Inicial</Label>
+                                <Input id="stock_current" name="stock_current" type="number" min="0" value={formData.stock_current} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="stock_minimum" className="text-white">Stock Mínimo</Label>
+                                <Input id="stock_minimum" name="stock_minimum" type="number" min="0" value={formData.stock_minimum} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
                             </div>
                         </div>
 
                     </div>
                     <DialogFooter>
-                        <Button type="submit" disabled={loading}>
+                        <Button type="submit" disabled={loading} className="bg-primary text-background-dark hover:bg-primary-dark font-bold">
                             {loading ? 'Guardando...' : 'Guardar Producto'}
                         </Button>
                     </DialogFooter>

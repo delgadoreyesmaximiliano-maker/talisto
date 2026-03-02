@@ -29,18 +29,12 @@ export default function PricingPage() {
                             <span className="text-slate-500 font-medium">/mes</span>
                         </div>
                         <ul className="space-y-4 mb-8 flex-1">
-                            <li className="flex items-start gap-3">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                <span className="text-slate-700">Hasta 50 productos</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                <span className="text-slate-700">Dashboard básico</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                <span className="text-slate-700">1 usuario</span>
-                            </li>
+                            {['1 usuario', '3 fuentes de datos', '5 dashboards', 'Hasta 50 productos', '10 recomendaciones IA/mes', 'Soporte por email'].map((f) => (
+                                <li key={f} className="flex items-start gap-3">
+                                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                                    <span className="text-slate-700">{f}</span>
+                                </li>
+                            ))}
                         </ul>
                         <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl h-12 text-base font-bold shadow-lg shadow-slate-900/10">
                             <a href="https://wa.me/56912345678?text=Hola,%20quiero%20el%20Plan%20Básico%20de%20Talisto" target="_blank" rel="noreferrer" className="w-full h-full flex items-center justify-center">
@@ -63,18 +57,12 @@ export default function PricingPage() {
                             <span className="text-emerald-100 font-medium">/mes</span>
                         </div>
                         <ul className="space-y-4 mb-8 flex-1">
-                            <li className="flex items-start gap-3">
-                                <CheckCircle2 className="w-5 h-5 text-white shrink-0" />
-                                <span>Productos e Inventario ilimitados</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <CheckCircle2 className="w-5 h-5 text-white shrink-0" />
-                                <span>Intelegencia Artificial Avanzada (Tali)</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <CheckCircle2 className="w-5 h-5 text-white shrink-0" />
-                                <span>Hasta 5 usuarios</span>
-                            </li>
+                            {['Hasta 5 usuarios', 'Fuentes de datos ilimitadas', 'Dashboards ilimitados', 'Productos e Inventario ilimitados', 'Inteligencia Artificial Avanzada (Tali)', 'Recomendaciones IA ilimitadas', 'Alertas automáticas', 'Soporte prioritario'].map((f) => (
+                                <li key={f} className="flex items-start gap-3">
+                                    <CheckCircle2 className="w-5 h-5 text-white shrink-0" />
+                                    <span>{f}</span>
+                                </li>
+                            ))}
                         </ul>
                         <Button className="w-full bg-white text-emerald-700 hover:bg-emerald-50 rounded-xl h-12 text-base font-bold shadow-xl shadow-black/10">
                             <a href="https://wa.me/56912345678?text=Hola,%20quiero%20el%20Plan%20Pro%20de%20Talisto" target="_blank" rel="noreferrer" className="w-full h-full flex items-center justify-center">
@@ -92,18 +80,12 @@ export default function PricingPage() {
                             <span className="text-slate-500 font-medium">/mes</span>
                         </div>
                         <ul className="space-y-4 mb-8 flex-1">
-                            <li className="flex items-start gap-3">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                <span className="text-slate-700">Módulos ILIMITADOS</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                <span className="text-slate-700">Soporte Operativo 24/7 SLA</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
-                                <span className="text-slate-700">Onboarding Personalizado In-Situ</span>
-                            </li>
+                            {['Todo de Pro +', 'Usuarios ilimitados', 'Integraciones personalizadas', 'IA entrenada para tu negocio', 'Análisis multi-sucursal', 'Soporte Operativo 24/7 SLA', 'Onboarding Personalizado', 'Gerente de cuenta dedicado'].map((f) => (
+                                <li key={f} className="flex items-start gap-3">
+                                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                                    <span className="text-slate-700">{f}</span>
+                                </li>
+                            ))}
                         </ul>
                         <Button className="w-full bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-xl h-12 text-base font-bold" variant="secondary">
                             <a href="https://wa.me/56912345678?text=Hola,%20quiero%20cotizar%20el%20Plan%20Enterprise" target="_blank" rel="noreferrer" className="w-full h-full flex items-center justify-center">

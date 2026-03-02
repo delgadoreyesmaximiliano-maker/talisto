@@ -1,66 +1,55 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ShoppingBag, Store, Truck, CreditCard, BarChart3, Mail, ExternalLink, Check, Plug } from 'lucide-react'
+import { Plug, Check, ExternalLink, ShoppingBag, Store, CreditCard, Truck, BarChart3, Mail } from 'lucide-react'
 import { toast } from 'sonner'
+import Image from 'next/image'
 
 const integrations = [
     {
         id: 'mercadolibre',
         name: 'MercadoLibre',
-        desc: 'Sincroniza productos y pedidos con tu cuenta de MercadoLibre.',
+        desc: 'Sincroniza tus productos, precios y pedidos con tu cuenta oficial.',
+        logo: 'https://http2.mlstatic.com/frontend-assets/ml-web-navigation/ui-navigation/5.21.22/mercadolibre/logo__large_plus.png',
         icon: ShoppingBag,
-        color: 'bg-yellow-500/10 text-yellow-600',
         status: 'available' as const,
     },
     {
         id: 'shopify',
         name: 'Shopify',
-        desc: 'Conecta tu tienda Shopify para sincronizar inventario automáticamente.',
+        desc: 'Conecta tu tienda para manejar inventario unificado y multi-canal.',
+        logo: 'https://upload.wikimedia.org/wikipedia/commons/0/0e/Shopify_logo_2018.svg',
         icon: Store,
-        color: 'bg-green-500/10 text-green-600',
         status: 'available' as const,
     },
     {
         id: 'woocommerce',
         name: 'WooCommerce',
-        desc: 'Integra tu tienda WordPress con WooCommerce para gestión unificada.',
+        desc: 'Integra tu WordPress con gestión de despachos automática.',
+        logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/WooCommerce_logo.svg',
         icon: Store,
-        color: 'bg-purple-500/10 text-purple-600',
         status: 'available' as const,
     },
     {
         id: 'transbank',
-        name: 'Transbank / Webpay',
-        desc: 'Procesa pagos con tarjeta de crédito y débito en Chile.',
+        name: 'Transbank',
+        desc: 'Procesa pagos con tarjeta de crédito, débito y prepago en Chile.',
         icon: CreditCard,
-        color: 'bg-blue-500/10 text-blue-600',
         status: 'coming_soon' as const,
     },
     {
-        id: 'despacho',
-        name: 'Chilexpress / Starken',
-        desc: 'Genera guías de despacho y seguimiento automático de envíos.',
+        id: 'starken',
+        name: 'Starken',
+        desc: 'Genera guías de despacho y seguimiento automático en tiempo real.',
         icon: Truck,
-        color: 'bg-orange-500/10 text-orange-600',
         status: 'coming_soon' as const,
     },
     {
         id: 'analytics',
         name: 'Google Analytics',
-        desc: 'Conecta Analytics para métricas avanzadas de tu e-commerce.',
+        desc: 'Métricas avanzadas de tráfico integradas con tu embudo de ventas.',
         icon: BarChart3,
-        color: 'bg-rose-500/10 text-rose-600',
-        status: 'coming_soon' as const,
-    },
-    {
-        id: 'email',
-        name: 'Mailchimp / Brevo',
-        desc: 'Sincroniza clientes del CRM para campañas de email marketing.',
-        icon: Mail,
-        color: 'bg-cyan-500/10 text-cyan-600',
         status: 'coming_soon' as const,
     },
 ]
@@ -73,83 +62,110 @@ export default function IntegrationsPage() {
             const next = new Set(prev)
             if (next.has(id)) {
                 next.delete(id)
-                toast.info(`${name} desconectado`)
+                toast.info(`${name} desconectado.`)
             } else {
                 next.add(id)
-                toast.success(`${name} conectado exitosamente`)
+                toast.success(`¡Conexión exitosa con ${name}!`)
             }
             return next
         })
     }
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground">Integraciones</h1>
-                <p className="text-muted-foreground">
-                    Conecta servicios externos para potenciar tu negocio.
-                </p>
+        <div className="space-y-6 max-w-6xl mx-auto pb-12">
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold tracking-tight text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>Integraciones</h1>
+                <p className="text-secondary mt-1">Conecta los servicios que ya utilizas y centraliza tu operación en Talisto.</p>
+            </div>
+
+            {/* Demo notice */}
+            <div className="flex items-center gap-3 px-5 py-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5">
+                <span className="text-yellow-500 text-xs font-bold uppercase tracking-wider">Modo Demo</span>
+                <span className="text-secondary text-xs">Las conexiones son una simulación y no persisten al recargar la página. Las integraciones reales estarán disponibles próximamente.</span>
             </div>
 
             {/* Connected count */}
-            <div className="flex items-center gap-2 px-4 py-3 rounded-lg bg-muted/50 border">
-                <Plug className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
+            <div className="flex items-center gap-3 px-5 py-4 rounded-xl glass-panel shadow-[0_0_15px_rgba(19,236,128,0.05)] border-primary/20 bg-primary/5">
+                <Plug className="w-5 h-5 text-primary" />
+                <span className="text-sm font-medium text-white">
                     {connected.size === 0
-                        ? 'No tienes integraciones activas'
-                        : `${connected.size} integración${connected.size > 1 ? 'es' : ''} activa${connected.size > 1 ? 's' : ''}`
+                        ? 'Explora nuestras integraciones y comienza a automatizar tu negocio.'
+                        : `Tienes ${connected.size} plataforma${connected.size > 1 ? 's' : ''} activa${connected.size > 1 ? 's' : ''} correctamente.`
                     }
                 </span>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pt-4">
                 {integrations.map((integration) => {
                     const isConnected = connected.has(integration.id)
                     const isComingSoon = integration.status === 'coming_soon'
 
                     return (
-                        <Card
+                        <div
                             key={integration.id}
-                            className={`relative transition-all duration-200 ${isConnected
-                                    ? 'border-emerald-300 dark:border-emerald-700 shadow-sm shadow-emerald-100 dark:shadow-emerald-900/20'
-                                    : 'hover:shadow-md'
-                                } ${isComingSoon ? 'opacity-70' : ''}`}
+                            className={`relative rounded-2xl p-6 transition-all duration-300 glass-panel flex flex-col justify-between h-full bg-surface-dark/80 
+                                ${isConnected
+                                    ? 'border-primary shadow-[0_0_20px_rgba(19,236,128,0.15)] bg-surface-dark'
+                                    : 'border-border-dark hover:border-primary/50 hover:-translate-y-1'
+                                } 
+                                ${isComingSoon ? 'opacity-60 cursor-not-allowed hover:transform-none' : ''}`
+                            }
                         >
                             {isConnected && (
-                                <div className="absolute top-3 right-3">
-                                    <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
-                                        <Check className="w-3.5 h-3.5 text-white" />
+                                <div className="absolute top-4 right-4">
+                                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-[0_0_10px_rgba(19,236,128,0.5)]">
+                                        <Check className="w-3.5 h-3.5 text-background-dark font-bold" />
                                     </div>
                                 </div>
                             )}
-                            <CardHeader className="pb-3">
-                                <div className="flex items-center gap-3">
-                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${integration.color}`}>
-                                        <integration.icon className="w-5 h-5" />
+
+                            <div>
+                                <div className="flex items-center gap-4 mb-5">
+                                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden border border-border-dark bg-white/5`}>
+                                        {integration.logo ? (
+                                            <div className="relative w-full h-full bg-white p-2">
+                                                <Image
+                                                    src={integration.logo}
+                                                    alt={integration.name}
+                                                    fill
+                                                    className="object-contain p-2"
+                                                    unoptimized
+                                                />
+                                            </div>
+                                        ) : (
+                                            <integration.icon className="w-6 h-6 text-secondary" />
+                                        )}
                                     </div>
                                     <div>
-                                        <CardTitle className="text-base">{integration.name}</CardTitle>
+                                        <h3 className="font-bold text-lg text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                                            {integration.name}
+                                        </h3>
                                         {isComingSoon && (
-                                            <span className="text-[10px] font-medium text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-1.5 py-0.5 rounded-full">
+                                            <span className="inline-block mt-1 text-[10px] uppercase tracking-wider font-bold text-primary border border-primary/30 bg-primary/10 px-2 py-0.5 rounded-full">
                                                 Próximamente
                                             </span>
                                         )}
                                     </div>
                                 </div>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <CardDescription className="text-sm leading-relaxed">
+
+                                <p className="text-sm text-secondary min-h-[60px] leading-relaxed">
                                     {integration.desc}
-                                </CardDescription>
+                                </p>
+                            </div>
+
+                            <div className="mt-6 pt-5 border-t border-border-dark">
                                 {isComingSoon ? (
-                                    <Button variant="outline" size="sm" disabled className="w-full">
-                                        Próximamente
+                                    <Button variant="outline" size="sm" disabled className="w-full bg-background-dark text-secondary border-border-dark opacity-50">
+                                        En Desarrollo
                                     </Button>
                                 ) : (
                                     <Button
-                                        variant={isConnected ? "outline" : "default"}
+                                        variant="default"
                                         size="sm"
-                                        className={`w-full gap-1.5 ${isConnected ? 'text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20' : ''}`}
+                                        className={`w-full gap-2 transition-all ${isConnected
+                                            ? 'bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 border border-rose-500/20'
+                                            : 'bg-primary text-background-dark hover:bg-primary/90 font-medium'
+                                            }`}
                                         onClick={() => handleConnect(integration.id, integration.name)}
                                     >
                                         {isConnected ? (
@@ -162,8 +178,8 @@ export default function IntegrationsPage() {
                                         )}
                                     </Button>
                                 )}
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
                     )
                 })}
             </div>

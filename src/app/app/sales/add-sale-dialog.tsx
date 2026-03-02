@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
@@ -14,15 +14,17 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { toast } from 'sonner'
 
 export function AddSaleDialog() {
+    const router = useRouter()
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
-    const router = useRouter()
+    const submittingRef = useRef(false)
 
-    // Simplistic form for now - just tracking amount and customer name
     const [formData, setFormData] = useState({
         amount: '',
+        description: '',
         customer_name: '',
         customer_email: '',
         source: 'manual',
@@ -34,14 +36,24 @@ export function AddSaleDialog() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (submittingRef.current) return
+        submittingRef.current = true
+
+        const amount = parseFloat(formData.amount)
+        if (!formData.amount || isNaN(amount) || amount <= 0) {
+            toast.error('El monto debe ser mayor a $0')
+            submittingRef.current = false
+            return
+        }
+
         setLoading(true)
 
         const supabase = createClient()
 
-        // 1. Get user to find company_id
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) {
-            alert("No authenticated user found.")
+            toast.error('No se encontró usuario autenticado')
+            submittingRef.current = false
             setLoading(false)
             return
         }
@@ -55,82 +67,106 @@ export function AddSaleDialog() {
         const companyId = (userProfile as any)?.company_id
 
         if (!companyId) {
-            alert("No company profile linked to this user.")
+            toast.error('No hay empresa vinculada a este usuario')
+            submittingRef.current = false
             setLoading(false)
             return
         }
 
+        const items = [{
+            name: formData.description || 'Venta Manual',
+            quantity: 1,
+            price: amount
+        }]
+
         const { error } = await supabase.from('sales').insert([
             {
                 company_id: companyId,
-                amount: parseFloat(formData.amount),
+                amount: amount,
                 customer_name: formData.customer_name || null,
                 customer_email: formData.customer_email || null,
                 source: formData.source,
+                items: items,
                 status: 'completed'
             }
         ] as any)
 
+        submittingRef.current = false
         setLoading(false)
 
         if (!error) {
             setOpen(false)
             setFormData({
                 amount: '',
+                description: '',
                 customer_name: '',
                 customer_email: '',
                 source: 'manual',
             })
-            // Force a refresh or rely on a state update mechanism if needed
-            // The simplest approach is to reload the browser or trigger a state event
-            window.location.reload()
+            toast.success('Venta registrada exitosamente')
+            router.refresh()
         } else {
-            console.error(error)
-            alert("Error saving sale")
+            toast.error('Error al guardar la venta')
         }
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button>Registrar Venta</Button>
+                <Button className="bg-primary text-background-dark hover:bg-primary/90">Registrar Venta</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] bg-surface-dark border-border-dark text-white">
                 <DialogHeader>
-                    <DialogTitle>Registrar Nueva Venta</DialogTitle>
-                    <DialogDescription>
-                        Ingresa los detalles de la transacción.
+                    <DialogTitle className="text-white">Registrar Nueva Venta</DialogTitle>
+                    <DialogDescription className="text-secondary">
+                        Ingresa los detalles y el producto de la transacción.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4 pt-4">
                     <div className="space-y-2">
-                        <Label htmlFor="amount">Monto Total ($) *</Label>
+                        <Label htmlFor="description" className="text-white">Descripción / Producto Vendido *</Label>
+                        <Input
+                            id="description"
+                            name="description"
+                            placeholder="Ej. Suscripción Mensual, Producto X..."
+                            value={formData.description}
+                            onChange={handleChange}
+                            required
+                            autoFocus
+                            className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="amount" className="text-white">Monto Total ($) *</Label>
                         <Input
                             id="amount"
                             name="amount"
                             type="number"
                             step="0.01"
-                            min="0"
+                            min="0.01"
                             placeholder="0"
                             value={formData.amount}
                             onChange={handleChange}
                             required
+                            className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="customer_name">Nombre del Cliente</Label>
+                        <Label htmlFor="customer_name" className="text-white">Nombre del Cliente</Label>
                         <Input
                             id="customer_name"
                             name="customer_name"
                             placeholder="Ej. Juan Pérez"
                             value={formData.customer_name}
                             onChange={handleChange}
+                            className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="customer_email">Correo del Cliente</Label>
+                        <Label htmlFor="customer_email" className="text-white">Correo del Cliente</Label>
                         <Input
                             id="customer_email"
                             name="customer_email"
@@ -138,14 +174,15 @@ export function AddSaleDialog() {
                             placeholder="juan@ejemplo.com"
                             value={formData.customer_email}
                             onChange={handleChange}
+                            className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
                         />
                     </div>
 
                     <div className="flex justify-end pt-4">
-                        <Button type="button" variant="outline" className="mr-2" onClick={() => setOpen(false)}>
+                        <Button type="button" variant="outline" className="mr-2 border-border-dark bg-transparent text-secondary hover:text-white" onClick={() => setOpen(false)}>
                             Cancelar
                         </Button>
-                        <Button type="submit" disabled={loading}>
+                        <Button type="submit" disabled={loading} className="bg-primary text-background-dark hover:bg-primary/90">
                             {loading ? 'Guardando...' : 'Guardar Venta'}
                         </Button>
                     </div>

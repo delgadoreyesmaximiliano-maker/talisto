@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Talisto - Funciones Premium</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#13ec80",
+                        "primary-dark": "#0ea35e",
+                        "background-dark": "#111814",
+                        "surface-dark": "#1c2721",
+                        "border-dark": "#283930",
+                        "text-secondary": "#9db9ab",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(28, 39, 33, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 84, 71, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-white font-body antialiased selection:bg-primary selection:text-background-dark">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Header -->
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-border-dark bg-background-dark/80 backdrop-blur-md px-6 py-4 lg:px-10">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary">
+<span class="material-symbols-outlined text-[32px]">diamond</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight text-white">Talisto</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-text-secondary hover:text-white transition-colors" href="#">Producto</a>
+<a class="text-sm font-medium text-text-secondary hover:text-white transition-colors" href="#">Soluciones</a>
+<a class="text-sm font-medium text-text-secondary hover:text-white transition-colors" href="#">Precios</a>
+<a class="text-sm font-medium text-text-secondary hover:text-white transition-colors" href="#">Empresa</a>
+</nav>
+<div class="flex gap-3">
+<button class="hidden sm:flex h-9 items-center justify-center rounded-lg px-4 text-sm font-bold text-white hover:bg-surface-dark transition-colors border border-transparent hover:border-border-dark">
+                    Iniciar sesión
+                </button>
+<button class="flex h-9 items-center justify-center rounded-lg bg-primary px-4 text-sm font-bold text-background-dark hover:bg-primary-dark transition-colors shadow-[0_0_15px_rgba(19,236,128,0.3)]">
+                    Empezar gratis
+                </button>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center">
+<div class="w-full max-w-6xl px-4 py-12 lg:px-8">
+<!-- Hero Section -->
+<div class="mb-20 flex flex-col items-center text-center gap-6">
+<div class="inline-flex items-center rounded-full border border-border-dark bg-surface-dark/50 px-3 py-1 text-xs font-medium text-primary">
+<span class="mr-2 h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></span>
+                        Novedades v2.0
+                    </div>
+<h1 class="max-w-3xl text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
+                        Funcionalidades <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-[#0bda46]">Premium</span>
+</h1>
+<p class="max-w-2xl text-lg text-text-secondary">
+                        Descubre el poder de la elegancia oscura en cada interacción. Herramientas diseñadas para escalar tu negocio con precisión y estilo.
+                    </p>
+<div class="mt-4 flex flex-wrap justify-center gap-4">
+<button class="flex h-12 items-center justify-center rounded-lg bg-surface-dark border border-border-dark px-6 text-base font-bold text-white hover:bg-border-dark transition-all hover:scale-105">
+                            Explorar características
+                        </button>
+</div>
+</div>
+<!-- Feature Block 1: Dashboards -->
+<div class="mb-24 flex flex-col gap-12 lg:flex-row lg:items-center">
+<div class="flex flex-1 flex-col gap-6">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm font-bold uppercase tracking-wider">Analytics</span>
+</div>
+<h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                            Dashboards Intuitivos
+                        </h2>
+<p class="text-lg text-text-secondary">
+                            Visualiza tus datos con claridad cristalina. Paneles de control diseñados para la toma de decisiones rápida y elegante, eliminando el ruido visual para que te enfoques en lo importante.
+                        </p>
+<div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+<div class="glass-panel rounded-xl p-5 hover:bg-surface-dark/60 transition-colors cursor-default">
+<span class="material-symbols-outlined mb-3 text-primary text-3xl">ssid_chart</span>
+<h3 class="font-bold text-white">Datos en tiempo real</h3>
+<p class="text-sm text-text-secondary mt-1">Monitoreo constante sin latencia perceptible.</p>
+</div>
+<div class="glass-panel rounded-xl p-5 hover:bg-surface-dark/60 transition-colors cursor-default">
+<span class="material-symbols-outlined mb-3 text-primary text-3xl">filter_alt</span>
+<h3 class="font-bold text-white">Filtros avanzados</h3>
+<p class="text-sm text-text-secondary mt-1">Segmentación granular de tu audiencia.</p>
+</div>
+</div>
+<div class="mt-4">
+<a class="inline-flex items-center gap-2 text-primary font-bold hover:text-white transition-colors group" href="#">
+                                Ver demo interactiva
+                                <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+<div class="flex-1">
+<div class="relative rounded-2xl border border-border-dark bg-surface-dark/30 p-2 shadow-2xl overflow-hidden">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary/20 to-transparent blur-2xl opacity-30"></div>
+<div class="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-dark" data-alt="Dark dashboard interface showing emerald green data charts and graphs" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAYpRDbW-63LQVc2U84t102-3l2qEyK4XmQkhAiEdCVJQwCf_MuTdttzU-un3GLSb39U3-6fGMQgOq9hGOE6f17GXa-KwDSOYH2WiaeKhD1Ve210sK-o859vdPi5mo2W3ctz9Pq2GAfde1Kq_Zk0f0DXxUtz3z5DWe9K6oQQ3WZbgJQY_lfTIJK-CtA81YE-8X8qtlmL69bCnUSF9mICoqTrRO9cMJDaQ9Z1OFPiINw3Ej0c0ecU3bx_OsLy1Z4HFAIgL9pdzkF8qAO"); background-size: cover; background-position: center;'>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent opacity-60"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Stats Section -->
+<div class="mb-24 grid grid-cols-1 gap-6 sm:grid-cols-3">
+<div class="glass-panel flex flex-col items-center justify-center rounded-2xl p-8 text-center border-t-2 border-t-primary/50">
+<p class="text-sm font-medium text-text-secondary">Tiempo ahorrado</p>
+<p class="mt-2 text-4xl font-black tracking-tight text-white">40%</p>
+<div class="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                            +15% vs promedio
+                        </div>
+</div>
+<div class="glass-panel flex flex-col items-center justify-center rounded-2xl p-8 text-center border-t-2 border-t-primary/50">
+<p class="text-sm font-medium text-text-secondary">Precisión de datos</p>
+<p class="mt-2 text-4xl font-black tracking-tight text-white">99.9%</p>
+<div class="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                            Garantizado
+                        </div>
+</div>
+<div class="glass-panel flex flex-col items-center justify-center rounded-2xl p-8 text-center border-t-2 border-t-primary/50">
+<p class="text-sm font-medium text-text-secondary">Usuarios activos</p>
+<p class="mt-2 text-4xl font-black tracking-tight text-white">10k+</p>
+<div class="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+<span class="material-symbols-outlined text-sm">group_add</span>
+                            Crecimiento mensual
+                        </div>
+</div>
+</div>
+<!-- Feature Block 2: AI -->
+<div class="mb-24 flex flex-col gap-12 lg:flex-row-reverse lg:items-center">
+<div class="flex flex-1 flex-col gap-6">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined">neurology</span>
+<span class="text-sm font-bold uppercase tracking-wider">Inteligencia Artificial</span>
+</div>
+<h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                            Automatización Esmeralda
+                        </h2>
+<p class="text-lg text-text-secondary">
+                            IA que se integra perfectamente en tu flujo de trabajo. Predicciones precisas y asistentes que entienden el contexto de tu negocio antes que tú.
+                        </p>
+<div class="mt-4 space-y-4">
+<div class="group flex items-start gap-4 rounded-xl border border-transparent p-4 hover:border-border-dark hover:bg-surface-dark/50 transition-all">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-dark border border-border-dark group-hover:bg-primary group-hover:text-background-dark transition-colors text-primary">
+<span class="material-symbols-outlined">query_stats</span>
+</div>
+<div>
+<h3 class="font-bold text-white">Predicción de tendencias</h3>
+<p class="text-sm text-text-secondary">Adelántate al mercado con modelos predictivos que analizan millones de puntos de datos.</p>
+</div>
+</div>
+<div class="group flex items-start gap-4 rounded-xl border border-transparent p-4 hover:border-border-dark hover:bg-surface-dark/50 transition-all">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-dark border border-border-dark group-hover:bg-primary group-hover:text-background-dark transition-colors text-primary">
+<span class="material-symbols-outlined">smart_toy</span>
+</div>
+<div>
+<h3 class="font-bold text-white">Asistente Virtual 24/7</h3>
+<p class="text-sm text-text-secondary">Soporte automático para tus clientes con un tono humano y resolutivo.</p>
+</div>
+</div>
+<div class="group flex items-start gap-4 rounded-xl border border-transparent p-4 hover:border-border-dark hover:bg-surface-dark/50 transition-all">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-dark border border-border-dark group-hover:bg-primary group-hover:text-background-dark transition-colors text-primary">
+<span class="material-symbols-outlined">sentiment_satisfied</span>
+</div>
+<div>
+<h3 class="font-bold text-white">Análisis de sentimiento</h3>
+<p class="text-sm text-text-secondary">Entiende lo que dicen de tu marca en redes sociales y tickets de soporte.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-1">
+<div class="relative grid grid-cols-2 gap-4">
+<div class="space-y-4">
+<div class="h-48 rounded-2xl bg-surface-dark border border-border-dark p-1" data-alt="Abstract neural network visualization dark background">
+<div class="h-full w-full rounded-xl bg-cover bg-center opacity-80 hover:opacity-100 transition-opacity" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAtbktkV6KM_kMr99TY267aptXMEpacU7FmJHNQp9N2VkDi2dDGQWT98oi4-_LHeYDhkE3m1v9bGE4CPe1ffTSbYXxfiC4KjziJjd22LVYq44awp5EQicRp0BVytVcEhTbzEJlHuKHqdTosLTUPHg6q_B5JyfxXAR1-xgfQ3zMSXYObGeRD5vFwK7Oo3Zax5ofCSNM0plbEXczMZ_R_MOKnOr2AKy4kQ8IGRx0SEn41cUGPnaPSToqeOqxTv_D0VA2Gag9tfywqdJej")'></div>
+</div>
+<div class="h-32 rounded-2xl bg-surface-dark border border-border-dark p-1" data-alt="Abstract digital waves dark green">
+<div class="h-full w-full rounded-xl bg-cover bg-center opacity-80 hover:opacity-100 transition-opacity" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB0RUHj9_hmOrn46yKUaG2bbZswsMcgdTp7boStOZ5Gf58A0tTTAqZ3EBxI3bdfQKCk0MjavxuGf2y43UPr5ZdQANqSjOyMLqFy1iS182bTE1lWxnxKhTi64g4pzVCqF4-YRfzbxV4d-BuwvYzH6hA5Phl_hsLpbVhrPiV79oO1kIBWJTIqq2EbrrRVovomrHneuZfD6VTTidSjCKXdkIq3NqjiGtYaEr3sNb4R-oOPbdQBFAKTouTZSAcBNx3uNKx_swdhtFpXuPGX")'></div>
+</div>
+</div>
+<div class="mt-8 space-y-4">
+<div class="h-32 rounded-2xl bg-surface-dark border border-border-dark p-1" data-alt="Abstract cyber security lock concept">
+<div class="h-full w-full rounded-xl bg-cover bg-center opacity-80 hover:opacity-100 transition-opacity" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCaaVTx13__ykImqpf9fxnGOYOglP1udJc358-41F9Aynp7ehadeAYPS1837hbegan7Lm3YMI1aRRwfUwJLeLUtrEEKR7oDMx3I0TWVI_ZhItgFgnHI_PRDqt2g2ACtrRonzAdD2sIKl12M1-qf-rm0J6nO4YuzLA6MHYtU_cSE9I4HIP-Bwi_KlH2wdqriaSTlxn48aI6XQ_FtpOjlGi50D796OVZoLRI_RakhX7koEy0jcUEfACJOzw44MA03kZSoI_FtGbylMpq8")'></div>
+</div>
+<div class="h-48 rounded-2xl bg-surface-dark border border-border-dark p-1" data-alt="Futuristic AI chip close up">
+<div class="h-full w-full rounded-xl bg-cover bg-center opacity-80 hover:opacity-100 transition-opacity" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAVA15WalsfRy9aYOg6oVE-I3FOyPt_Cd7EBcH180TLbx6EVAeAddXOZXepbJLVrA8bu_OEZ_jKtkw-VNkbPNQMpKrOmIFQJ0ngE32wNozc8Gwf8CP-gs0VLSmyuM_W3ARpTGZYEcSO1oT5h_Vkzof1bf18-meVphUIvoWRHWldzMs5cW6MgqV0zjul4NK7ky85Cr2rAsbVL0JNwXGG-hTm5oiI_MLxit6dWmqcX0jG-UXnhgyF5hhiOj0ML95BQDQbaUwun6sP7dyb")'></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- CTA Bottom -->
+<div class="relative overflow-hidden rounded-3xl bg-surface-dark border border-border-dark px-6 py-16 text-center sm:px-12 lg:px-24">
+<div class="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/20 blur-[100px] rounded-full"></div>
+<div class="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-64 h-64 bg-primary/10 blur-[100px] rounded-full"></div>
+<h2 class="relative text-3xl font-black tracking-tight text-white sm:text-4xl">
+                        ¿Listo para transformar tu gestión?
+                    </h2>
+<p class="relative mx-auto mt-4 max-w-2xl text-lg text-text-secondary">
+                        Únete a miles de empresas que ya utilizan Talisto para optimizar sus recursos. Sin tarjetas de crédito para empezar.
+                    </p>
+<div class="relative mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+<button class="flex h-12 min-w-[160px] items-center justify-center rounded-lg bg-primary px-8 font-bold text-background-dark shadow-[0_0_20px_rgba(19,236,128,0.4)] hover:bg-primary-dark transition-all hover:scale-105">
+                            Comenzar ahora
+                        </button>
+<button class="flex h-12 min-w-[160px] items-center justify-center rounded-lg border border-border-dark bg-transparent px-8 font-bold text-white hover:bg-border-dark transition-all">
+                            Hablar con ventas
+                        </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Simple Footer -->
+<footer class="border-t border-border-dark bg-background-dark py-12">
+<div class="w-full max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2 text-text-secondary">
+<span class="material-symbols-outlined">diamond</span>
+<span class="font-bold">Talisto</span>
+<span class="text-xs ml-2">© 2024</span>
+</div>
+<div class="flex gap-6">
+<a class="text-text-secondary hover:text-primary transition-colors" href="#"><span class="sr-only">Twitter</span><span class="material-symbols-outlined">public</span></a>
+<a class="text-text-secondary hover:text-primary transition-colors" href="#"><span class="sr-only">LinkedIn</span><span class="material-symbols-outlined">share</span></a>
+<a class="text-text-secondary hover:text-primary transition-colors" href="#"><span class="sr-only">GitHub</span><span class="material-symbols-outlined">code</span></a>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

@@ -8,8 +8,8 @@ export default function InventoryPage() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Inventario</h1>
-                    <p className="text-muted-foreground">
+                    <h1 className="text-3xl font-extrabold tracking-tight text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>Inventario</h1>
+                    <p className="text-secondary font-medium mt-1">
                         Gestiona tus productos, variaciones y niveles de stock.
                     </p>
                 </div>
@@ -19,14 +19,14 @@ export default function InventoryPage() {
                 </div>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Lista de Productos</CardTitle>
-                    <CardDescription>
+            <Card className="glass-panel border-none shadow-sm rounded-3xl overflow-hidden">
+                <CardHeader className="border-b border-border-dark px-8 py-6">
+                    <CardTitle className="text-lg font-extrabold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>Lista de Productos</CardTitle>
+                    <CardDescription className="text-secondary font-medium">
                         Una lista de todos tus productos dados de alta.
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-8">
                     <ProductsTable />
                 </CardContent>
             </Card>
