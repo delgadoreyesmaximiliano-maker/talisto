@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { processAgentMessage, transcribeAudio } from '@/lib/telegram/ai-agent';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +11,23 @@ const supabase = createClient(
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
 
-async function sendTelegramMessage(chatId: string, text: string) {
+async function sendTelegramMessage(chatId: string, text: string, photoUrl?: string) {
+    if (photoUrl) {
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+        const payload = {
+            chat_id: chatId,
+            photo: photoUrl,
+            caption: text,
+            parse_mode: 'HTML'
+        };
+        try {
+            await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        } catch (e) {
+            console.error(e);
+        }
+        return;
+    }
+
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
     const payload = {
         chat_id: chatId,
@@ -33,14 +50,26 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         
-        // Formato estándar de un mensaje de Telegram
         const message = body?.message;
-        if (!message || !message.text) {
+        if (!message) {
             return NextResponse.json({ status: 'ok' });
         }
 
         const chatId = message.chat.id.toString();
-        const text: string = message.text.trim();
+        let text: string = '';
+
+        if (message.voice) {
+            // Process audio with Whisper
+            text = await transcribeAudio(message.voice.file_id);
+            if (!text || text.trim() === '') {
+                await sendTelegramMessage(chatId, 'No pude transcribir tu mensaje de voz.');
+                return NextResponse.json({ status: 'ok' });
+            }
+        } else if (message.text) {
+            text = message.text.trim();
+        } else {
+            return NextResponse.json({ status: 'ok' });
+        }
 
         // Si el usuario envía /start <code>
         if (text.startsWith('/start')) {
@@ -95,47 +124,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ status: 'ok' });
         }
 
-        const companyId = company.id;
-
-        // Comandos de lectura interactiva
-        if (text.startsWith('/sales')) {
-            const todayStart = new Date();
-            todayStart.setHours(0, 0, 0, 0);
-            const todayEnd = new Date();
-            todayEnd.setHours(23, 59, 59, 999);
-
-            const { data: salesAyer } = await supabase
-                .from('sales')
-                .select('amount')
-                .eq('company_id', companyId)
-                .gte('created_at', todayStart.toISOString())
-                .lte('created_at', todayEnd.toISOString());
-
-            const totalVentasAyer = (salesAyer || []).reduce((sum: number, s: any) => sum + (s.amount || 0), 0);
-            const cantVentasAyer = (salesAyer || []).length;
-
-            await sendTelegramMessage(chatId, `📊 <b>Ventas de Hoy (${company.name}):</b>\n\n- Transacciones: ${cantVentasAyer}\n- Total Recaudado: $${totalVentasAyer.toLocaleString('es-CL')}`);
-        
-        } else if (text.startsWith('/critical')) {
-            const { data: allProducts } = await supabase
-                .from('products')
-                .select('name, stock_current, stock_minimum')
-                .eq('company_id', companyId);
-            
-            const criticalProducts = (allProducts || []).filter((p: any) => p.stock_current <= p.stock_minimum);
-
-            if (criticalProducts.length > 0) {
-                let msg = `⚠️ <b>Productos en Stock Crítico:</b>\n\n`;
-                criticalProducts.forEach((p: any) => {
-                    msg += `- ${p.name}: ${p.stock_current} (Min: ${p.stock_minimum})\n`;
-                });
-                await sendTelegramMessage(chatId, msg);
-            } else {
-                await sendTelegramMessage(chatId, `✅ <b>Inventario Saludable</b>\nNo tienes productos por debajo del stock mínimo.`);
-            }
-        } else {
-            await sendTelegramMessage(chatId, `🤖 No reconozco ese comando.\n\n<b>Comandos disponibles:</b>\n/sales - Ventas de hoy\n/critical - Stock crítico`);
-        }
+        // --- DELEGACIÓN DEL MENSAJE AL AGENTE IA (Groq/LLaMA + Whisper) ---
+        const agentResponse = await processAgentMessage(text, company.id, company.name);
+        await sendTelegramMessage(chatId, agentResponse.text, agentResponse.photoUrl);
 
         return NextResponse.json({ status: 'ok' });
     } catch (error) {
