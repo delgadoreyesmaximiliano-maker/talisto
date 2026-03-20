@@ -3,11 +3,12 @@ import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-async function sendWhatsAppMessage(instanceId: string, token: string, toPhone: string, text: string) {
-    const url = `https://api.green-api.com/waInstance${instanceId}/sendMessage/${token}`;
+async function sendTelegramMessage(token: string, chatId: string, text: string) {
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
     const payload = {
-        chatId: `${toPhone}@c.us`,
-        message: text
+        chat_id: chatId,
+        text: text,
+        parse_mode: 'Markdown'
     };
 
     try {
@@ -18,10 +19,10 @@ async function sendWhatsAppMessage(instanceId: string, token: string, toPhone: s
         });
         if (!response.ok) {
             const err = await response.text();
-            console.error(`[CRON] Error Green-API para ${toPhone}:`, err);
+            console.error(`[CRON] Error Telegram para chat ${chatId}:`, err);
         }
     } catch (error) {
-        console.error(`[CRON] Excepción Green-API para ${toPhone}:`, error);
+        console.error(`[CRON] Excepción Telegram para chat ${chatId}:`, error);
     }
 }
 
@@ -39,14 +40,12 @@ export async function GET(request: Request) {
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
-        // 2. Extraer empresas con Green-API configurado
+        // 2. Extraer empresas con Telegram con su chat ID
         const { data: companies, error: compError } = await supabase
             .from('companies')
             .select('*')
-            .not('green_api_instance_id', 'is', null)
-            .not('green_api_instance_id', 'eq', '')
-            .not('green_api_token', 'is', null)
-            .not('green_api_token', 'eq', '');
+            .not('telegram_chat_id', 'is', null)
+            .not('telegram_chat_id', 'eq', '');
 
         if (compError) {
             console.error('[CRON] Error obteniendo empresas:', compError);
@@ -69,14 +68,12 @@ export async function GET(request: Request) {
 
         // 3. Procesar cada empresa
         for (const company of companies) {
-            const ownerPhone = company.phone || (company as any).phone_number;
+            const chatId = company.telegram_chat_id;
 
-            if (!ownerPhone) {
-                console.log(`[CRON] Empresa ${company.id} no tiene teléfono asociado.`);
+            if (!chatId) {
+                console.log(`[CRON] Empresa ${company.id} no tiene telegram_chat_id asociado.`);
                 continue;
             }
-            
-            const cleanPhone = ownerPhone.replace(/\D/g, '');
 
             // Calcular ventas de ayer
             const { data: salesAyer } = await supabase
@@ -114,7 +111,12 @@ export async function GET(request: Request) {
 
             mensaje += `\n¡Que tengas un excelente día de ventas! 🚀`;
 
-            await sendWhatsAppMessage(company.green_api_instance_id, company.green_api_token, cleanPhone, mensaje);
+            const botToken = process.env.TELEGRAM_BOT_TOKEN;
+            if (botToken) {
+                await sendTelegramMessage(botToken, chatId, mensaje);
+            } else {
+                console.error('[CRON] TELEGRAM_BOT_TOKEN no está definido en .env');
+            }
             mensajesEnviados++;
         }
 

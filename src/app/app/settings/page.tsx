@@ -37,6 +37,10 @@ export default function SettingsPage() {
     const [greenApiLoading, setGreenApiLoading] = useState(false)
     const [testPhone, setTestPhone] = useState('')
     const [testLoading, setTestLoading] = useState(false)
+    
+    // Telegram State
+    const [telegramCode, setTelegramCode] = useState<string | null>(null)
+    const [telegramLoading, setTelegramLoading] = useState(false)
 
     useEffect(() => {
         async function loadProfile() {
@@ -53,7 +57,7 @@ export default function SettingsPage() {
                 if ((profile as any)?.company_id) {
                     const { data: companyData } = await supabase
                         .from('companies')
-                        .select('id, name, industry, plan, green_api_instance_id, green_api_token, whatsapp_report_time, whatsapp_report_preferences')
+                        .select('id, name, industry, plan, green_api_instance_id, green_api_token, whatsapp_report_time, whatsapp_report_preferences, telegram_chat_id')
                         .eq('id', (profile as any).company_id)
                         .single()
 
@@ -138,6 +142,32 @@ export default function SettingsPage() {
             toast.error('Ocurrió un error de red al intentar enviar la prueba')
         } finally {
             setTestLoading(false)
+        }
+    }
+
+    const generateTelegramCode = async () => {
+        if (!company?.id) return
+        setTelegramLoading(true)
+        
+        const code = Math.floor(100000 + Math.random() * 900000).toString()
+
+        try {
+            await supabase.from('telegram_pairing_codes').delete().eq('company_id', company.id)
+            
+            const { error } = await supabase
+                .from('telegram_pairing_codes')
+                // @ts-expect-error - Supabase types not updated yet
+                .insert([{ company_id: company.id, code }])
+            
+            if (error) throw error
+            
+            setTelegramCode(code)
+            toast.success('Código generado con éxito')
+        } catch (error) {
+            console.error(error)
+            toast.error('Error al generar código')
+        } finally {
+            setTelegramLoading(false)
         }
     }
 
@@ -435,6 +465,78 @@ export default function SettingsPage() {
                                     {testLoading ? 'Enviando...' : 'Enviar Test'}
                                 </Button>
                             </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Telegram Integration Info */}
+            {company && (
+                <Card className="bg-surface-dark border-border-dark mt-6 mb-6">
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                                    <MessageSquareMore className="w-5 h-5 text-blue-500" />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-lg text-white">Bot de Telegram</CardTitle>
+                                    <CardDescription className="text-secondary">Chatea con TaliBots para ver tu stock y ventas</CardDescription>
+                                </div>
+                            </div>
+                            {company.telegram_chat_id && (
+                                <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 flex items-center gap-1.5 text-xs font-bold">
+                                    <CheckCircle2 className="w-3.5 h-3.5" /> Vinculado
+                                </div>
+                            )}
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            <p className="text-sm text-secondary mb-4">
+                                Conecta tu cuenta corporativa con nuestro Bot oficial de Telegram para consultar tus ventas del día, ver stock crítico y recibir notificaciones.
+                            </p>
+                            {!company.telegram_chat_id ? (
+                                <div className="bg-background-dark p-4 rounded-lg border border-border-dark/50 space-y-3">
+                                    <h4 className="text-sm font-bold text-white">1. Genera tu código</h4>
+                                    <p className="text-xs text-secondary">Genera un código único temporal para enlazar tu cuenta con tu perfil de Telegram de forma rápida y segura.</p>
+                                    
+                                    {telegramCode ? (
+                                        <div className="space-y-3 mt-2">
+                                            <div className="bg-surface-dark p-3 rounded text-center border border-primary/30">
+                                                <span className="text-2xl font-mono font-bold tracking-widest text-primary">{telegramCode}</span>
+                                            </div>
+                                            <div className="flex items-center justify-center gap-2">
+                                                <Button 
+                                                    onClick={() => window.open(`https://t.me/Talistbot?start=${telegramCode}`, '_blank')}
+                                                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold w-full"
+                                                >
+                                                    Abrir Telegram y Vincular
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <Button 
+                                            onClick={generateTelegramCode} 
+                                            disabled={telegramLoading}
+                                            variant="outline"
+                                            className="w-full bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:text-primary"
+                                        >
+                                            {telegramLoading ? 'Generando...' : 'Generar Código de Enlace'}
+                                        </Button>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="bg-background-dark p-4 rounded-lg border border-border-dark/50">
+                                    <p className="text-sm text-white font-medium mb-3">✅ Tu cuenta ya está vinculada al bot.</p>
+                                    <Button 
+                                        onClick={() => window.open(`https://t.me/Talistbot`, '_blank')}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold"
+                                    >
+                                        Ir al Chat de Telegram
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
