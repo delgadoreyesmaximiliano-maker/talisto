@@ -30,6 +30,17 @@ const formatChartValue = (value: number) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const formatTooltipValue = (value: any) => [`$${Number(value ?? 0).toLocaleString('es-CL')}`, 'Monto'] as any
 
+// Defined outside component so the reference is stable across renders
+// If defined inline, useChat resets on every keystroke (inputValue state change)
+const INITIAL_MESSAGES = [
+    {
+        id: 'welcome',
+        role: 'assistant' as const,
+        content: '¡Hola! Soy tu asistente de Talisto.\n\nAún estoy aprendiendo el contexto de tu negocio, pero estaré 100% disponible muy pronto para darte reportes de ventas, crear gráficas y sugerir oportunidades.\n\nEscribe cualquier duda o comando abajo.',
+        parts: [{ type: 'text' as const, text: '¡Hola! Soy tu asistente de Talisto.\n\nAún estoy aprendiendo el contexto de tu negocio, pero estaré 100% disponible muy pronto para darte reportes de ventas, crear gráficas y sugerir oportunidades.\n\nEscribe cualquier duda o comando abajo.', state: 'done' as const }],
+    }
+]
+
 export function ChatClient() {
     const [inputValue, setInputValue] = useState('')
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -52,14 +63,7 @@ export function ChatClient() {
     const { messages, sendMessage, status } = useChat({
         transport,
         onError: handleError,
-        messages: [
-            {
-                id: 'welcome',
-                role: 'assistant',
-                content: '¡Hola! Soy tu asistente de Talisto.\n\nAún estoy aprendiendo el contexto de tu negocio, pero estaré 100% disponible muy pronto para darte reportes de ventas, crear gráficas y sugerir oportunidades.\n\nEscribe cualquier duda o comando abajo.',
-                parts: [{ type: 'text', text: '¡Hola! Soy tu asistente de Talisto.\n\nAún estoy aprendiendo el contexto de tu negocio, pero estaré 100% disponible muy pronto para darte reportes de ventas, crear gráficas y sugerir oportunidades.\n\nEscribe cualquier duda o comando abajo.', state: 'done' }],
-            }
-        ],
+        messages: INITIAL_MESSAGES,
     })
 
     const isLoading = status === 'submitted' || status === 'streaming'
