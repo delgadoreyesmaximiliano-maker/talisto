@@ -47,7 +47,7 @@ export default function LoginPage() {
                 <div className="grid md:grid-cols-2 gap-16 items-center">
 
                     {/* Left Column (Hero Text) */}
-                    <div className="text-white flex flex-col justify-center">
+                    <div className="text-foreground flex flex-col justify-center">
                         <Link href="/" className="inline-flex items-center gap-3 mb-12">
                             <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                                 <Zap className="w-6 h-6 text-white fill-white" />
@@ -55,7 +55,7 @@ export default function LoginPage() {
                             <span className="text-2xl font-black tracking-tighter" style={{ fontFamily: "'Outfit', sans-serif" }}>TALISTO</span>
                         </Link>
 
-                        <h1 className="text-4xl md:text-5xl font-black mb-6 leading-tight text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                        <h1 className="text-4xl md:text-5xl font-black mb-6 leading-tight text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
                             Bienvenido de vuelta
                         </h1>
 
@@ -140,7 +140,7 @@ export default function LoginPage() {
 
                                     <Button
                                         type="submit"
-                                        className="w-full py-4 h-auto bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors text-base shadow-lg shadow-emerald-500/20"
+                                        className="w-full py-4 h-auto bg-emerald-500 hover:bg-emerald-600 text-background font-bold rounded-lg transition-colors text-base shadow-lg shadow-emerald-500/20"
                                         disabled={loading}
                                     >
                                         {loading ? 'Validando...' : 'Iniciar Sesión'}

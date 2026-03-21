@@ -254,7 +254,7 @@ export function ProductsTable() {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
-                <Button variant="outline" size="icon" onClick={fetchProducts} aria-label="Recargar tabla" className="bg-surface-dark border-border-dark text-secondary hover:text-white hover:bg-border-dark">
+                <Button variant="outline" size="icon" onClick={fetchProducts} aria-label="Recargar tabla" className="bg-surface-dark border-border-dark text-secondary hover:text-foreground hover:bg-border-dark">
                     <RefreshCcw className="h-4 w-4" aria-hidden="true" />
                 </Button>
             </div>
@@ -275,7 +275,7 @@ export function ProductsTable() {
                         <TableHeader className="bg-background-dark/50 hover:bg-background-dark/50">
                             <TableRow className="border-border-dark hover:bg-transparent">
                                 <TableHead
-                                    className="text-secondary font-medium cursor-pointer select-none hover:text-white transition-colors"
+                                    className="text-secondary font-medium cursor-pointer select-none hover:text-foreground transition-colors"
                                     onClick={() => toggleSort('name')}
                                     onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('name'))}
                                     role="button" tabIndex={0}
@@ -285,7 +285,7 @@ export function ProductsTable() {
                                 <TableHead className="text-secondary font-medium">SKU</TableHead>
                                 <TableHead className="text-secondary font-medium">Categoría</TableHead>
                                 <TableHead
-                                    className="text-secondary font-medium text-right cursor-pointer select-none hover:text-white transition-colors"
+                                    className="text-secondary font-medium text-right cursor-pointer select-none hover:text-foreground transition-colors"
                                     onClick={() => toggleSort('price_sale')}
                                     onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('price_sale'))}
                                     role="button" tabIndex={0}
@@ -293,7 +293,7 @@ export function ProductsTable() {
                                     Precio <SortIcon col="price_sale" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
                                 <TableHead
-                                    className="text-secondary font-medium text-right cursor-pointer select-none hover:text-white transition-colors"
+                                    className="text-secondary font-medium text-right cursor-pointer select-none hover:text-foreground transition-colors"
                                     onClick={() => toggleSort('stock_current')}
                                     onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('stock_current'))}
                                     role="button" tabIndex={0}
@@ -386,7 +386,7 @@ export function ProductsTable() {
                                     size="sm"
                                     onClick={() => setPage(p => p - 1)}
                                     disabled={page === 1}
-                                    className="bg-surface-dark border-border-dark text-secondary hover:text-white hover:bg-border-dark disabled:opacity-40 text-xs"
+                                    className="bg-surface-dark border-border-dark text-secondary hover:text-foreground hover:bg-border-dark disabled:opacity-40 text-xs"
                                 >
                                     Anterior
                                 </Button>
@@ -395,7 +395,7 @@ export function ProductsTable() {
                                     size="sm"
                                     onClick={() => setPage(p => p + 1)}
                                     disabled={page === totalPages}
-                                    className="bg-surface-dark border-border-dark text-secondary hover:text-white hover:bg-border-dark disabled:opacity-40 text-xs"
+                                    className="bg-surface-dark border-border-dark text-secondary hover:text-foreground hover:bg-border-dark disabled:opacity-40 text-xs"
                                 >
                                     Siguiente
                                 </Button>
@@ -468,7 +468,7 @@ export function ProductsTable() {
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)} className="border-border-dark bg-transparent text-secondary hover:text-white">
+                            <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)} className="border-border-dark bg-transparent text-secondary hover:text-foreground">
                                 Cancelar
                             </Button>
                             <Button type="submit" disabled={editLoading} className="bg-primary text-background-dark hover:bg-primary/90 font-bold">

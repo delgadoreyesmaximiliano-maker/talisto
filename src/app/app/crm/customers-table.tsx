@@ -182,7 +182,7 @@ export function CustomersTable() {
                         <TableHeader className="bg-background-dark/50 hover:bg-background-dark/50">
                             <TableRow className="border-border-dark hover:bg-transparent">
                                 <TableHead
-                                    className="text-secondary font-medium cursor-pointer select-none hover:text-white transition-colors"
+                                    className="text-secondary font-medium cursor-pointer select-none hover:text-foreground transition-colors"
                                     onClick={() => toggleSort('name')}
                                     onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('name'))}
                                     role="button" tabIndex={0}
@@ -192,7 +192,7 @@ export function CustomersTable() {
                                 <TableHead className="text-secondary font-medium">Estado</TableHead>
                                 <TableHead className="text-secondary font-medium">Suscripción</TableHead>
                                 <TableHead
-                                    className="text-right text-secondary font-medium cursor-pointer select-none hover:text-white transition-colors"
+                                    className="text-right text-secondary font-medium cursor-pointer select-none hover:text-foreground transition-colors"
                                     onClick={() => toggleSort('mrr')}
                                     onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('mrr'))}
                                     role="button" tabIndex={0}
@@ -200,7 +200,7 @@ export function CustomersTable() {
                                     MRR <SortIcon col="mrr" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
                                 <TableHead
-                                    className="text-right text-secondary font-medium cursor-pointer select-none hover:text-white transition-colors"
+                                    className="text-right text-secondary font-medium cursor-pointer select-none hover:text-foreground transition-colors"
                                     onClick={() => toggleSort('last_activity')}
                                     onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('last_activity'))}
                                     role="button" tabIndex={0}
@@ -247,7 +247,7 @@ export function CustomersTable() {
                                     size="sm"
                                     onClick={() => setPage(p => p - 1)}
                                     disabled={page === 1}
-                                    className="bg-surface-dark border-border-dark text-secondary hover:text-white hover:bg-border-dark disabled:opacity-40 text-xs"
+                                    className="bg-surface-dark border-border-dark text-secondary hover:text-foreground hover:bg-border-dark disabled:opacity-40 text-xs"
                                 >
                                     Anterior
                                 </Button>
@@ -256,7 +256,7 @@ export function CustomersTable() {
                                     size="sm"
                                     onClick={() => setPage(p => p + 1)}
                                     disabled={page === totalPages}
-                                    className="bg-surface-dark border-border-dark text-secondary hover:text-white hover:bg-border-dark disabled:opacity-40 text-xs"
+                                    className="bg-surface-dark border-border-dark text-secondary hover:text-foreground hover:bg-border-dark disabled:opacity-40 text-xs"
                                 >
                                     Siguiente
                                 </Button>

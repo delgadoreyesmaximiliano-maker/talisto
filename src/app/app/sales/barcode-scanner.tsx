@@ -103,7 +103,7 @@ export function BarcodeScannerInput() {
                     ref={inputRef}
                     type="text"
                     placeholder="Escanear lector de código..."
-                    className="border-0 bg-transparent text-white placeholder:text-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 px-2 h-11 text-lg font-mono tracking-wider"
+                    className="border-0 bg-transparent text-foreground placeholder:text-primary/50 focus-visible:ring-0 focus-visible:ring-offset-0 px-2 h-11 text-lg font-mono tracking-wider"
                     value={barcode}
                     onChange={(e) => setBarcode(e.target.value)}
                     disabled={isScanning}

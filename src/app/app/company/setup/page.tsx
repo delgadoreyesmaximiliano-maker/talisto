@@ -209,7 +209,7 @@ export default function CompanySetupPage() {
                     <div key={num} className="flex flex-col items-center gap-2">
                         <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold transition-all duration-500 
                             ${step > num ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' :
-                                step === num ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/30 ring-4 ring-slate-100' :
+                                step === num ? 'bg-surface-dark text-foreground shadow-lg shadow-surface-dark/30 ring-4 ring-slate-100' :
                                     'bg-white text-slate-400 border-2 border-slate-100'}`}>
                             {step > num ? <Check className="w-5 h-5 md:w-6 md:h-6" /> : num}
                         </div>
@@ -310,7 +310,7 @@ export default function CompanySetupPage() {
                                     <Button
                                         onClick={nextStep}
                                         disabled={!formData.name || !formData.industry}
-                                        className="w-full h-14 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl shadow-xl shadow-slate-900/10 group transition-all"
+                                        className="w-full h-14 bg-surface-dark hover:bg-surface-dark/90 text-foreground font-bold rounded-2xl shadow-xl shadow-slate-900/10 group transition-all"
                                     >
                                         Siguiente Paso <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                     </Button>
@@ -359,7 +359,7 @@ export default function CompanySetupPage() {
 
                                 <div className="flex gap-4 pt-4 mt-auto">
                                     <Button variant="outline" onClick={prevStep} className="h-14 px-6 border-slate-200 text-slate-500 font-bold rounded-2xl hover:bg-slate-50">Atrás</Button>
-                                    <Button onClick={nextStep} disabled={!formData.actividad} className="flex-1 h-14 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl shadow-xl shadow-slate-900/10 group">
+                                    <Button onClick={nextStep} disabled={!formData.actividad} className="flex-1 h-14 bg-surface-dark hover:bg-surface-dark/90 text-foreground font-bold rounded-2xl shadow-xl shadow-slate-900/10 group">
                                         Continuar <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                     </Button>
                                 </div>

@@ -50,7 +50,7 @@ export default function SignupPage() {
                 <div className="grid md:grid-cols-2 gap-16 items-center">
 
                     {/* Left Column (Hero Text) */}
-                    <div className="text-white flex flex-col justify-center">
+                    <div className="text-foreground flex flex-col justify-center">
                         <Link href="/" className="inline-flex items-center gap-3 mb-12">
                             <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                                 <Zap className="w-6 h-6 text-white fill-white" />
@@ -66,14 +66,14 @@ export default function SignupPage() {
                             Potencia tu negocio con las herramientas que usan las empresas líderes. Sin tarjetas de crédito, sin complicaciones.
                         </p>
 
-                        <div className="mt-8 bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
+                        <div className="mt-8 bg-muted/30 border border-muted/40 rounded-2xl p-6 backdrop-blur-sm">
                             <div className="flex gap-1 mb-3">
                                 {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-4 h-4 text-emerald-400 fill-emerald-400" />)}
                             </div>
                             <p className="text-gray-200 italic leading-relaxed mb-4">
                                 "Talisto ha unificado todas nuestras operaciones en un solo lugar. La integración de IA nos ahorra horas cada semana."
                             </p>
-                            <p className="text-sm font-bold text-white uppercase tracking-widest">— María S., Directora Comercial</p>
+                            <p className="text-sm font-bold text-foreground uppercase tracking-widest">— María S., Directora Comercial</p>
                         </div>
                     </div>
 
@@ -146,7 +146,7 @@ export default function SignupPage() {
 
                                     <Button
                                         type="submit"
-                                        className="w-full py-4 h-auto bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors text-base shadow-lg shadow-emerald-500/20"
+                                        className="w-full py-4 h-auto bg-emerald-500 hover:bg-emerald-600 text-background font-bold rounded-lg transition-colors text-base shadow-lg shadow-emerald-500/20"
                                         disabled={loading}
                                     >
                                         {loading ? 'Creando cuenta...' : 'Crear mi Cuenta'}

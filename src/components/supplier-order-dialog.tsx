@@ -154,9 +154,9 @@ Gracias.`
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] bg-background-dark border-border-dark text-white">
+            <DialogContent className="sm:max-w-[500px] bg-background-dark border-border-dark text-foreground">
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-bold text-white flex items-center gap-2" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                    <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2" style={{ fontFamily: "'Outfit', sans-serif" }}>
                         <ShoppingCart className="w-5 h-5 text-amber-400" />
                         {labels.orderLabel}
                     </DialogTitle>
@@ -175,7 +175,7 @@ Gracias.`
                                 className="border-border-dark data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
                             />
                             <div className="flex-1 min-w-0">
-                                <label htmlFor={`chk-${p.name}`} className="text-sm font-medium text-white cursor-pointer block truncate">{p.name}</label>
+                                <label htmlFor={`chk-${p.name}`} className="text-sm font-medium text-foreground cursor-pointer block truncate">{p.name}</label>
                                 <p className="text-xs text-secondary">Stock: {p.stock_current} / mín. {p.stock_minimum}</p>
                             </div>
                             <div className="w-20 shrink-0">
@@ -185,7 +185,7 @@ Gracias.`
                                     value={quantities[p.name]}
                                     onChange={(e) => setQuantities(prev => ({ ...prev, [p.name]: e.target.value }))}
                                     disabled={!selected[p.name]}
-                                    className="h-8 text-center text-sm bg-surface-dark border-border-dark/50 text-white focus-visible:ring-primary/50 disabled:opacity-40"
+                                    className="h-8 text-center text-sm bg-surface-dark border-border-dark/50 text-foreground focus-visible:ring-primary/50 disabled:opacity-40"
                                 />
                             </div>
                         </div>
@@ -196,7 +196,7 @@ Gracias.`
                 {selectedProducts.length > 0 && (
                     <div className="bg-surface-dark rounded-xl p-3 border border-border-dark">
                         <p className="text-xs text-secondary mb-2 font-medium uppercase tracking-wider">Vista previa del mensaje</p>
-                        <pre className="text-xs text-white whitespace-pre-wrap font-mono leading-relaxed">
+                        <pre className="text-xs text-foreground whitespace-pre-wrap font-mono leading-relaxed">
                             {generateText()}
                         </pre>
                     </div>
@@ -212,7 +212,7 @@ Gracias.`
                             placeholder="Ej: +56 9 1234 5678"
                             value={supplierPhone}
                             onChange={(e) => handlePhoneChange(e.target.value)}
-                            className="bg-surface-dark border-border-dark text-white focus-visible:ring-primary/50"
+                            className="bg-surface-dark border-border-dark text-foreground focus-visible:ring-primary/50"
                         />
                         <p className="text-[10px] text-secondary">El número se guardará para tu próxima orden</p>
                     </div>
@@ -222,7 +222,7 @@ Gracias.`
                             variant="outline"
                             onClick={handleCopy}
                             disabled={selectedProducts.length === 0}
-                            className="flex-1 gap-2 border-border-dark bg-transparent text-secondary hover:text-white hover:bg-white/5 disabled:opacity-40"
+                            className="flex-1 gap-2 border-border-dark bg-transparent text-secondary hover:text-foreground hover:bg-muted/30 disabled:opacity-40"
                         >
                             {copied
                                 ? <><Check className="w-4 h-4" /> Copiado</>

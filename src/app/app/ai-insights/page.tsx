@@ -67,10 +67,10 @@ export default async function AIInsightsPage() {
         <div className="space-y-6 max-w-7xl mx-auto">
             {/* Header */}
             <div className="space-y-2">
-                <h1 className="text-4xl font-bold text-white">
+                <h1 className="text-4xl font-bold text-foreground">
                     💼 Tu CFO Virtual
                 </h1>
-                <p className="text-lg text-gray-400">
+                <p className="text-lg text-muted-foreground">
                     Navega por el tiempo para analizar tu negocio. La IA genera insights automáticamente.
                 </p>
             </div>

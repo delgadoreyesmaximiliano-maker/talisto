@@ -106,9 +106,9 @@ export function AddCustomerDialog() {
                     <Plus className="mr-2 h-4 w-4" /> Agregar Cliente
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-background-dark border-border-dark text-white">
+            <DialogContent className="sm:max-w-[425px] bg-background-dark border-border-dark text-foreground">
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-bold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>Nuevo Cliente</DialogTitle>
+                    <DialogTitle className="text-xl font-bold text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>Nuevo Cliente</DialogTitle>
                     <DialogDescription className="text-secondary">
                         Ingresa los datos del cliente para agregarlo a tu CRM.
                     </DialogDescription>
@@ -170,7 +170,7 @@ export function AddCustomerDialog() {
                     </div>
 
                     <div className="flex justify-end pt-4">
-                        <Button type="button" variant="outline" className="mr-2 border-border-dark bg-transparent text-secondary hover:text-white" onClick={() => setOpen(false)}>
+                        <Button type="button" variant="outline" className="mr-2 border-border-dark bg-transparent text-secondary hover:text-foreground" onClick={() => setOpen(false)}>
                             Cancelar
                         </Button>
                         <Button type="submit" disabled={loading} className="bg-primary text-background-dark hover:bg-primary/90 font-bold">

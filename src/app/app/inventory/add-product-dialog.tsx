@@ -149,9 +149,9 @@ export function AddProductDialog() {
                     <Plus className="mr-2 h-4 w-4" /> Agregar Producto
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-background-dark border-border-dark text-white">
+            <DialogContent className="sm:max-w-[425px] bg-background-dark border-border-dark text-foreground">
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-bold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>Nuevo Producto</DialogTitle>
+                    <DialogTitle className="text-xl font-bold text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>Nuevo Producto</DialogTitle>
                     <DialogDescription className="text-secondary">
                         Ingresa los datos del nuevo artículo para añadirlo al inventario.
                     </DialogDescription>

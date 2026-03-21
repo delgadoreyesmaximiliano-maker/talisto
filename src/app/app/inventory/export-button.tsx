@@ -36,7 +36,7 @@ export function ExportButton() {
     }
 
     return (
-        <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5 bg-surface-dark border-border-dark text-secondary hover:text-white hover:bg-border-dark transition-colors">
+        <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5 bg-surface-dark border-border-dark text-secondary hover:text-foreground hover:bg-border-dark transition-colors">
             <Download className="w-4 h-4" />
             Exportar CSV
         </Button>

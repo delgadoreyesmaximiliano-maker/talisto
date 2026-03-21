@@ -139,14 +139,14 @@ export function ReceiveStockDialog() {
     return (
         <Dialog open={open} onOpenChange={handleClose}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="gap-2 border-border-dark bg-surface-dark text-secondary hover:text-white hover:bg-border-dark">
+                <Button variant="outline" className="gap-2 border-border-dark bg-surface-dark text-secondary hover:text-foreground hover:bg-border-dark">
                     <PackagePlus className="w-4 h-4" />
                     Recibir Mercadería
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[480px] bg-background-dark border-border-dark text-white">
+            <DialogContent className="sm:max-w-[480px] bg-background-dark border-border-dark text-foreground">
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-bold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                    <DialogTitle className="text-xl font-bold text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
                         Recibir Mercadería
                     </DialogTitle>
                     <DialogDescription className="text-secondary">
@@ -158,7 +158,7 @@ export function ReceiveStockDialog() {
                     {/* SKU input */}
                     <div className="flex gap-2">
                         <div className="flex-1">
-                            <Label htmlFor="sku-scan" className="text-white text-sm mb-1.5 block">SKU / Código de barras</Label>
+                            <Label htmlFor="sku-scan" className="text-foreground text-sm mb-1.5 block">SKU / Código de barras</Label>
                             <Input
                                 ref={inputRef}
                                 id="sku-scan"
@@ -167,7 +167,7 @@ export function ReceiveStockDialog() {
                                 onKeyDown={handleKeyDown}
                                 placeholder="Escanea o escribe el SKU..."
                                 autoComplete="off"
-                                className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                                className="bg-surface-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                             />
                         </div>
                         <div className="flex items-end">
@@ -177,7 +177,7 @@ export function ReceiveStockDialog() {
                                 onClick={searchProduct}
                                 disabled={searching || !skuInput.trim()}
                                 aria-label="Buscar producto"
-                                className="border-border-dark bg-surface-dark text-secondary hover:text-white"
+                                className="border-border-dark bg-surface-dark text-secondary hover:text-foreground"
                             >
                                 {searching ? <Loader2 className="w-4 h-4 animate-spin" aria-label="Buscando..." /> : <Search className="w-4 h-4" aria-hidden="true" />}
                             </Button>
@@ -190,7 +190,7 @@ export function ReceiveStockDialog() {
                             <div className="flex items-start gap-3">
                                 <CheckCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                                 <div>
-                                    <p className="font-bold text-white">{found.name}</p>
+                                    <p className="font-bold text-foreground">{found.name}</p>
                                     <p className="text-xs text-secondary mt-0.5">
                                         SKU: {found.sku || '—'} {found.category ? `· ${found.category}` : ''}
                                     </p>
@@ -202,7 +202,7 @@ export function ReceiveStockDialog() {
 
                             <div className="flex items-center gap-3">
                                 <div className="flex-1">
-                                    <Label htmlFor="qty-input" className="text-white text-sm mb-1.5 block">Cantidad recibida</Label>
+                                    <Label htmlFor="qty-input" className="text-foreground text-sm mb-1.5 block">Cantidad recibida</Label>
                                     <Input
                                         id="qty-input"
                                         type="number"
@@ -210,7 +210,7 @@ export function ReceiveStockDialog() {
                                         value={quantity}
                                         onChange={(e) => setQuantity(e.target.value)}
                                         onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
-                                        className="bg-surface-dark border-border-dark/50 text-white focus-visible:ring-primary/50"
+                                        className="bg-surface-dark border-border-dark/50 text-foreground focus-visible:ring-primary/50"
                                         autoFocus
                                     />
                                 </div>

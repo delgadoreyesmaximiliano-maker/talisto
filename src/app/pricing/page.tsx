@@ -11,7 +11,7 @@ export default function PricingPage() {
                     Volver al Dashboard
                 </Link>
                 <div className="text-center mb-16">
-                    <h1 className="text-4xl md:text-5xl font-black text-white mb-6 tracking-tight" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                    <h1 className="text-4xl md:text-5xl font-black text-foreground mb-6 tracking-tight" style={{ fontFamily: "'Outfit', sans-serif" }}>
                         Planes de Talisto
                     </h1>
                     <p className="text-xl text-slate-300 max-w-2xl mx-auto">
@@ -36,7 +36,7 @@ export default function PricingPage() {
                                 </li>
                             ))}
                         </ul>
-                        <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl h-12 text-base font-bold shadow-lg shadow-slate-900/10">
+                        <Button className="w-full bg-slate-900 hover:bg-slate-800 text-foreground rounded-xl h-12 text-base font-bold shadow-lg shadow-slate-900/10">
                             <a href="https://wa.me/56912345678?text=Hola,%20quiero%20el%20Plan%20Básico%20de%20Talisto" target="_blank" rel="noreferrer" className="w-full h-full flex items-center justify-center">
                                 Seleccionar Básico
                             </a>

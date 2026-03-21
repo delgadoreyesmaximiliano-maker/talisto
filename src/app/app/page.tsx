@@ -372,7 +372,7 @@ export default async function AppDashboard() {
                                 {activeProductsCount}
                             </h2>
                             <div className="mt-4 h-12 w-full flex items-center gap-2 opacity-60">
-                                <Link href="/app/inventory" className="text-xs font-bold text-primary hover:text-white transition-colors">
+                                <Link href="/app/inventory" className="text-xs font-bold text-primary hover:text-foreground transition-colors">
                                     Gestionar inventario →
                                 </Link>
                             </div>
@@ -457,7 +457,7 @@ export default async function AppDashboard() {
                                         <p className="text-sm font-bold text-foreground mb-1">Todo bajo control</p>
                                         <p className="text-xs text-muted-foreground">Sin alertas activas. ¿Quieres analizar tu negocio en profundidad?</p>
                                     </div>
-                                    <Link href="/app/ai" className="text-xs font-bold text-primary hover:text-white transition-colors flex items-center gap-1">
+                                    <Link href="/app/ai" className="text-xs font-bold text-primary hover:text-foreground transition-colors flex items-center gap-1">
                                         Preguntar a Tali <ArrowRight className="w-3 h-3" />
                                     </Link>
                                 </div>
@@ -530,7 +530,7 @@ export default async function AppDashboard() {
                                 })}
                             </div>
                         )}
-                        <Link href="/app/sales" className="mt-4 block text-center text-xs font-bold text-primary hover:text-white transition-colors">Ver todas</Link>
+                        <Link href="/app/sales" className="mt-4 block text-center text-xs font-bold text-primary hover:text-foreground transition-colors">Ver todas</Link>
                     </div>
 
                     {/* System Status placeholder */}

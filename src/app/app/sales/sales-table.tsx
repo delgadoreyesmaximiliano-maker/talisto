@@ -221,7 +221,7 @@ export function SalesTable() {
                             onClick={() => setDateFilter(f.key)}
                             className={dateFilter === f.key
                                 ? 'bg-primary text-background-dark hover:bg-primary/90 font-bold text-xs'
-                                : 'bg-surface-dark border-border-dark text-secondary hover:text-white hover:bg-border-dark text-xs'}
+                                : 'bg-surface-dark border-border-dark text-secondary hover:text-foreground hover:bg-border-dark text-xs'}
                         >
                             {f.label}
                         </Button>
@@ -240,7 +240,7 @@ export function SalesTable() {
                         <TableHeader className="bg-background-dark hover:bg-background-dark/90">
                             <TableRow className="border-border-dark hover:bg-transparent">
                                 <TableHead
-                                    className="text-secondary font-medium cursor-pointer select-none hover:text-white transition-colors"
+                                    className="text-secondary font-medium cursor-pointer select-none hover:text-foreground transition-colors"
                                     onClick={() => toggleSort('created_at')}
                                     onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('created_at'))}
                                     role="button" tabIndex={0}
@@ -252,7 +252,7 @@ export function SalesTable() {
                                 <TableHead className="text-secondary font-medium">Origen</TableHead>
                                 <TableHead className="text-secondary font-medium">Estado</TableHead>
                                 <TableHead
-                                    className="text-right text-secondary font-medium cursor-pointer select-none hover:text-white transition-colors"
+                                    className="text-right text-secondary font-medium cursor-pointer select-none hover:text-foreground transition-colors"
                                     onClick={() => toggleSort('amount')}
                                     onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('amount'))}
                                     role="button" tabIndex={0}
@@ -312,7 +312,7 @@ export function SalesTable() {
                                     size="sm"
                                     onClick={() => setPage(p => p - 1)}
                                     disabled={page === 1}
-                                    className="bg-surface-dark border-border-dark text-secondary hover:text-white hover:bg-border-dark disabled:opacity-40 text-xs"
+                                    className="bg-surface-dark border-border-dark text-secondary hover:text-foreground hover:bg-border-dark disabled:opacity-40 text-xs"
                                 >
                                     Anterior
                                 </Button>
@@ -321,7 +321,7 @@ export function SalesTable() {
                                     size="sm"
                                     onClick={() => setPage(p => p + 1)}
                                     disabled={page === totalPages}
-                                    className="bg-surface-dark border-border-dark text-secondary hover:text-white hover:bg-border-dark disabled:opacity-40 text-xs"
+                                    className="bg-surface-dark border-border-dark text-secondary hover:text-foreground hover:bg-border-dark disabled:opacity-40 text-xs"
                                 >
                                     Siguiente
                                 </Button>

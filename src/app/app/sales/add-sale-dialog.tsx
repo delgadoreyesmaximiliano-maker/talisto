@@ -115,16 +115,16 @@ export function AddSaleDialog() {
             <DialogTrigger asChild>
                 <Button className="bg-primary text-background-dark hover:bg-primary/90">Registrar Venta</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-surface-dark border-border-dark text-white">
+            <DialogContent className="sm:max-w-[425px] bg-surface-dark border-border-dark text-foreground">
                 <DialogHeader>
-                    <DialogTitle className="text-white">Registrar Nueva Venta</DialogTitle>
+                    <DialogTitle className="text-foreground">Registrar Nueva Venta</DialogTitle>
                     <DialogDescription className="text-secondary">
                         Ingresa los detalles y el producto de la transacción.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4 pt-4">
                     <div className="space-y-2">
-                        <Label htmlFor="description" className="text-white">Descripción / Producto Vendido *</Label>
+                        <Label htmlFor="description" className="text-foreground">Descripción / Producto Vendido *</Label>
                         <Input
                             id="description"
                             name="description"
@@ -133,12 +133,12 @@ export function AddSaleDialog() {
                             onChange={handleChange}
                             required
                             autoFocus
-                            className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                            className="bg-background-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="amount" className="text-white">Monto Total ($) *</Label>
+                        <Label htmlFor="amount" className="text-foreground">Monto Total ($) *</Label>
                         <Input
                             id="amount"
                             name="amount"
@@ -149,24 +149,24 @@ export function AddSaleDialog() {
                             value={formData.amount}
                             onChange={handleChange}
                             required
-                            className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                            className="bg-background-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="customer_name" className="text-white">Nombre del Cliente</Label>
+                        <Label htmlFor="customer_name" className="text-foreground">Nombre del Cliente</Label>
                         <Input
                             id="customer_name"
                             name="customer_name"
                             placeholder="Ej. Juan Pérez"
                             value={formData.customer_name}
                             onChange={handleChange}
-                            className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                            className="bg-background-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="customer_email" className="text-white">Correo del Cliente</Label>
+                        <Label htmlFor="customer_email" className="text-foreground">Correo del Cliente</Label>
                         <Input
                             id="customer_email"
                             name="customer_email"
@@ -174,12 +174,12 @@ export function AddSaleDialog() {
                             placeholder="juan@ejemplo.com"
                             value={formData.customer_email}
                             onChange={handleChange}
-                            className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                            className="bg-background-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                         />
                     </div>
 
                     <div className="flex justify-end pt-4">
-                        <Button type="button" variant="outline" className="mr-2 border-border-dark bg-transparent text-secondary hover:text-white" onClick={() => setOpen(false)}>
+                        <Button type="button" variant="outline" className="mr-2 border-border-dark bg-transparent text-secondary hover:text-foreground" onClick={() => setOpen(false)}>
                             Cancelar
                         </Button>
                         <Button type="submit" disabled={loading} className="bg-primary text-background-dark hover:bg-primary/90">
