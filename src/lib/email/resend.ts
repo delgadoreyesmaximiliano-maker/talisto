@@ -1,6 +1,15 @@
 import { Resend } from 'resend'
 
-export const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy singleton: only initialized when first used (at runtime), not at build time.
+let _resend: Resend | null = null
+function getResend(): Resend {
+    if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY)
+    return _resend
+}
+
+export { getResend as resend_client }
+// Keep backwards-compatible named export used by route handlers
+export const resend = { emails: { send: (...args: Parameters<Resend['emails']['send']>) => getResend().emails.send(...args) } }
 
 // Colores del tema
 const FOREST = '#102c26'
