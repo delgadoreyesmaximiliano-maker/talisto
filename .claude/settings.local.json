@@ -14,7 +14,15 @@
       "Bash(npx next:*)",
       "Bash(powershell -Command \"\\(Get-Content ''src\\\\app\\\\app\\\\crm\\\\add-customer-dialog.tsx''\\) -replace ''\"\"text-white\"\"'', ''\"\"text-foreground\"\"'' | Set-Content ''src\\\\app\\\\app\\\\crm\\\\add-customer-dialog.tsx''\")",
       "Bash(powershell -Command \"\\(Get-Content ''src\\\\app\\\\app\\\\inventory\\\\add-product-dialog.tsx''\\) -replace ''text-white placeholder:text-secondary'', ''text-foreground placeholder:text-muted-foreground'' | Set-Content ''src\\\\app\\\\app\\\\inventory\\\\add-product-dialog.tsx''\")",
-      "Bash(powershell -Command \"\\(Get-Content ''src\\\\app\\\\app\\\\inventory\\\\add-product-dialog.tsx''\\) -replace ''\"\"text-white\"\"'', ''\"\"text-foreground\"\"'' | Set-Content ''src\\\\app\\\\app\\\\inventory\\\\add-product-dialog.tsx''\")"
+      "Bash(powershell -Command \"\\(Get-Content ''src\\\\app\\\\app\\\\inventory\\\\add-product-dialog.tsx''\\) -replace ''\"\"text-white\"\"'', ''\"\"text-foreground\"\"'' | Set-Content ''src\\\\app\\\\app\\\\inventory\\\\add-product-dialog.tsx''\")",
+      "Bash(powershell -Command \"\\(Get-Content ''src\\\\app\\\\app\\\\sales\\\\add-sale-dialog.tsx''\\) -replace ''text-white placeholder:text-secondary'', ''text-foreground placeholder:text-muted-foreground'' | Set-Content ''src\\\\app\\\\app\\\\sales\\\\add-sale-dialog.tsx''\")",
+      "Bash(powershell -Command \"\\(Get-Content ''src\\\\app\\\\app\\\\sales\\\\add-sale-dialog.tsx''\\) -replace ''\"\"text-white\"\"'', ''\"\"text-foreground\"\"'' | Set-Content ''src\\\\app\\\\app\\\\sales\\\\add-sale-dialog.tsx''\")",
+      "Bash(powershell -Command \"\\(Get-Content ''src\\\\app\\\\app\\\\inventory\\\\receive-stock-dialog.tsx''\\) -replace ''\"\"text-white\"\"'', ''\"\"text-foreground\"\"'' | Set-Content ''src\\\\app\\\\app\\\\inventory\\\\receive-stock-dialog.tsx''\")",
+      "Bash(powershell -Command \"\\(Get-Content ''src\\\\components\\\\supplier-order-dialog.tsx''\\) -replace ''\"\"text-white\"\"'', ''\"\"text-foreground\"\"'' | Set-Content ''src\\\\components\\\\supplier-order-dialog.tsx''\")",
+      "Bash(powershell -Command \"\\(Get-Content ''src\\\\components\\\\supplier-order-dialog.tsx''\\) -replace ''hover:bg-white/5'', ''hover:bg-muted/30'' | Set-Content ''src\\\\components\\\\supplier-order-dialog.tsx''\")",
+      "Bash(powershell -Command \"\\(Get-Content ''src\\\\app\\\\app\\\\company\\\\setup\\\\page.tsx''\\) -replace ''bg-slate-900 hover:bg-slate-800 text-white'', ''bg-surface-dark hover:bg-surface-dark/90 text-foreground'' | Set-Content ''src\\\\app\\\\app\\\\company\\\\setup\\\\page.tsx''\")",
+      "Bash(cd:*)",
+      "Bash(grep -v \"//.*text-white\\\\|//.*text-gray\")"
     ]
   }
 }
