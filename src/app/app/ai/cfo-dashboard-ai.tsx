@@ -92,10 +92,10 @@ export function CfoDashboardAppAi({ contextData }: CfoDashboardProps) {
                     <Sparkles className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2" style={{ fontFamily: "'Outfit', sans-serif" }}>
                         💼 Tu CFO Virtual
                     </h1>
-                    <p className="text-secondary text-sm">Navega por el tiempo para analizar tu negocio en Talisto.</p>
+                    <p className="text-muted-foreground text-sm">Navega por el tiempo para analizar tu negocio en Talisto.</p>
                 </div>
             </div>
 
@@ -124,10 +124,10 @@ export function CfoDashboardAppAi({ contextData }: CfoDashboardProps) {
                 {/* Chat Conversacional Integrado */}
                 <div className="border-t border-border-dark pt-8 mt-8">
                     <div className="mb-6">
-                        <h2 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                        <h2 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>
                             💬 Continúa la conversación
                         </h2>
-                        <p className="text-secondary text-sm">
+                        <p className="text-muted-foreground text-sm">
                             Haz preguntas específicas sobre este escenario a Tali.
                         </p>
                     </div>

@@ -159,40 +159,40 @@ export function AddProductDialog() {
                 <form onSubmit={handleSubmit}>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="name" className="text-white">Nombre del Producto *</Label>
-                            <Input id="name" name="name" placeholder="Ej. Monitor LG" value={formData.name} onChange={handleChange} required autoFocus className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
+                            <Label htmlFor="name" className="text-foreground">Nombre del Producto *</Label>
+                            <Input id="name" name="name" placeholder="Ej. Monitor LG" value={formData.name} onChange={handleChange} required autoFocus className="bg-surface-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50" />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="sku" className="text-white">SKU / Código</Label>
-                                <Input id="sku" name="sku" placeholder="MON-001" value={formData.sku} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
+                                <Label htmlFor="sku" className="text-foreground">SKU / Código</Label>
+                                <Input id="sku" name="sku" placeholder="MON-001" value={formData.sku} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50" />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="category" className="text-white">Categoría</Label>
-                                <Input id="category" name="category" placeholder="Pantallas" value={formData.category} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="price_sale" className="text-white">Precio Venta ($)</Label>
-                                <Input id="price_sale" name="price_sale" type="number" step="0.01" min="0" value={formData.price_sale} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="price_cost" className="text-white">Costo Compra ($)</Label>
-                                <Input id="price_cost" name="price_cost" type="number" step="0.01" min="0" value={formData.price_cost} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
+                                <Label htmlFor="category" className="text-foreground">Categoría</Label>
+                                <Input id="category" name="category" placeholder="Pantallas" value={formData.category} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50" />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="stock_current" className="text-white">Stock Inicial</Label>
-                                <Input id="stock_current" name="stock_current" type="number" min="0" value={formData.stock_current} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
+                                <Label htmlFor="price_sale" className="text-foreground">Precio Venta ($)</Label>
+                                <Input id="price_sale" name="price_sale" type="number" step="0.01" min="0" value={formData.price_sale} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50" />
                             </div>
                             <div className="grid gap-2">
-                                <Label htmlFor="stock_minimum" className="text-white">Stock Mínimo</Label>
-                                <Input id="stock_minimum" name="stock_minimum" type="number" min="0" value={formData.stock_minimum} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50" />
+                                <Label htmlFor="price_cost" className="text-foreground">Costo Compra ($)</Label>
+                                <Input id="price_cost" name="price_cost" type="number" step="0.01" min="0" value={formData.price_cost} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50" />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="stock_current" className="text-foreground">Stock Inicial</Label>
+                                <Input id="stock_current" name="stock_current" type="number" min="0" value={formData.stock_current} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50" />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="stock_minimum" className="text-foreground">Stock Mínimo</Label>
+                                <Input id="stock_minimum" name="stock_minimum" type="number" min="0" value={formData.stock_minimum} onChange={handleChange} className="bg-surface-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50" />
                             </div>
                         </div>
 

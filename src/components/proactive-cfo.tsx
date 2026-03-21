@@ -49,19 +49,19 @@ export function ProactiveCFO({ analysis, loading, monthOffset }: ProactiveCFOPro
     const getBgColor = () => {
         if (isFuture) return "bg-purple-500/5";
         if (isPast) return "bg-blue-500/5";
-        return "bg-[#13ec80]/5";
+        return "bg-primary/5";
     };
 
     const getIconColor = () => {
         if (isFuture) return "text-purple-400";
         if (isPast) return "text-blue-400";
-        return "text-[#13ec80]";
+        return "text-primary";
     };
 
     const getBorderColor = () => {
         if (isFuture) return "border-purple-500/30";
         if (isPast) return "border-blue-500/30";
-        return "border-[#13ec80]/30";
+        return "border-primary/30";
     };
 
     const handleSimulate = async (scenarioPrompt: string) => {
@@ -100,14 +100,14 @@ export function ProactiveCFO({ analysis, loading, monthOffset }: ProactiveCFOPro
 
     if (loading) {
         return (
-            <Card className="bg-[#1c2721] border-[#283930] shadow-lg">
+            <Card className="bg-card border-border shadow-lg">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-3">
                         <div className={`p-3 rounded-lg ${getBgColor()}`}>
                             <div className={getIconColor()}>{getIcon()}</div>
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-xl font-bold text-white">
+                            <h3 className="text-xl font-bold text-foreground">
                                 Tu CFO Virtual está analizando...
                             </h3>
                         </div>
@@ -115,10 +115,10 @@ export function ProactiveCFO({ analysis, loading, monthOffset }: ProactiveCFOPro
                 </CardHeader>
                 <CardContent>
                     <div className="space-y-3 animate-pulse">
-                        <div className="h-4 bg-[#283930] rounded w-3/4" />
-                        <div className="h-4 bg-[#283930] rounded w-full" />
-                        <div className="h-4 bg-[#283930] rounded w-5/6" />
-                        <div className="h-4 bg-[#283930] rounded w-4/5" />
+                        <div className="h-4 bg-muted/40 rounded w-3/4" />
+                        <div className="h-4 bg-muted/40 rounded w-full" />
+                        <div className="h-4 bg-muted/40 rounded w-5/6" />
+                        <div className="h-4 bg-muted/40 rounded w-4/5" />
                     </div>
                 </CardContent>
             </Card>
@@ -126,15 +126,15 @@ export function ProactiveCFO({ analysis, loading, monthOffset }: ProactiveCFOPro
     }
 
     return (
-        <Card className={`bg-[#1c2721] border-2 ${getBorderColor()} shadow-xl hover:shadow-2xl transition-all`}>
+        <Card className={`bg-card border-2 ${getBorderColor()} shadow-xl hover:shadow-2xl transition-all`}>
             <CardHeader>
                 <CardTitle className="flex items-center gap-3">
                     <div className={`p-3 rounded-lg ${getBgColor()}`}>
                         <div className={getIconColor()}>{getIcon()}</div>
                     </div>
                     <div className="flex-1">
-                        <h3 className="text-xl font-bold text-white">{getTitle()}</h3>
-                        <p className="text-sm text-gray-400 font-normal mt-1">
+                        <h3 className="text-xl font-bold text-foreground">{getTitle()}</h3>
+                        <p className="text-sm text-muted-foreground font-normal mt-1">
                             {getSubtitle()}
                         </p>
                     </div>
@@ -144,15 +144,15 @@ export function ProactiveCFO({ analysis, loading, monthOffset }: ProactiveCFOPro
             <CardContent className="space-y-6">
                 {/* Analysis text */}
                 <div className="prose prose-invert max-w-none">
-                    <div className={`text-gray-300 leading-relaxed whitespace-pre-line ${!showDetails && analysis.length > 400 ? 'line-clamp-6' : ''}`}>
+                    <div className={`text-muted-foreground leading-relaxed whitespace-pre-line ${!showDetails && analysis.length > 400 ? 'line-clamp-6' : ''}`}>
                         {analysis}
                     </div>
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex flex-wrap gap-3 pt-4 border-t border-[#283930]">
+                <div className="flex flex-wrap gap-3 pt-4 border-t border-border">
                     <Button
-                        className="bg-[#13ec80] hover:bg-[#10d170] text-[#111814] font-semibold"
+                        className="bg-primary hover:bg-primary/90 text-background-dark font-semibold"
                         onClick={() => setShowDetails(!showDetails)}
                     >
                         <ChevronDown className={`w-4 h-4 mr-2 transition-transform ${showDetails ? 'rotate-180' : ''}`} />
@@ -160,7 +160,7 @@ export function ProactiveCFO({ analysis, loading, monthOffset }: ProactiveCFOPro
                     </Button>
                     <Button
                         variant="outline"
-                        className="border-[#283930] bg-[#111814] hover:bg-[#243830] text-gray-300"
+                        className="border-border bg-background hover:bg-muted/30 text-muted-foreground"
                         onClick={() => { setShowSimulator(!showSimulator); setSimResult(''); }}
                     >
                         {showSimulator ? '✕ Cerrar simulador' : '✨ Laboratorio de Estrategia'}
@@ -169,17 +169,17 @@ export function ProactiveCFO({ analysis, loading, monthOffset }: ProactiveCFOPro
 
                 {/* Scenario Simulator Panel */}
                 {showSimulator && (
-                    <div className="bg-[#111814] border border-[#283930] rounded-xl p-5 space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="bg-background border border-border rounded-xl p-5 space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="flex items-center justify-between">
-                            <h4 className="text-white font-bold text-lg flex items-center gap-2">
+                            <h4 className="text-foreground font-bold text-lg flex items-center gap-2">
                                 <Sparkles className="w-5 h-5 text-purple-400" />
                                 Laboratorio de Estrategias
                             </h4>
-                            <button onClick={() => setShowSimulator(false)} className="text-gray-500 hover:text-white">
+                            <button onClick={() => setShowSimulator(false)} className="text-muted-foreground hover:text-foreground">
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm text-muted-foreground">
                             ¿Qué estás pensando hacer? El CFO con IA evaluará el riesgo, el retorno de inversión y el impacto en tu flujo de caja.
                         </p>
 
@@ -191,7 +191,7 @@ export function ProactiveCFO({ analysis, loading, monthOffset }: ProactiveCFOPro
                                         key={scenario.id}
                                         onClick={() => handleSimulate(scenario.prompt)}
                                         disabled={simLoading}
-                                        className="flex flex-col items-center justify-center p-3 rounded-lg border border-[#283930] bg-[#1c2721] hover:bg-[#243830] hover:border-purple-500/30 transition-all text-xs text-gray-300 gap-2 disabled:opacity-50"
+                                        className="flex flex-col items-center justify-center p-3 rounded-lg border border-border bg-card hover:bg-muted/30 hover:border-purple-500/30 transition-all text-xs text-muted-foreground gap-2 disabled:opacity-50"
                                     >
                                         <Icon className="w-5 h-5 text-purple-400" />
                                         <span className="text-center font-medium">{scenario.label}</span>
@@ -205,7 +205,7 @@ export function ProactiveCFO({ analysis, loading, monthOffset }: ProactiveCFOPro
                                 value={customScenario}
                                 onChange={(e) => setCustomScenario(e.target.value)}
                                 placeholder="O describe tu propia idea: 'Quiero abrir un local nuevo en Providencia que costará $10M al mes...'"
-                                className="w-full bg-[#1c2721] border-[#283930] text-white placeholder:text-gray-600 focus-visible:ring-purple-500/50 min-h-[100px] resize-none"
+                                className="w-full bg-card border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-purple-500/50 min-h-[100px] resize-none"
                             />
                             <Button
                                 onClick={() => handleSimulate(customScenario)}
@@ -226,7 +226,7 @@ export function ProactiveCFO({ analysis, loading, monthOffset }: ProactiveCFOPro
                                 <h5 className="text-purple-300 font-bold flex items-center gap-2">
                                     <Target className="w-4 h-4" /> Veredicto del CFO:
                                 </h5>
-                                <div className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
+                                <div className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">
                                     {simResult}
                                 </div>
                             </div>

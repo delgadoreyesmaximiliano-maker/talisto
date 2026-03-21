@@ -158,7 +158,7 @@ export function AppSidebar() {
             </SidebarHeader>
             <SidebarContent className="bg-sidebar px-2 py-4">
                 <SidebarGroup>
-                    <SidebarGroupLabel className="text-secondary text-[10px] font-bold uppercase tracking-widest px-4 mb-4">
+                    <SidebarGroupLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest px-4 mb-4">
                         Menú Principal
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
@@ -171,8 +171,8 @@ export function AppSidebar() {
                                         className={`
                                             h-11 px-4 rounded-xl transition-all duration-200
                                             ${isActive(item.url)
-                                                ? 'bg-primary/10 text-primary'
-                                                : 'text-secondary hover:text-foreground hover:bg-surface-dark/50'
+                                                ? 'bg-primary/15 text-primary cream-glow-sm'
+                                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                                             }
                                         `}
                                     >
@@ -196,7 +196,7 @@ export function AppSidebar() {
                 </SidebarGroup>
 
                 <SidebarGroup className="mt-4">
-                    <SidebarGroupLabel className="text-secondary text-[10px] font-bold uppercase tracking-widest px-4 mb-4">
+                    <SidebarGroupLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest px-4 mb-4">
                         Sistema
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
@@ -208,8 +208,8 @@ export function AppSidebar() {
                                     className={`
                                         h-11 px-4 rounded-xl transition-all duration-200
                                         ${isActive('/app/settings')
-                                            ? 'bg-primary/10 text-primary'
-                                            : 'text-secondary hover:text-foreground hover:bg-surface-dark/50'
+                                            ? 'bg-primary/15 text-primary cream-glow-sm'
+                                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                                         }
                                     `}
                                 >

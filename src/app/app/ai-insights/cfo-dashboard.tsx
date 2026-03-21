@@ -84,7 +84,7 @@ export function CfoDashboard({ contextData }: CfoDashboardProps) {
     }, [monthOffset]);
 
     return (
-        <div className="min-h-screen bg-[#111814] p-6 rounded-xl border border-[#283930]">
+        <div className="min-h-screen bg-background p-6 rounded-xl border border-border">
             <div className="max-w-7xl mx-auto space-y-8">
                 {/* Temporal Navigation */}
                 <TemporalSlider
@@ -108,17 +108,17 @@ export function CfoDashboard({ contextData }: CfoDashboardProps) {
                 />
 
                 {/* Existing Conversational Chat */}
-                <div className="border-t border-[#283930] pt-8 mt-8">
+                <div className="border-t border-border pt-8 mt-8">
                     <div className="mb-6">
-                        <h2 className="text-2xl font-bold text-white mb-2">
+                        <h2 className="text-2xl font-bold text-foreground mb-2">
                             💬 También puedes preguntarme:
                         </h2>
-                        <p className="text-gray-400">
+                        <p className="text-muted-foreground">
                             Haz preguntas específicas sobre este periodo o simula escenarios
                         </p>
                     </div>
 
-                    <div className="bg-[#1c2721] rounded-xl border border-[#283930] overflow-hidden">
+                    <div className="bg-card rounded-xl border border-border overflow-hidden">
                         <ChatInterface contextData={contextData} />
                     </div>
                 </div>

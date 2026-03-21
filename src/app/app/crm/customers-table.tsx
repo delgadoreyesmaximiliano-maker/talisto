@@ -119,7 +119,7 @@ export function CustomersTable() {
                     <Users className="w-8 h-8 text-primary" />
                 </div>
                 <div className="text-center">
-                    <h3 className="text-white font-bold text-lg mb-1">Sin clientes registrados</h3>
+                    <h3 className="text-foreground font-bold text-lg mb-1">Sin clientes registrados</h3>
                     <p className="text-secondary text-sm max-w-sm">Agrega tu primer cliente para comenzar a gestionar tus relaciones comerciales.</p>
                 </div>
             </div>
@@ -165,7 +165,7 @@ export function CustomersTable() {
                 <Input
                     type="search"
                     placeholder="Buscar por nombre o email..."
-                    className="pl-9 bg-surface-dark border-border-dark text-white placeholder:text-secondary focus-visible:ring-primary"
+                    className="pl-9 bg-surface-dark border-border-dark text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -211,8 +211,8 @@ export function CustomersTable() {
                         </TableHeader>
                         <TableBody>
                             {pagedCustomers.map((customer) => (
-                                <TableRow key={customer.id} className="border-border-dark hover:bg-white/5 transition-colors">
-                                    <TableCell className="font-medium text-white">
+                                <TableRow key={customer.id} className="border-border-dark hover:bg-muted/30 transition-colors">
+                                    <TableCell className="font-medium text-foreground">
                                         <div>{customer.name}</div>
                                         <div className="text-xs text-secondary font-normal">{customer.email || 'Sin correo asociado'}</div>
                                     </TableCell>
@@ -227,7 +227,7 @@ export function CustomersTable() {
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="capitalize text-secondary text-sm">{customer.plan || '-'}</TableCell>
-                                    <TableCell className="text-right font-bold text-white">
+                                    <TableCell className="text-right font-bold text-foreground">
                                         ${customer.mrr ? Number(customer.mrr).toLocaleString('es-CL') : '0'}
                                     </TableCell>
                                     <TableCell className="text-right text-sm text-secondary">

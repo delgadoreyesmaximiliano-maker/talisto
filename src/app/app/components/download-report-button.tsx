@@ -30,7 +30,7 @@ export function DownloadReportButton({ sales }: DownloadReportButtonProps) {
     return (
         <button
             onClick={handleDownload}
-            className="px-5 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-sm hover:scale-105 transition-all active:scale-95 shadow-lg shadow-slate-900/20 flex items-center gap-2"
+            className="px-5 py-2.5 bg-surface-dark text-foreground rounded-xl font-bold text-sm hover:scale-105 transition-all active:scale-95 shadow-lg shadow-black/20 flex items-center gap-2"
         >
             Descargar Reporte
             <ArrowDownRight className="w-4 h-4" />

@@ -78,8 +78,8 @@ export default async function AppDashboard() {
                 <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center border border-red-500/20">
                     <AlertCircle className="w-8 h-8 text-red-400" />
                 </div>
-                <h2 className="text-xl font-bold text-white">Error al cargar los datos</h2>
-                <p className="text-secondary text-sm max-w-md">
+                <h2 className="text-xl font-bold text-foreground">Error al cargar los datos</h2>
+                <p className="text-muted-foreground text-sm max-w-md">
                     No pudimos obtener la información de tu negocio. Por favor recarga la página o contacta soporte si el problema persiste.
                 </p>
                 <p className="text-xs text-secondary font-mono bg-surface-dark px-3 py-1 rounded-lg border border-border-dark">
@@ -264,10 +264,10 @@ export default async function AppDashboard() {
             {/* Header section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
                         Dashboard Principal
                     </h1>
-                    <p className="text-secondary text-sm font-medium">
+                    <p className="text-muted-foreground text-sm font-medium">
                         {welcomeSubtitle}
                     </p>
                 </div>
@@ -285,7 +285,7 @@ export default async function AppDashboard() {
 
                 {/* Left Column: KPIs (3 cols width) */}
                 <div className="lg:col-span-3 space-y-6 flex flex-col">
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-2">Indicadores Clave</h3>
+                    <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-2">Indicadores Clave</h3>
 
                     {/* Total Revenue */}
                     <div className="relative overflow-hidden group glass-panel p-5 rounded-2xl">
@@ -301,11 +301,11 @@ export default async function AppDashboard() {
                                 </span>
                             )}
                         </div>
-                        <h2 className="text-3xl font-black text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                        <h2 className="text-3xl font-black text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
                             ${totalRevenue.toLocaleString('es-CL')}
                         </h2>
                         <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-secondary">Hoy: <span className="text-white font-bold">${todayRevenue.toLocaleString('es-CL')}</span></span>
+                            <span className="text-xs text-muted-foreground">Hoy: <span className="text-foreground font-bold">${todayRevenue.toLocaleString('es-CL')}</span></span>
                             {todayVsYesterdayPercent !== null && (
                                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${todayVsYesterdayPercent >= 0 ? 'text-primary bg-primary/10' : 'text-red-400 bg-red-400/10'}`}>
                                     {todayVsYesterdayPercent >= 0 ? '+' : ''}{todayVsYesterdayPercent}% vs ayer
@@ -327,7 +327,7 @@ export default async function AppDashboard() {
                             <div className="flex items-center justify-between mb-2">
                                 <p className="text-xs font-bold text-secondary">MRR</p>
                             </div>
-                            <h2 className="text-3xl font-black text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                            <h2 className="text-3xl font-black text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
                                 ${totalMrr.toLocaleString('es-CL')}
                             </h2>
                             <div className="mt-4 h-12 w-full flex items-end justify-between gap-1 opacity-50">
@@ -341,7 +341,7 @@ export default async function AppDashboard() {
                             <div className="flex items-center justify-between mb-2">
                                 <p className="text-xs font-bold text-secondary">Ticket Promedio</p>
                             </div>
-                            <h2 className="text-3xl font-black text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                            <h2 className="text-3xl font-black text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
                                 ${sales.length > 0 ? Math.round(totalRevenue / sales.length).toLocaleString('es-CL') : '0'}
                             </h2>
                         </div>
@@ -353,7 +353,7 @@ export default async function AppDashboard() {
                             <div className="flex items-center justify-between mb-2">
                                 <p className="text-xs font-bold text-secondary">Clientes Activos</p>
                             </div>
-                            <h2 className="text-3xl font-black text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                            <h2 className="text-3xl font-black text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
                                 {activeCustomers}
                             </h2>
                             <div className="mt-4 h-12 w-full flex items-center gap-2 opacity-60">
@@ -368,7 +368,7 @@ export default async function AppDashboard() {
                             <div className="flex items-center justify-between mb-2">
                                 <p className="text-xs font-bold text-secondary">Productos en Catálogo</p>
                             </div>
-                            <h2 className="text-3xl font-black text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                            <h2 className="text-3xl font-black text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
                                 {activeProductsCount}
                             </h2>
                             <div className="mt-4 h-12 w-full flex items-center gap-2 opacity-60">
@@ -385,7 +385,7 @@ export default async function AppDashboard() {
                     {/* Performance Overview Chart */}
                     <Card className="glass-panel border-border-dark shadow-sm rounded-2xl overflow-hidden bg-surface-dark border">
                         <CardHeader className="border-b border-border-dark/50 px-6 py-4 flex flex-row items-center justify-between">
-                            <CardTitle className="text-sm font-bold text-white uppercase tracking-wider" style={{ fontFamily: "'Outfit', sans-serif" }}>Rendimiento Anual</CardTitle>
+                            <CardTitle className="text-sm font-bold text-foreground uppercase tracking-wider" style={{ fontFamily: "'Outfit', sans-serif" }}>Rendimiento Anual</CardTitle>
                             <span className="text-xs font-medium text-secondary bg-background-dark px-3 py-1 rounded-md border border-border-dark">Este año</span>
                         </CardHeader>
                         <CardContent className="p-6">
@@ -397,7 +397,7 @@ export default async function AppDashboard() {
                                         <div key={i} className="flex-1 flex flex-col items-center gap-3 group relative h-full">
                                             <div className="w-full flex-1 flex flex-col justify-end relative">
                                                 {d.value > 0 && (
-                                                    <div className="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-black border border-primary/50 text-white text-[10px] font-bold px-2 py-1 rounded-md z-10 whitespace-nowrap shadow-xl">
+                                                    <div className="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-card border border-primary/50 text-foreground text-[10px] font-bold px-2 py-1 rounded-md z-10 whitespace-nowrap shadow-xl">
                                                         ${(d.value / 1000).toFixed(0)}k
                                                     </div>
                                                 )}
@@ -422,7 +422,7 @@ export default async function AppDashboard() {
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-[50px] -mr-16 -mt-16 pointer-events-none" />
                         <CardHeader className="border-b border-border-dark/50 px-6 py-4 flex flex-row items-center gap-2">
                             <Sparkles className="w-4 h-4 text-primary" />
-                            <CardTitle className="text-sm font-bold text-white uppercase tracking-wider" style={{ fontFamily: "'Outfit', sans-serif" }}>Insights e IA</CardTitle>
+                            <CardTitle className="text-sm font-bold text-foreground uppercase tracking-wider" style={{ fontFamily: "'Outfit', sans-serif" }}>Insights e IA</CardTitle>
                         </CardHeader>
                         <CardContent className="p-6 grid sm:grid-cols-2 gap-4">
                             {dynamicRecommendations.length > 0 ? (
@@ -431,8 +431,8 @@ export default async function AppDashboard() {
                                         <div className="flex justify-between mb-2">
                                             <span className={`text-[10px] font-bold uppercase ${rec.type === 'opportunity' ? 'text-primary' : 'text-amber-500'}`}>{rec.label}</span>
                                         </div>
-                                        <h3 className="font-bold text-white text-sm mb-1">{rec.title}</h3>
-                                        <p className="text-xs text-secondary mb-3">{rec.description}</p>
+                                        <h3 className="font-bold text-foreground text-sm mb-1">{rec.title}</h3>
+                                        <p className="text-xs text-muted-foreground mb-3">{rec.description}</p>
                                         <Link href={rec.actionHref} className={`text-xs font-bold flex items-center gap-1 ${rec.type === 'opportunity' ? 'text-primary' : 'text-amber-500'}`}>
                                             {rec.actionLabel} <ArrowRight className="w-3 h-3" />
                                         </Link>
@@ -444,8 +444,8 @@ export default async function AppDashboard() {
                                         <div className="flex justify-between mb-2">
                                             <span className={`text-[10px] font-bold uppercase ${rec.type === 'opportunity' ? 'text-primary' : 'text-amber-500'}`}>{rec.type === 'opportunity' ? 'Oportunidad' : 'Atención'}</span>
                                         </div>
-                                        <h3 className="font-bold text-white text-sm mb-1">{rec.title}</h3>
-                                        <p className="text-xs text-secondary mb-3">{rec.description}</p>
+                                        <h3 className="font-bold text-foreground text-sm mb-1">{rec.title}</h3>
+                                        <p className="text-xs text-muted-foreground mb-3">{rec.description}</p>
                                     </div>
                                 ))
                             ) : (
@@ -454,8 +454,8 @@ export default async function AppDashboard() {
                                         <Sparkles className="w-5 h-5 text-primary" />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-bold text-white mb-1">Todo bajo control</p>
-                                        <p className="text-xs text-secondary">Sin alertas activas. ¿Quieres analizar tu negocio en profundidad?</p>
+                                        <p className="text-sm font-bold text-foreground mb-1">Todo bajo control</p>
+                                        <p className="text-xs text-muted-foreground">Sin alertas activas. ¿Quieres analizar tu negocio en profundidad?</p>
                                     </div>
                                     <Link href="/app/ai" className="text-xs font-bold text-primary hover:text-white transition-colors flex items-center gap-1">
                                         Preguntar a Tali <ArrowRight className="w-3 h-3" />
@@ -472,7 +472,7 @@ export default async function AppDashboard() {
                     {!['saas', 'services', 'marketing'].includes(industry) && (
                         <div className="glass-panel p-5 rounded-2xl border border-border-dark">
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Estado de Stock</h3>
+                                <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Estado de Stock</h3>
                             </div>
 
                             {lowStockProducts.length > 0 ? (
@@ -502,7 +502,7 @@ export default async function AppDashboard() {
                     {/* Recent Activities */}
                     <div className="glass-panel p-5 rounded-2xl border border-border-dark flex-1 flex flex-col">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Últimas Ventas</h3>
+                            <h3 className="text-sm font-bold text-foreground uppercase tracking-wider">Últimas Ventas</h3>
                         </div>
 
                         {recentSales.length === 0 ? (
@@ -518,7 +518,7 @@ export default async function AppDashboard() {
                                             </div>
                                             <div className="w-[calc(100%-3rem)] md:w-[calc(50%-2rem)] p-3 rounded-xl border border-border-dark bg-background-dark shadow-sm">
                                                 <div className="flex items-center justify-between mb-1">
-                                                    <span className="font-bold text-white text-sm">${Number(sale.amount).toLocaleString('es-CL')}</span>
+                                                    <span className="font-bold text-foreground text-sm">${Number(sale.amount).toLocaleString('es-CL')}</span>
                                                 </div>
                                                 <div className="text-xs text-secondary flex justify-between">
                                                     <span>{sale.source || 'Directo'}</span>
@@ -535,7 +535,7 @@ export default async function AppDashboard() {
 
                     {/* System Status placeholder */}
                     <div className="glass-panel p-4 rounded-2xl border border-border-dark">
-                        <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Estado del Sistema</h3>
+                        <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-3">Estado del Sistema</h3>
                         <div className="flex items-center gap-2 text-primary text-xs font-bold bg-primary/10 px-3 py-2 rounded-lg border border-primary/20">
                             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                             Todos los sistemas operativos

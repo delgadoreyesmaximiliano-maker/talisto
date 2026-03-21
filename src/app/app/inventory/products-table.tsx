@@ -249,7 +249,7 @@ export function ProductsTable() {
                     <Input
                         type="search"
                         placeholder="Buscar por nombre o SKU..."
-                        className="pl-9 bg-surface-dark border-border-dark text-white placeholder:text-secondary focus-visible:ring-primary"
+                        className="pl-9 bg-surface-dark border-border-dark text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -265,7 +265,7 @@ export function ProductsTable() {
                         <Package className="w-8 h-8 text-primary" />
                     </div>
                     <div className="text-center">
-                        <h3 className="text-white font-bold text-lg mb-1">Sin productos en inventario</h3>
+                        <h3 className="text-foreground font-bold text-lg mb-1">Sin productos en inventario</h3>
                         <p className="text-secondary text-sm max-w-sm">Agrega tu primer producto para comenzar a gestionar tu inventario y recibir alertas de stock.</p>
                     </div>
                 </div>
@@ -312,8 +312,8 @@ export function ProductsTable() {
                                     </TableCell>
                                 </TableRow>
                             ) : pagedProducts.map((product) => (
-                                <TableRow key={product.id} className="border-border-dark hover:bg-white/5 transition-colors">
-                                    <TableCell className="font-medium text-white">{product.name}</TableCell>
+                                <TableRow key={product.id} className="border-border-dark hover:bg-muted/30 transition-colors">
+                                    <TableCell className="font-medium text-foreground">{product.name}</TableCell>
                                     <TableCell className="text-secondary">{product.sku || '-'}</TableCell>
                                     <TableCell className="text-secondary">{product.category || '-'}</TableCell>
                                     <TableCell className="text-right text-secondary">
@@ -423,9 +423,9 @@ export function ProductsTable() {
             </AlertDialog>
 
             <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-                <DialogContent className="sm:max-w-[425px] bg-background-dark border-border-dark text-white">
+                <DialogContent className="sm:max-w-[425px] bg-background-dark border-border-dark text-foreground">
                     <DialogHeader>
-                        <DialogTitle className="text-xl font-bold text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>Editar Producto</DialogTitle>
+                        <DialogTitle className="text-xl font-bold text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>Editar Producto</DialogTitle>
                         <DialogDescription className="text-secondary">
                             Modifica los datos del producto.
                         </DialogDescription>
@@ -433,37 +433,37 @@ export function ProductsTable() {
                     <form onSubmit={handleEditSubmit}>
                         <div className="grid gap-4 py-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="edit-name" className="text-white">Nombre *</Label>
-                                <Input id="edit-name" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} required className="bg-surface-dark border-border-dark/50 text-white focus-visible:ring-primary/50" />
+                                <Label htmlFor="edit-name" className="text-foreground">Nombre *</Label>
+                                <Input id="edit-name" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} required className="bg-surface-dark border-border-dark/50 text-foreground focus-visible:ring-primary/50" />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="edit-sku" className="text-white">SKU</Label>
-                                    <Input id="edit-sku" value={editForm.sku} onChange={(e) => setEditForm({ ...editForm, sku: e.target.value })} className="bg-surface-dark border-border-dark/50 text-white focus-visible:ring-primary/50" />
+                                    <Label htmlFor="edit-sku" className="text-foreground">SKU</Label>
+                                    <Input id="edit-sku" value={editForm.sku} onChange={(e) => setEditForm({ ...editForm, sku: e.target.value })} className="bg-surface-dark border-border-dark/50 text-foreground focus-visible:ring-primary/50" />
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="edit-category" className="text-white">Categoría</Label>
-                                    <Input id="edit-category" value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })} className="bg-surface-dark border-border-dark/50 text-white focus-visible:ring-primary/50" />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="edit-price-sale" className="text-white">Precio Venta ($)</Label>
-                                    <Input id="edit-price-sale" type="number" step="0.01" min="0" value={editForm.price_sale} onChange={(e) => setEditForm({ ...editForm, price_sale: e.target.value })} className="bg-surface-dark border-border-dark/50 text-white focus-visible:ring-primary/50" />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="edit-price-cost" className="text-white">Costo ($)</Label>
-                                    <Input id="edit-price-cost" type="number" step="0.01" min="0" value={editForm.price_cost} onChange={(e) => setEditForm({ ...editForm, price_cost: e.target.value })} className="bg-surface-dark border-border-dark/50 text-white focus-visible:ring-primary/50" />
+                                    <Label htmlFor="edit-category" className="text-foreground">Categoría</Label>
+                                    <Input id="edit-category" value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })} className="bg-surface-dark border-border-dark/50 text-foreground focus-visible:ring-primary/50" />
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="edit-stock" className="text-white">Stock Actual</Label>
-                                    <Input id="edit-stock" type="number" min="0" value={editForm.stock_current} onChange={(e) => setEditForm({ ...editForm, stock_current: e.target.value })} className="bg-surface-dark border-border-dark/50 text-white focus-visible:ring-primary/50" />
+                                    <Label htmlFor="edit-price-sale" className="text-foreground">Precio Venta ($)</Label>
+                                    <Input id="edit-price-sale" type="number" step="0.01" min="0" value={editForm.price_sale} onChange={(e) => setEditForm({ ...editForm, price_sale: e.target.value })} className="bg-surface-dark border-border-dark/50 text-foreground focus-visible:ring-primary/50" />
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="edit-stock-min" className="text-white">Stock Mínimo</Label>
-                                    <Input id="edit-stock-min" type="number" min="0" value={editForm.stock_minimum} onChange={(e) => setEditForm({ ...editForm, stock_minimum: e.target.value })} className="bg-surface-dark border-border-dark/50 text-white focus-visible:ring-primary/50" />
+                                    <Label htmlFor="edit-price-cost" className="text-foreground">Costo ($)</Label>
+                                    <Input id="edit-price-cost" type="number" step="0.01" min="0" value={editForm.price_cost} onChange={(e) => setEditForm({ ...editForm, price_cost: e.target.value })} className="bg-surface-dark border-border-dark/50 text-foreground focus-visible:ring-primary/50" />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="edit-stock" className="text-foreground">Stock Actual</Label>
+                                    <Input id="edit-stock" type="number" min="0" value={editForm.stock_current} onChange={(e) => setEditForm({ ...editForm, stock_current: e.target.value })} className="bg-surface-dark border-border-dark/50 text-foreground focus-visible:ring-primary/50" />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="edit-stock-min" className="text-foreground">Stock Mínimo</Label>
+                                    <Input id="edit-stock-min" type="number" min="0" value={editForm.stock_minimum} onChange={(e) => setEditForm({ ...editForm, stock_minimum: e.target.value })} className="bg-surface-dark border-border-dark/50 text-foreground focus-visible:ring-primary/50" />
                                 </div>
                             </div>
                         </div>

@@ -66,12 +66,12 @@ export function TemporalSlider({ currentOffset, onDateChange }: TemporalSliderPr
         ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
         : isFuture
             ? 'bg-purple-500/20 text-purple-400 border-purple-500/30'
-            : 'bg-[#13ec80]/20 text-[#13ec80] border-[#13ec80]/30';
+            : 'bg-primary/20 text-primary border-primary/30';
 
     const badgeLabel = isPast ? 'Histórico' : isFuture ? 'Proyección' : 'Actual';
 
     return (
-        <div className="space-y-6 p-6 bg-[#1c2721] rounded-2xl border border-[#283930]">
+        <div className="space-y-6 p-6 bg-card rounded-2xl border border-border">
             {/* Header with navigation */}
             <div className="flex items-center justify-between gap-4">
                 <Button
@@ -79,16 +79,16 @@ export function TemporalSlider({ currentOffset, onDateChange }: TemporalSliderPr
                     disabled={offset <= MIN_OFFSET}
                     variant="ghost"
                     size="icon"
-                    className="h-10 w-10 rounded-lg bg-[#111814] hover:bg-[#243830] disabled:opacity-30 disabled:cursor-not-allowed border border-[#283930]"
+                    className="h-10 w-10 rounded-lg bg-background hover:bg-muted/30 disabled:opacity-30 disabled:cursor-not-allowed border border-border"
                 >
-                    <ChevronLeft className="w-5 h-5 text-gray-400" />
+                    <ChevronLeft className="w-5 h-5 text-muted-foreground" />
                 </Button>
 
                 <div className="flex-1 text-center">
                     <div className="inline-flex flex-col items-center gap-2">
-                        <div className="flex items-center gap-3 px-6 py-3 bg-[#111814] rounded-xl border border-[#283930]">
-                            <Calendar className="w-5 h-5 text-gray-400" />
-                            <span className="text-2xl font-bold text-white">
+                        <div className="flex items-center gap-3 px-6 py-3 bg-background rounded-xl border border-border">
+                            <Calendar className="w-5 h-5 text-muted-foreground" />
+                            <span className="text-2xl font-bold text-foreground">
                                 {getDateLabel(offset)}
                             </span>
                         </div>
@@ -104,9 +104,9 @@ export function TemporalSlider({ currentOffset, onDateChange }: TemporalSliderPr
                     disabled={offset >= MAX_OFFSET}
                     variant="ghost"
                     size="icon"
-                    className="h-10 w-10 rounded-lg bg-[#111814] hover:bg-[#243830] disabled:opacity-30 disabled:cursor-not-allowed border border-[#283930]"
+                    className="h-10 w-10 rounded-lg bg-background hover:bg-muted/30 disabled:opacity-30 disabled:cursor-not-allowed border border-border"
                 >
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </Button>
             </div>
 
@@ -122,9 +122,9 @@ export function TemporalSlider({ currentOffset, onDateChange }: TemporalSliderPr
                 />
 
                 {/* Timeline markers */}
-                <div className="flex justify-between mt-3 text-xs text-gray-500">
+                <div className="flex justify-between mt-3 text-xs text-muted-foreground">
                     <span className="text-blue-400">-12 meses</span>
-                    <span className="font-semibold text-[#13ec80]">HOY</span>
+                    <span className="font-semibold text-primary">HOY</span>
                     <span className="text-purple-400">+6 meses</span>
                 </div>
             </div>
@@ -135,7 +135,7 @@ export function TemporalSlider({ currentOffset, onDateChange }: TemporalSliderPr
                     onClick={() => jumpTo(-3)}
                     variant="outline"
                     size="sm"
-                    className="bg-[#111814] hover:bg-[#243830] border-[#283930] text-gray-400 hover:text-white"
+                    className="bg-background hover:bg-muted/30 border-border text-muted-foreground hover:text-foreground"
                 >
                     -3 meses
                 </Button>
@@ -143,7 +143,7 @@ export function TemporalSlider({ currentOffset, onDateChange }: TemporalSliderPr
                     onClick={() => jumpTo(0)}
                     variant="outline"
                     size="sm"
-                    className="bg-[#13ec80] hover:bg-[#10d170] border-[#13ec80] text-[#111814] font-semibold"
+                    className="bg-primary hover:bg-primary/90 border-primary text-background-dark font-semibold"
                 >
                     Hoy
                 </Button>
@@ -151,7 +151,7 @@ export function TemporalSlider({ currentOffset, onDateChange }: TemporalSliderPr
                     onClick={() => jumpTo(3)}
                     variant="outline"
                     size="sm"
-                    className="bg-[#111814] hover:bg-[#243830] border-[#283930] text-gray-400 hover:text-white"
+                    className="bg-background hover:bg-muted/30 border-border text-muted-foreground hover:text-foreground"
                 >
                     +3 meses
                 </Button>

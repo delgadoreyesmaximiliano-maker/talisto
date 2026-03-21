@@ -115,7 +115,7 @@ export function AddCustomerDialog() {
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4 pt-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name" className="text-white">Nombre o Empresa *</Label>
+                        <Label htmlFor="name" className="text-foreground">Nombre o Empresa *</Label>
                         <Input
                             id="name"
                             name="name"
@@ -124,12 +124,12 @@ export function AddCustomerDialog() {
                             onChange={handleChange}
                             required
                             autoFocus
-                            className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                            className="bg-surface-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="email" className="text-white">Correo Electrónico</Label>
+                        <Label htmlFor="email" className="text-foreground">Correo Electrónico</Label>
                         <Input
                             id="email"
                             name="email"
@@ -137,24 +137,24 @@ export function AddCustomerDialog() {
                             placeholder="cliente@ejemplo.com"
                             value={formData.email}
                             onChange={handleChange}
-                            className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                            className="bg-surface-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="plan" className="text-white">Plan / Nivel</Label>
+                            <Label htmlFor="plan" className="text-foreground">Plan / Nivel</Label>
                             <Input
                                 id="plan"
                                 name="plan"
                                 placeholder="Pro, Básico..."
                                 value={formData.plan}
                                 onChange={handleChange}
-                                className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                                className="bg-surface-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="mrr" className="text-white">MRR ($)</Label>
+                            <Label htmlFor="mrr" className="text-foreground">MRR ($)</Label>
                             <Input
                                 id="mrr"
                                 name="mrr"
@@ -164,7 +164,7 @@ export function AddCustomerDialog() {
                                 placeholder="0"
                                 value={formData.mrr}
                                 onChange={handleChange}
-                                className="bg-surface-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                                className="bg-surface-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                             />
                         </div>
                     </div>

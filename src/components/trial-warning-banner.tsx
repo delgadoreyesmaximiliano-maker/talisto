@@ -96,7 +96,7 @@ export function TrialWarningBanner({ status, companyName }: TrialWarningBannerPr
                             </a>
                         </Button>
 
-                        <Button variant="outline" size="sm" className="bg-white/50" asChild>
+                        <Button variant="outline" size="sm" className="bg-muted/30" asChild>
                             <Link href="/pricing">
                                 Ver Planes
                             </Link>

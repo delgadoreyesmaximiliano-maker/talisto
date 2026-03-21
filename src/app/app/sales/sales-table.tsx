@@ -184,7 +184,7 @@ export function SalesTable() {
                     <ShoppingBag className="w-8 h-8 text-primary" />
                 </div>
                 <div className="text-center">
-                    <h3 className="text-white font-bold text-lg mb-1">Sin ventas registradas</h3>
+                    <h3 className="text-foreground font-bold text-lg mb-1">Sin ventas registradas</h3>
                     <p className="text-secondary text-sm max-w-sm">Registra tu primera venta para comenzar a ver métricas y análisis de tu negocio.</p>
                 </div>
             </div>
@@ -206,7 +206,7 @@ export function SalesTable() {
                     <Input
                         type="search"
                         placeholder="Buscar por cliente o producto..."
-                        className="pl-9 bg-surface-dark border-border-dark text-white placeholder:text-secondary focus-visible:ring-primary"
+                        className="pl-9 bg-surface-dark border-border-dark text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -268,15 +268,15 @@ export function SalesTable() {
                                 const description = items.length > 0 ? items[0].name : 'Venta Manual';
 
                                 return (
-                                    <TableRow key={sale.id} className="border-border-dark hover:bg-white/[0.02]">
-                                        <TableCell className="font-medium text-white">
+                                    <TableRow key={sale.id} className="border-border-dark hover:bg-muted/20">
+                                        <TableCell className="font-medium text-foreground">
                                             {new Date(sale.created_at).toLocaleDateString('es-CL')}
                                         </TableCell>
                                         <TableCell>
-                                            <span className="text-white font-medium">{description}</span>
+                                            <span className="text-foreground font-medium">{description}</span>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="text-white">{sale.customer_name || 'Al Contado'}</div>
+                                            <div className="text-foreground">{sale.customer_name || 'Al Contado'}</div>
                                             <div className="text-xs text-secondary mt-0.5">{sale.customer_email || ''}</div>
                                         </TableCell>
                                         <TableCell>
@@ -294,7 +294,7 @@ export function SalesTable() {
                                                 {sale.status === 'completed' ? 'Completado' : sale.status || 'Completado'}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-right font-bold text-white">
+                                        <TableCell className="text-right font-bold text-foreground">
                                             ${sale.amount ? Number(sale.amount).toLocaleString('es-CL') : '0'}
                                         </TableCell>
                                     </TableRow>

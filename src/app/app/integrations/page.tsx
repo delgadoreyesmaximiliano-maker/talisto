@@ -74,8 +74,8 @@ export default function IntegrationsPage() {
     return (
         <div className="space-y-6 max-w-6xl mx-auto pb-12">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold tracking-tight text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>Integraciones</h1>
-                <p className="text-secondary mt-1">Conecta los servicios que ya utilizas y centraliza tu operación en Talisto.</p>
+                <h1 className="text-3xl font-bold tracking-tight text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>Integraciones</h1>
+                <p className="text-muted-foreground mt-1">Conecta los servicios que ya utilizas y centraliza tu operación en Talisto.</p>
             </div>
 
             {/* Demo notice */}
@@ -87,7 +87,7 @@ export default function IntegrationsPage() {
             {/* Connected count */}
             <div className="flex items-center gap-3 px-5 py-4 rounded-xl glass-panel shadow-[0_0_15px_rgba(19,236,128,0.05)] border-primary/20 bg-primary/5">
                 <Plug className="w-5 h-5 text-primary" />
-                <span className="text-sm font-medium text-white">
+                <span className="text-sm font-medium text-foreground">
                     {connected.size === 0
                         ? 'Explora nuestras integraciones y comienza a automatizar tu negocio.'
                         : `Tienes ${connected.size} plataforma${connected.size > 1 ? 's' : ''} activa${connected.size > 1 ? 's' : ''} correctamente.`
@@ -121,7 +121,7 @@ export default function IntegrationsPage() {
 
                             <div>
                                 <div className="flex items-center gap-4 mb-5">
-                                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden border border-border-dark bg-white/5`}>
+                                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center overflow-hidden border border-border-dark bg-muted/30`}>
                                         {integration.logo ? (
                                             <div className="relative w-full h-full bg-white p-2">
                                                 <Image
@@ -137,7 +137,7 @@ export default function IntegrationsPage() {
                                         )}
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                                        <h3 className="font-bold text-lg text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
                                             {integration.name}
                                         </h3>
                                         {isComingSoon && (

@@ -49,14 +49,23 @@ export async function transcribeAudio(fileId: string): Promise<string> {
  */
 export async function processAgentMessage(text: string, companyId: string, companyName: string): Promise<AIMessageResponse> {
     const systemPrompt = `Eres "Tali", el asistente virtual de la empresa "${companyName}".
-IMPORTANTE: Tú TIENES acceso directo a la base de datos del negocio a través de tus herramientas (tools). 
+IMPORTANTE: Tú TIENES acceso directo a TODA la base de datos del negocio a través de tus herramientas (tools). 
 NUNCA digas que no tienes acceso a los datos. SIEMPRE usa tus herramientas para consultar información real.
-- Si el usuario pregunta por ventas, USA la herramienta get_sales_today.
-- Si el usuario pregunta por stock o inventario, USA la herramienta get_critical_stock.
-- Si el usuario quiere registrar una venta, USA la herramienta add_sale.
-- Si el usuario pide un gráfico o resumen visual, USA la herramienta get_sales_chart_last_7_days.
-- Si el usuario solo saluda o hace una pregunta general que no requiere datos, USA la herramienta chat_with_user.
-Responde siempre de forma amigable, concisa y con emojis. Habla como un asistente profesional pero cercano.`;
+
+REGLAS DE USO DE HERRAMIENTAS:
+- Ventas de hoy → get_sales_today
+- Resumen del mes → get_monthly_summary
+- Stock crítico o productos bajos → get_critical_stock
+- Ver todos los productos / catálogo / precios → get_all_products
+- Ver clientes → get_customers
+- Registrar una venta → add_sale
+- Agregar producto nuevo al inventario → add_product
+- Agregar cliente nuevo → add_customer
+- Gráfico de ventas → get_sales_chart_last_7_days
+- Saludo o pregunta general → chat_with_user
+
+Responde SIEMPRE de forma amigable, concisa y con emojis. Habla como un asistente profesional pero cercano.
+Si el usuario te envía un audio, esta entrada es la transcripción de su audio.`;
 
     // Herramientas que la IA puede decidir llamar
     const tools: any[] = [
@@ -64,7 +73,15 @@ Responde siempre de forma amigable, concisa y con emojis. Habla como un asistent
             type: "function",
             function: {
                 name: "get_sales_today",
-                description: "Consulta las ventas del día de hoy en la base de datos. ÚSALA siempre que el usuario pregunte por ventas, ingresos, cuánto se vendió, facturación, o cualquier tema de dinero del día.",
+                description: "Consulta las ventas del día de hoy. ÚSALA para: ventas de hoy, cuánto vendimos, ingresos del día, facturación de hoy.",
+                parameters: { type: "object", properties: {}, required: [] },
+            },
+        },
+        {
+            type: "function",
+            function: {
+                name: "get_monthly_summary",
+                description: "Resumen completo del mes actual: ventas totales, cantidad de transacciones, ticket promedio y comparación con mes anterior. ÚSALA para: resumen del mes, cómo vamos, balance mensual.",
                 parameters: { type: "object", properties: {}, required: [] },
             },
         },
@@ -72,7 +89,23 @@ Responde siempre de forma amigable, concisa y con emojis. Habla como un asistent
             type: "function",
             function: {
                 name: "get_critical_stock",
-                description: "Consulta los productos con stock bajo o crítico en la base de datos. ÚSALA cuando pregunten por inventario, stock, productos que faltan, o qué hay que reponer.",
+                description: "Productos con stock bajo o crítico. ÚSALA para: qué se está acabando, stock bajo, hay que reponer, alertas de inventario.",
+                parameters: { type: "object", properties: {}, required: [] },
+            },
+        },
+        {
+            type: "function",
+            function: {
+                name: "get_all_products",
+                description: "Lista todos los productos del catálogo con nombre, precio, stock actual y stock mínimo. ÚSALA para: qué productos tenemos, catálogo, lista de precios, inventario completo.",
+                parameters: { type: "object", properties: {}, required: [] },
+            },
+        },
+        {
+            type: "function",
+            function: {
+                name: "get_customers",
+                description: "Lista todos los clientes registrados con nombre, email, teléfono y estado. ÚSALA para: quiénes son mis clientes, lista de clientes, contactos, CRM.",
                 parameters: { type: "object", properties: {}, required: [] },
             },
         },
@@ -80,7 +113,7 @@ Responde siempre de forma amigable, concisa y con emojis. Habla como un asistent
             type: "function",
             function: {
                 name: "add_sale",
-                description: "Registra una venta nueva en la base de datos. ÚSALA cuando el usuario diga que vendió algo, que cobre algo, que anote una venta, o mencione un precio de producto vendido.",
+                description: "Registra una venta nueva. ÚSALA cuando: vendí algo, cobré, anota una venta, registra un pago.",
                 parameters: {
                     type: "object",
                     properties: {
@@ -94,8 +127,41 @@ Responde siempre de forma amigable, concisa y con emojis. Habla como un asistent
         {
             type: "function",
             function: {
+                name: "add_product",
+                description: "Agrega un producto nuevo al inventario. ÚSALA cuando: agregar producto, nuevo producto, meter al catálogo, registrar mercadería.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        name: { type: "string", description: "Nombre del producto" },
+                        price: { type: "number", description: "Precio de venta al público" },
+                        stock: { type: "number", description: "Cantidad de unidades en stock. Si no se indica, usar 0." },
+                        stock_minimum: { type: "number", description: "Stock mínimo antes de alerta. Si no se indica, usar 5." }
+                    },
+                    required: ["name", "price"]
+                }
+            }
+        },
+        {
+            type: "function",
+            function: {
+                name: "add_customer",
+                description: "Registra un cliente nuevo. ÚSALA cuando: nuevo cliente, agregar cliente, registrar contacto.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        name: { type: "string", description: "Nombre completo del cliente" },
+                        email: { type: "string", description: "Email del cliente (opcional)" },
+                        phone: { type: "string", description: "Teléfono del cliente (opcional)" }
+                    },
+                    required: ["name"]
+                }
+            }
+        },
+        {
+            type: "function",
+            function: {
                 name: "get_sales_chart_last_7_days",
-                description: "Genera un gráfico visual (imagen PNG) con las ventas de los últimos 7 días. ÚSALA cuando el usuario pida gráficos, estadísticas visuales, o quiera ver cómo van las ventas.",
+                description: "Genera un gráfico visual PNG con las ventas de los últimos 7 días. ÚSALA para: gráfico, estadísticas visuales, muéstrame las ventas, reporte visual.",
                 parameters: { type: "object", properties: {}, required: [] }
             }
         },
@@ -103,7 +169,7 @@ Responde siempre de forma amigable, concisa y con emojis. Habla como un asistent
             type: "function",
             function: {
                 name: "chat_with_user",
-                description: "Responde de forma conversacional al usuario. ÚSALA SOLO cuando el usuario saluda, hace preguntas generales, o no necesita datos del negocio.",
+                description: "Responde conversacionalmente. ÚSALA SOLO para saludos, preguntas generales o temas que NO requieren datos del negocio.",
                 parameters: {
                     type: "object",
                     properties: {
@@ -132,14 +198,14 @@ Responde siempre de forma amigable, concisa y con emojis. Habla como un asistent
         let photoUrlToReturn: string | undefined = undefined;
 
         if (toolCalls && toolCalls.length > 0) {
-            // La IA decidió que necesita datos de una herramienta
             const toolResults = [];
 
             for (const toolCall of toolCalls) {
                 const args = JSON.parse(toolCall.function.arguments);
                 const toolName = toolCall.function.name;
-                let resultObj: any = { error: 'Unknown tool' };
+                let resultObj: any = { error: 'Herramienta no reconocida' };
 
+                // ───── VENTAS DE HOY ─────
                 if (toolName === 'get_sales_today') {
                     const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
                     const { data } = await supabase.from('sales').select('amount').eq('company_id', companyId).gte('created_at', todayStart.toISOString());
@@ -147,47 +213,110 @@ Responde siempre de forma amigable, concisa y con emojis. Habla como un asistent
                     resultObj = { cant_ventas: data?.length || 0, monto_total_ganado: totalAmount };
                 }
 
+                // ───── RESUMEN DEL MES ─────
+                if (toolName === 'get_monthly_summary') {
+                    const now = new Date();
+                    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                    const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+                    
+                    const { data: thisMonth } = await supabase.from('sales').select('amount').eq('company_id', companyId).gte('created_at', monthStart.toISOString());
+                    const { data: lastMonth } = await supabase.from('sales').select('amount').eq('company_id', companyId).gte('created_at', prevMonthStart.toISOString()).lte('created_at', prevMonthEnd.toISOString());
+                    
+                    const thisTotal = thisMonth?.reduce((a: number, s: any) => a + (s.amount || 0), 0) || 0;
+                    const lastTotal = lastMonth?.reduce((a: number, s: any) => a + (s.amount || 0), 0) || 0;
+                    const ticketPromedio = thisMonth && thisMonth.length > 0 ? Math.round(thisTotal / thisMonth.length) : 0;
+
+                    resultObj = {
+                        mes_actual: { total_ventas: thisTotal, cantidad_transacciones: thisMonth?.length || 0, ticket_promedio: ticketPromedio },
+                        mes_anterior: { total_ventas: lastTotal, cantidad_transacciones: lastMonth?.length || 0 },
+                        variacion_porcentual: lastTotal > 0 ? Math.round(((thisTotal - lastTotal) / lastTotal) * 100) : null
+                    };
+                }
+
+                // ───── STOCK CRÍTICO ─────
                 if (toolName === 'get_critical_stock') {
                     const { data } = await supabase.from('products').select('name, stock_current, stock_minimum').eq('company_id', companyId);
                     const critical = (data || []).filter((p: any) => p.stock_current <= p.stock_minimum);
-                    resultObj = { productos_criticos: critical.slice(0, 10) }; // Solo top 10 para no saturar 
+                    resultObj = { productos_criticos: critical.slice(0, 10), total_productos_criticos: critical.length };
                 }
 
+                // ───── TODOS LOS PRODUCTOS ─────
+                if (toolName === 'get_all_products') {
+                    const { data } = await supabase.from('products').select('name, price, stock_current, stock_minimum').eq('company_id', companyId).order('name').limit(25);
+                    resultObj = { productos: data || [], total: data?.length || 0 };
+                }
+
+                // ───── CLIENTES ─────
+                if (toolName === 'get_customers') {
+                    const { data } = await supabase.from('customers').select('name, email, phone, status').eq('company_id', companyId).order('name').limit(25);
+                    resultObj = { clientes: data || [], total: data?.length || 0 };
+                }
+
+                // ───── AGREGAR VENTA ─────
                 if (toolName === 'add_sale') {
-                    // Ver si el producto existe
                     const { data: prods } = await supabase.from('products').select('id, name').eq('company_id', companyId).ilike('name', `%${args.product_name}%`).limit(1);
                     const prodId = prods && prods.length > 0 ? prods[0].id : null;
                     const insertedName = prods && prods.length > 0 ? prods[0].name : args.product_name;
 
-                    // Insertar la venta
                     const saleRow: any = { company_id: companyId, amount: args.price, payment_method: 'Efectivo', created_at: new Date().toISOString() };
-                    
                     const { data: saleData } = await supabase.from('sales').insert([saleRow]).select('id').single();
                     
                     if (saleData && prodId) {
-                        // Insertar item y descontar stock 
                         await supabase.from('sale_items').insert([{ sale_id: saleData.id, product_id: prodId, quantity: 1, unit_price: args.price, subtotal: args.price }]);
-                        // Decimos a Supabase que baje el stock 
                         const { data: currentStockObj } = await supabase.from('products').select('stock_current').eq('id', prodId).single();
                         if (currentStockObj) {
                             await supabase.from('products').update({ stock_current: currentStockObj.stock_current - 1 }).eq('id', prodId);
                         }
                     } else if (saleData) {
-                        // Venta sin item asociado (por ejemplo registrando venta sin inventario)
                         await supabase.from('sale_items').insert([{ sale_id: saleData.id, custom_product_name: args.product_name, quantity: 1, unit_price: args.price, subtotal: args.price }]);
                     }
-                    resultObj = { status: 'success', product_matched: insertedName, total_registered: args.price };
+                    resultObj = { status: 'success', producto: insertedName, monto_registrado: args.price };
                 }
 
+                // ───── AGREGAR PRODUCTO ─────
+                if (toolName === 'add_product') {
+                    const newProduct = {
+                        company_id: companyId,
+                        name: args.name,
+                        price: args.price,
+                        stock_current: args.stock ?? 0,
+                        stock_minimum: args.stock_minimum ?? 5,
+                    };
+                    const { data, error } = await supabase.from('products').insert([newProduct]).select('id, name').single();
+                    if (error) {
+                        resultObj = { status: 'error', message: error.message };
+                    } else {
+                        resultObj = { status: 'success', producto_creado: data?.name, precio: args.price, stock_inicial: newProduct.stock_current };
+                    }
+                }
+
+                // ───── AGREGAR CLIENTE ─────
+                if (toolName === 'add_customer') {
+                    const newCustomer: any = {
+                        company_id: companyId,
+                        name: args.name,
+                        status: 'active',
+                    };
+                    if (args.email) newCustomer.email = args.email;
+                    if (args.phone) newCustomer.phone = args.phone;
+
+                    const { data, error } = await supabase.from('customers').insert([newCustomer]).select('id, name').single();
+                    if (error) {
+                        resultObj = { status: 'error', message: error.message };
+                    } else {
+                        resultObj = { status: 'success', cliente_creado: data?.name };
+                    }
+                }
+
+                // ───── GRÁFICO DE VENTAS ─────
                 if (toolName === 'get_sales_chart_last_7_days') {
-                    // Traemos las ventas de los ultimos 7 días
                     const sevenDaysAgo = new Date();
                     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
                     sevenDaysAgo.setHours(0,0,0,0);
                     
                     const { data } = await supabase.from('sales').select('amount, created_at').eq('company_id', companyId).gte('created_at', sevenDaysAgo.toISOString());
                     
-                    // Agrupar por días
                     const salesByDay: Record<string, number> = {};
                     for (let i = 6; i >= 0; i--) {
                         const d = new Date(); d.setDate(d.getDate() - i);
@@ -208,7 +337,6 @@ Responde siempre de forma amigable, concisa y con emojis. Habla como un asistent
                     const labels = Object.keys(salesByDay);
                     const values = Object.values(salesByDay);
 
-                    // QuickChart Chart
                     const chartConfig = {
                         type: 'bar',
                         data: {
@@ -222,7 +350,7 @@ Responde siempre de forma amigable, concisa y con emojis. Habla como un asistent
                             }]
                         },
                         options: {
-                            title: { display: true, text: 'Ventas Útimos 7 Días' },
+                            title: { display: true, text: 'Ventas Últimos 7 Días' },
                             legend: { display: false }
                         }
                     };
@@ -232,8 +360,8 @@ Responde siempre de forma amigable, concisa y con emojis. Habla como un asistent
                     resultObj = { status: 'success', chart_generated: true, data_summary: salesByDay };
                 }
 
+                // ───── CHAT CONVERSACIONAL ─────
                 if (toolName === 'chat_with_user') {
-                    // Respuesta conversacional directa, no necesita segunda llamada
                     return { text: args.response || '¡Hola! ¿En qué te puedo ayudar? 😊' };
                 }
 
@@ -262,7 +390,6 @@ Responde siempre de forma amigable, concisa y con emojis. Habla como un asistent
             };
         }
 
-        // Si no llamó tools, es una respuesta normal o conversacional
         return {
             text: responseMessage.content || 'No sé cómo responder a eso 🤔'
         };

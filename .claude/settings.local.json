@@ -6,7 +6,15 @@
       "Bash(npm run test:run)",
       "Bash(npx vercel --version)",
       "WebFetch(domain:talisto.cl)",
-      "Skill(update-config)"
+      "Skill(update-config)",
+      "WebSearch",
+      "Bash(claude mcp:*)",
+      "Bash(python3:*)",
+      "Bash(py --version)",
+      "Bash(npx next:*)",
+      "Bash(powershell -Command \"\\(Get-Content ''src\\\\app\\\\app\\\\crm\\\\add-customer-dialog.tsx''\\) -replace ''\"\"text-white\"\"'', ''\"\"text-foreground\"\"'' | Set-Content ''src\\\\app\\\\app\\\\crm\\\\add-customer-dialog.tsx''\")",
+      "Bash(powershell -Command \"\\(Get-Content ''src\\\\app\\\\app\\\\inventory\\\\add-product-dialog.tsx''\\) -replace ''text-white placeholder:text-secondary'', ''text-foreground placeholder:text-muted-foreground'' | Set-Content ''src\\\\app\\\\app\\\\inventory\\\\add-product-dialog.tsx''\")",
+      "Bash(powershell -Command \"\\(Get-Content ''src\\\\app\\\\app\\\\inventory\\\\add-product-dialog.tsx''\\) -replace ''\"\"text-white\"\"'', ''\"\"text-foreground\"\"'' | Set-Content ''src\\\\app\\\\app\\\\inventory\\\\add-product-dialog.tsx''\")"
     ]
   }
 }

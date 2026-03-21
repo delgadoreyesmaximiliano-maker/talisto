@@ -102,7 +102,7 @@ export function ChatClient() {
             >
                 {messages.map((m: any) => (
                     <div key={m.id} className={`flex w-full ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`glass-panel border-primary/20 rounded-2xl px-6 py-5 flex flex-col gap-4 shadow-[0_0_20px_rgba(19,236,128,0.05)] text-white w-full max-w-4xl
+                        <div className={`glass-panel border-primary/20 rounded-2xl px-6 py-5 flex flex-col gap-4 shadow-[0_0_20px_rgba(19,236,128,0.05)] text-foreground w-full max-w-4xl
                             ${m.role === 'user'
                                 ? 'bg-primary/10 border-primary/40 rounded-tr-sm ml-auto'
                                 : 'bg-surface-dark border-border-dark rounded-tl-sm mr-auto'
@@ -117,7 +117,7 @@ export function ChatClient() {
                                 </h3>
                             </div>
 
-                            <div className="text-sm text-secondary leading-relaxed mt-2 prose prose-invert max-w-none">
+                            <div className="text-sm text-muted-foreground leading-relaxed mt-2 prose prose-invert max-w-none">
                                 <ReactMarkdown
                                     components={{
                                         code({ node, inline, className, children, ...props }: any) {
@@ -153,7 +153,7 @@ export function ChatClient() {
                                                                                 ))}
                                                                             </Pie>
                                                                             <Tooltip
-                                                                                contentStyle={{ backgroundColor: '#1c2721', borderColor: '#283930', color: '#fff', borderRadius: '8px' }}
+                                                                                contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', color: 'hsl(var(--foreground))', borderRadius: '8px' }}
                                                                                 formatter={formatTooltipValue}
                                                                             />
                                                                             <Legend
@@ -178,7 +178,7 @@ export function ChatClient() {
                                                                             <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} tickFormatter={formatChartValue} />
                                                                             <Tooltip
                                                                                 cursor={{ fill: '#13ec80', opacity: 0.1 }}
-                                                                                contentStyle={{ backgroundColor: '#1c2721', borderColor: '#283930', color: '#fff', borderRadius: '8px' }}
+                                                                                contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', color: 'hsl(var(--foreground))', borderRadius: '8px' }}
                                                                                 itemStyle={{ color: '#13ec80' }}
                                                                                 formatter={formatTooltipValue}
                                                                             />
@@ -238,7 +238,7 @@ export function ChatClient() {
                                 }
                             }}
                             disabled={isLoading}
-                            className="flex-1 bg-transparent px-6 py-4 outline-none text-white text-sm placeholder:text-secondary resize-none min-h-[56px] max-h-32 focus:ring-0 focus-visible:ring-0"
+                            className="flex-1 bg-transparent px-6 py-4 outline-none text-foreground text-sm placeholder:text-muted-foreground resize-none min-h-[56px] max-h-32 focus:ring-0 focus-visible:ring-0"
                             placeholder={isLoading ? "Tali está pensando..." : "Escribe tu mensaje aquí... (Enter para enviar)"}
                             rows={1}
                         />
@@ -251,7 +251,7 @@ export function ChatClient() {
                         </button>
                     </div>
                 </form>
-                <p className="text-center text-[10px] text-secondary mt-3">
+                <p className="text-center text-[10px] text-muted-foreground mt-3">
                     La IA de Talisto puede cometer errores. Considera verificar la información importante.
                 </p>
             </div>

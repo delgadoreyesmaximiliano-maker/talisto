@@ -262,8 +262,8 @@ export default function SettingsPage() {
     return (
         <div className="space-y-6 max-w-2xl">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-white">Configuración</h1>
-                <p className="text-secondary">
+                <h1 className="text-3xl font-bold tracking-tight text-foreground">Configuración</h1>
+                <p className="text-muted-foreground">
                     Administra tu cuenta y preferencias.
                 </p>
             </div>
@@ -276,7 +276,7 @@ export default function SettingsPage() {
                             <User className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <CardTitle className="text-lg text-white">Perfil</CardTitle>
+                            <CardTitle className="text-lg text-foreground">Perfil</CardTitle>
                             <CardDescription className="text-secondary">Tu información de cuenta</CardDescription>
                         </div>
                     </div>
@@ -285,7 +285,7 @@ export default function SettingsPage() {
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-1.5">
                             <Label className="text-xs text-secondary">Correo electrónico</Label>
-                            <p className="text-sm font-medium text-white">{user?.email || '—'}</p>
+                            <p className="text-sm font-medium text-foreground">{user?.email || '—'}</p>
                         </div>
                         <div className="space-y-1.5">
                             <Label className="text-xs text-secondary">ID de usuario</Label>
@@ -300,11 +300,11 @@ export default function SettingsPage() {
                 <Card className="bg-surface-dark border-border-dark">
                     <CardHeader>
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-lg bg-muted/30 flex items-center justify-center">
                                 <Building2 className="w-5 h-5 text-secondary" />
                             </div>
                             <div>
-                                <CardTitle className="text-lg text-white">Empresa</CardTitle>
+                                <CardTitle className="text-lg text-foreground">Empresa</CardTitle>
                                 <CardDescription className="text-secondary">Información de tu negocio</CardDescription>
                             </div>
                         </div>
@@ -313,15 +313,15 @@ export default function SettingsPage() {
                         <div className="grid gap-4 sm:grid-cols-3">
                             <div className="space-y-1.5">
                                 <Label className="text-xs text-secondary">Nombre</Label>
-                                <p className="text-sm font-medium text-white">{company.name}</p>
+                                <p className="text-sm font-medium text-foreground">{company.name}</p>
                             </div>
                             <div className="space-y-1.5">
                                 <Label className="text-xs text-secondary">Rubro</Label>
-                                <p className="text-sm font-medium text-white">{industryLabels[company.industry] || company.industry}</p>
+                                <p className="text-sm font-medium text-foreground">{industryLabels[company.industry] || company.industry}</p>
                             </div>
                             <div className="space-y-1.5">
                                 <Label className="text-xs text-secondary">Plan</Label>
-                                <p className="text-sm font-medium text-white">{planLabels[company.plan] || company.plan}</p>
+                                <p className="text-sm font-medium text-foreground">{planLabels[company.plan] || company.plan}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -338,7 +338,7 @@ export default function SettingsPage() {
                                     <MessageSquareMore className="w-5 h-5 text-whatsapp" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-lg text-white">Integración WhatsApp (API)</CardTitle>
+                                    <CardTitle className="text-lg text-foreground">Integración WhatsApp (API)</CardTitle>
                                     <CardDescription className="text-secondary">Automatiza los mensajes de la plataforma</CardDescription>
                                 </div>
                             </div>
@@ -356,49 +356,49 @@ export default function SettingsPage() {
                             </p>
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="idInstance" className="text-white">ID Instance</Label>
+                                    <Label htmlFor="idInstance" className="text-foreground">ID Instance</Label>
                                     <Input
                                         id="idInstance"
                                         placeholder="Ej: 1101000000"
                                         value={greenApiConfig.instanceId}
                                         onChange={(e) => setGreenApiConfig({ ...greenApiConfig, instanceId: e.target.value })}
-                                        className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50 font-mono"
+                                        className="bg-background-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 font-mono"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="apiToken" className="text-white">API Token Instance</Label>
+                                    <Label htmlFor="apiToken" className="text-foreground">API Token Instance</Label>
                                     <Input
                                         id="apiToken"
                                         type="password"
                                         placeholder="Ej: 4e2c..."
                                         value={greenApiConfig.apiToken}
                                         onChange={(e) => setGreenApiConfig({ ...greenApiConfig, apiToken: e.target.value })}
-                                        className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50 font-mono"
+                                        className="bg-background-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50 font-mono"
                                     />
                                 </div>
                             </div>
 
                             <div className="pt-4 border-t border-border-dark/50 space-y-4">
                                 <div>
-                                    <h4 className="text-sm font-bold text-white mb-1">Preferencias del Reporte Diario</h4>
+                                    <h4 className="text-sm font-bold text-foreground mb-1">Preferencias del Reporte Diario</h4>
                                     <p className="text-xs text-secondary">Configura a qué hora y qué información incluirá el reporte que Tali te enviará cada mañana.</p>
                                 </div>
                                 <div className="grid gap-6 sm:grid-cols-2">
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="reportTime" className="text-white text-xs">Hora de Recepción (GMT-3)</Label>
+                                            <Label htmlFor="reportTime" className="text-foreground text-xs">Hora de Recepción (GMT-3)</Label>
                                             <Input
                                                 id="reportTime"
                                                 type="time"
                                                 value={whatsappPreferences.time}
                                                 onChange={(e) => setWhatsappPreferences({ ...whatsappPreferences, time: e.target.value })}
-                                                className="bg-background-dark border-border-dark/50 text-white w-full sm:w-32 focus-visible:ring-primary/50"
+                                                className="bg-background-dark border-border-dark/50 text-foreground w-full sm:w-32 focus-visible:ring-primary/50"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="space-y-3 bg-background-dark/50 p-4 rounded-lg border border-border-dark/30">
-                                        <Label className="text-white text-xs block mb-2">Información a Incluir</Label>
+                                        <Label className="text-foreground text-xs block mb-2">Información a Incluir</Label>
                                         <div className="flex items-center gap-3">
                                             <Checkbox
                                                 id="pref-kpis"
@@ -406,7 +406,7 @@ export default function SettingsPage() {
                                                 onCheckedChange={(v: boolean) => setWhatsappPreferences({ ...whatsappPreferences, includeKpis: v })}
                                                 className="border-border-dark data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
                                             />
-                                            <label htmlFor="pref-kpis" className="text-sm text-white cursor-pointer">Resumen y KPIs Financieros</label>
+                                            <label htmlFor="pref-kpis" className="text-sm text-foreground cursor-pointer">Resumen y KPIs Financieros</label>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Checkbox
@@ -415,7 +415,7 @@ export default function SettingsPage() {
                                                 onCheckedChange={(v: boolean) => setWhatsappPreferences({ ...whatsappPreferences, includeStock: v })}
                                                 className="border-border-dark data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
                                             />
-                                            <label htmlFor="pref-stock" className="text-sm text-white cursor-pointer">Alertas de Stock Crítico</label>
+                                            <label htmlFor="pref-stock" className="text-sm text-foreground cursor-pointer">Alertas de Stock Crítico</label>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <Checkbox
@@ -424,14 +424,14 @@ export default function SettingsPage() {
                                                 onCheckedChange={(v: boolean) => setWhatsappPreferences({ ...whatsappPreferences, includeSuggestions: v })}
                                                 className="border-border-dark data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
                                             />
-                                            <label htmlFor="pref-suggestions" className="text-sm text-white cursor-pointer">Sugerencias Estratégicas (IA)</label>
+                                            <label htmlFor="pref-suggestions" className="text-sm text-foreground cursor-pointer">Sugerencias Estratégicas (IA)</label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="pt-2 flex items-center justify-between border-b border-border-dark/50 pb-6">
-                                <Button type="submit" disabled={greenApiLoading} className="gap-2 bg-white text-black hover:bg-gray-200 font-bold">
+                                <Button type="submit" disabled={greenApiLoading} className="gap-2 bg-foreground text-background hover:bg-foreground/90 font-bold">
                                     <Save className="w-4 h-4" />
                                     {greenApiLoading ? 'Guardando...' : 'Guardar Credenciales'}
                                 </Button>
@@ -440,18 +440,18 @@ export default function SettingsPage() {
 
                         {/* Test Connection Section */}
                         <div className="pt-6 space-y-4">
-                            <h4 className="text-sm font-bold text-white">Probar Conexión</h4>
+                            <h4 className="text-sm font-bold text-foreground">Probar Conexión</h4>
                             <p className="text-xs text-secondary">Asegúrate de haber guardado tus credenciales primero. Envía un WhatsApp de prueba a tu número para verificar que la integración funciona.</p>
                             <div className="flex items-end gap-3 max-w-md">
                                 <div className="space-y-2 flex-1">
-                                    <Label htmlFor="testPhone" className="text-white text-xs">Tu número de celular (con código de país)</Label>
+                                    <Label htmlFor="testPhone" className="text-foreground text-xs">Tu número de celular (con código de país)</Label>
                                     <Input
                                         id="testPhone"
                                         type="tel"
                                         placeholder="Ej: 56912345678"
                                         value={testPhone}
                                         onChange={(e) => setTestPhone(e.target.value)}
-                                        className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                                        className="bg-background-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                                     />
                                 </div>
                                 <Button
@@ -480,7 +480,7 @@ export default function SettingsPage() {
                                     <MessageSquareMore className="w-5 h-5 text-blue-500" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-lg text-white">Bot de Telegram</CardTitle>
+                                    <CardTitle className="text-lg text-foreground">Bot de Telegram</CardTitle>
                                     <CardDescription className="text-secondary">Chatea con TaliBots para ver tu stock y ventas</CardDescription>
                                 </div>
                             </div>
@@ -498,7 +498,7 @@ export default function SettingsPage() {
                             </p>
                             {!company.telegram_chat_id ? (
                                 <div className="bg-background-dark p-4 rounded-lg border border-border-dark/50 space-y-3">
-                                    <h4 className="text-sm font-bold text-white">1. Genera tu código</h4>
+                                    <h4 className="text-sm font-bold text-foreground">1. Genera tu código</h4>
                                     <p className="text-xs text-secondary">Genera un código único temporal para enlazar tu cuenta con tu perfil de Telegram de forma rápida y segura.</p>
                                     
                                     {telegramCode ? (
@@ -528,7 +528,7 @@ export default function SettingsPage() {
                                 </div>
                             ) : (
                                 <div className="bg-background-dark p-4 rounded-lg border border-border-dark/50">
-                                    <p className="text-sm text-white font-medium mb-3">✅ Tu cuenta ya está vinculada al bot.</p>
+                                    <p className="text-sm text-foreground font-medium mb-3">✅ Tu cuenta ya está vinculada al bot.</p>
                                     <Button 
                                         onClick={() => window.open(`https://t.me/Talistbot`, '_blank')}
                                         className="bg-blue-600 hover:bg-blue-700 text-white font-bold"
@@ -550,7 +550,7 @@ export default function SettingsPage() {
                             <Lock className="w-5 h-5 text-amber-500" />
                         </div>
                         <div>
-                            <CardTitle className="text-lg text-white">Cambiar Contraseña</CardTitle>
+                            <CardTitle className="text-lg text-foreground">Cambiar Contraseña</CardTitle>
                             <CardDescription className="text-secondary">Actualiza tu clave de acceso</CardDescription>
                         </div>
                     </div>
@@ -558,7 +558,7 @@ export default function SettingsPage() {
                 <CardContent>
                     <form onSubmit={handleChangePassword} className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="newPassword" className="text-white">Nueva contraseña</Label>
+                            <Label htmlFor="newPassword" className="text-foreground">Nueva contraseña</Label>
                             <Input
                                 id="newPassword"
                                 type="password"
@@ -566,11 +566,11 @@ export default function SettingsPage() {
                                 value={passwords.newPassword}
                                 onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
                                 required
-                                className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                                className="bg-background-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="confirmPassword" className="text-white">Confirmar contraseña</Label>
+                            <Label htmlFor="confirmPassword" className="text-foreground">Confirmar contraseña</Label>
                             <Input
                                 id="confirmPassword"
                                 type="password"
@@ -578,7 +578,7 @@ export default function SettingsPage() {
                                 value={passwords.confirmPassword}
                                 onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
                                 required
-                                className="bg-background-dark border-border-dark/50 text-white placeholder:text-secondary focus-visible:ring-primary/50"
+                                className="bg-background-dark border-border-dark/50 text-foreground placeholder:text-muted-foreground focus-visible:ring-primary/50"
                             />
                         </div>
                         <Button type="submit" disabled={loading} className="gap-2 bg-primary text-background-dark hover:bg-primary/90 font-bold">

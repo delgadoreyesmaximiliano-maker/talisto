@@ -185,7 +185,7 @@ export function AppHeader() {
     const emailInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'U'
 
     return (
-        <header className="h-20 flex items-center px-6 shrink-0 bg-surface-dark/80 backdrop-blur-md border-b border-border-dark justify-between sticky top-0 z-30">
+        <header className="h-20 flex items-center px-6 shrink-0 bg-background-dark/90 backdrop-blur-md border-b border-border-dark justify-between sticky top-0 z-30">
             <div className="flex items-center gap-4">
                 <SidebarTrigger className="text-secondary hover:text-primary transition-colors" />
                 <div className="h-6 w-[1px] bg-border-dark hidden md:block" />
@@ -205,25 +205,25 @@ export function AppHeader() {
                             debounceRef.current = setTimeout(() => setSearchQuery(val), 300)
                         }}
                         onFocus={() => setSearchOpen(true)}
-                        className="pl-10 pr-4 py-2 bg-background-dark text-white placeholder:text-secondary border border-border-dark rounded-xl text-sm transition-all w-64 outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20"
+                        className="pl-10 pr-4 py-2 bg-surface-dark text-foreground placeholder:text-muted-foreground border border-border-dark rounded-xl text-sm transition-all w-64 outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/15"
                     />
                     {searchQuery && (
-                        <button aria-label="Limpiar búsqueda" onClick={() => { setSearchQuery(''); inputRef.current?.focus() }} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-white">
+                        <button aria-label="Limpiar búsqueda" onClick={() => { setSearchQuery(''); inputRef.current?.focus() }} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                             <X className="w-3 h-3" />
                         </button>
                     )}
 
                     {searchOpen && (
-                        <div className="absolute top-full left-0 mt-2 w-80 bg-background-dark border border-border-dark rounded-xl shadow-2xl overflow-hidden z-50">
+                        <div className="absolute top-full left-0 mt-2 w-80 bg-surface-dark border border-border-dark rounded-xl shadow-2xl overflow-hidden z-50">
                             <div className="p-2 max-h-72 overflow-y-auto">
                                 {filteredLinks.length === 0 ? (
-                                    <div className="p-4 text-center text-secondary text-sm">Sin resultados</div>
+                                    <div className="p-4 text-center text-muted-foreground text-sm">Sin resultados</div>
                                 ) : (
                                     filteredLinks.map((link) => (
                                         <button
                                             key={link.href}
                                             onClick={() => handleSearchSelect(link.href)}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-primary/10 text-secondary hover:text-white transition-colors"
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-primary/10 text-muted-foreground hover:text-foreground transition-colors"
                                         >
                                             {link.href.includes('inventory') ? <Package className="w-4 h-4 shrink-0" /> :
                                                 link.href.includes('sales') ? <ShoppingBag className="w-4 h-4 shrink-0" /> :
@@ -246,29 +246,29 @@ export function AppHeader() {
                 {/* Notifications */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button aria-label="Notificaciones" className="p-2 text-secondary hover:text-white rounded-xl transition-all relative">
+                        <button aria-label="Notificaciones" className="p-2 text-muted-foreground hover:text-foreground rounded-xl transition-all relative">
                             <Bell className="w-5 h-5" />
                             {notifications.length > 0 && (
-                                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center border-2 border-surface-dark">
+                                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center border-2 border-border-dark">
                                     {notifications.length}
                                 </span>
                             )}
                         </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-80 mt-2 border border-border-dark bg-background-dark shadow-2xl rounded-2xl p-2">
-                        <DropdownMenuLabel className="font-bold px-3 py-2 text-white text-sm" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                    <DropdownMenuContent align="end" className="w-80 mt-2 border border-border-dark bg-surface-dark shadow-2xl rounded-2xl p-2">
+                        <DropdownMenuLabel className="font-bold px-3 py-2 text-foreground text-sm" style={{ fontFamily: "'Outfit', sans-serif" }}>
                             Notificaciones
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator className="bg-border-dark mx-1" />
                         {notifications.length === 0 ? (
-                            <div className="px-3 py-6 text-center text-secondary text-sm">
+                            <div className="px-3 py-6 text-center text-muted-foreground text-sm">
                                 Sin notificaciones nuevas
                             </div>
                         ) : (
                             notifications.map((notif) => (
                                 <DropdownMenuItem
                                     key={notif.id}
-                                    className="rounded-xl flex items-start gap-3 p-3 cursor-pointer hover:bg-white/5 transition-all"
+                                    className="rounded-xl flex items-start gap-3 p-3 cursor-pointer hover:bg-muted/50 transition-all"
                                     onSelect={(e) => {
                                         if (notif.id === 'low-stock' && !['saas', 'services', 'marketing'].includes(userIndustry)) {
                                             // Let Radix close the dropdown before opening dialog to avoid pointer-events block
@@ -280,8 +280,8 @@ export function AppHeader() {
                                 >
                                     <div className="mt-0.5 shrink-0">{notif.icon}</div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-white text-sm font-medium">{notif.title}</p>
-                                        <p className="text-secondary text-xs mt-0.5">{notif.description}</p>
+                                        <p className="text-foreground text-sm font-medium">{notif.title}</p>
+                                        <p className="text-muted-foreground text-xs mt-0.5">{notif.description}</p>
                                         {notif.id === 'low-stock' && !['saas', 'services', 'marketing'].includes(userIndustry) && (
                                             <span
                                                 className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-amber-400 bg-amber-500/10 rounded-lg px-2 py-1 transition-colors"
@@ -304,23 +304,23 @@ export function AppHeader() {
                 {user && (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <button aria-label="Menú de usuario" className="flex items-center gap-3 outline-none p-1 pr-3 rounded-xl hover:bg-white/5 transition-all group">
+                            <button aria-label="Menú de usuario" className="flex items-center gap-3 outline-none p-1 pr-3 rounded-xl hover:bg-muted/40 transition-all group">
                                 <Avatar className="h-9 w-9 border-2 border-transparent group-hover:border-primary transition-all">
-                                    <AvatarFallback className="bg-primary text-background-dark font-bold text-sm shadow-inner">{emailInitial}</AvatarFallback>
+                                    <AvatarFallback className="bg-primary/20 text-primary font-bold text-sm">{emailInitial}</AvatarFallback>
                                 </Avatar>
                                 <div className="text-left hidden sm:block">
-                                    <p className="text-xs font-bold text-white leading-none">{user.email?.split('@')[0]}</p>
-                                    <p className="text-[10px] text-secondary leading-none mt-1 uppercase font-bold tracking-tight">Admin</p>
+                                    <p className="text-xs font-bold text-foreground leading-none">{user.email?.split('@')[0]}</p>
+                                    <p className="text-[10px] text-muted-foreground leading-none mt-1 uppercase font-bold tracking-tight">Admin</p>
                                 </div>
                             </button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56 mt-2 border border-border-dark bg-background-dark shadow-2xl rounded-2xl p-2">
-                            <DropdownMenuLabel className="font-bold px-3 py-2 text-white" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                        <DropdownMenuContent align="end" className="w-56 mt-2 border border-border-dark bg-surface-dark shadow-2xl rounded-2xl p-2">
+                            <DropdownMenuLabel className="font-bold px-3 py-2 text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
                                 Mi Cuenta
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator className="bg-border-dark mx-1" />
-                            <DropdownMenuItem onClick={() => router.push('/app/settings')} className="rounded-xl flex items-center gap-2 p-3 cursor-pointer hover:bg-primary/10 hover:text-primary text-secondary font-medium transition-all group">
-                                <User className="w-4 h-4 text-secondary group-hover:text-primary" />
+                            <DropdownMenuItem onClick={() => router.push('/app/settings')} className="rounded-xl flex items-center gap-2 p-3 cursor-pointer hover:bg-primary/10 hover:text-primary text-muted-foreground font-medium transition-all group">
+                                <User className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
                                 <span>Ver Perfil</span>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-border-dark mx-1" />
@@ -341,13 +341,13 @@ export function AppHeader() {
                 <AlertDialog open={logoutOpen} onOpenChange={setLogoutOpen}>
                     <AlertDialogContent className="bg-surface-dark border border-border-dark">
                         <AlertDialogHeader>
-                            <AlertDialogTitle className="text-white">¿Cerrar sesión?</AlertDialogTitle>
-                            <AlertDialogDescription className="text-secondary">
+                            <AlertDialogTitle className="text-foreground">¿Cerrar sesión?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-muted-foreground">
                                 Tu sesión se cerrará y serás redirigido al login.
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel className="border-border-dark text-secondary bg-transparent hover:bg-white/5">Cancelar</AlertDialogCancel>
+                            <AlertDialogCancel className="border-border-dark text-muted-foreground bg-transparent hover:bg-muted/40">Cancelar</AlertDialogCancel>
                             <AlertDialogAction
                                 className="bg-red-500/80 hover:bg-red-500 text-white border-0"
                                 onClick={async () => {

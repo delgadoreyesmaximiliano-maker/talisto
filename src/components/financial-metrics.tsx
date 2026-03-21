@@ -23,7 +23,7 @@ function MetricCard({ label, value, change, trend, icon, iconBg, iconColor }: Me
     const TrendIcon = trend === 'up' ? TrendingUp : TrendingDown;
 
     return (
-        <div className="bg-[#1c2721] rounded-xl p-6 border border-[#283930] hover:border-[#334941] transition-all hover:shadow-lg hover:shadow-[#13ec80]/5">
+        <div className="bg-card rounded-xl p-6 border border-border hover:border-border/70 transition-all hover:shadow-lg hover:shadow-[#13ec80]/5">
             <div className="flex items-start justify-between mb-4">
                 <div className={`p-3 rounded-lg ${iconBg}`}>
                     <div className={iconColor}>
@@ -40,8 +40,8 @@ function MetricCard({ label, value, change, trend, icon, iconBg, iconColor }: Me
             </div>
 
             <div>
-                <p className="text-sm text-gray-400 mb-1">{label}</p>
-                <p className="text-2xl font-bold text-white">{value}</p>
+                <p className="text-sm text-muted-foreground mb-1">{label}</p>
+                <p className="text-2xl font-bold text-foreground">{value}</p>
             </div>
         </div>
     );
@@ -69,11 +69,11 @@ export function FinancialMetrics({ data, loading }: FinancialMetricsProps) {
                 {[...Array(4)].map((_, i) => (
                     <div
                         key={i}
-                        className="bg-[#1c2721] rounded-xl p-6 border border-[#283930] animate-pulse"
+                        className="bg-card rounded-xl p-6 border border-border animate-pulse"
                     >
-                        <div className="h-12 bg-[#283930] rounded-lg mb-4" />
-                        <div className="h-4 bg-[#283930] rounded mb-2" />
-                        <div className="h-8 bg-[#283930] rounded" />
+                        <div className="h-12 bg-muted/40 rounded-lg mb-4" />
+                        <div className="h-4 bg-muted/40 rounded mb-2" />
+                        <div className="h-8 bg-muted/40 rounded" />
                     </div>
                 ))}
             </div>

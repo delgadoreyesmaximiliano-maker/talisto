@@ -24,103 +24,99 @@
 
 @layer base {
   :root {
-    /* New Design System: Emerald & Dark Navy */
-    --background: 210 40% 98%;
-    /* #F8FAFC - slate-50 */
-    --foreground: 222 47% 11%;
-    /* #0F172A - slate-950 */
+    /* Light mode — Forest + Cream */
+    --background: 37 60% 96%;
+    /* #fdf6ec warm cream bg */
+    --foreground: 168 47% 12%;
+    /* #102c26 forest green text */
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 168 47% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 168 47% 12%;
 
-    /* Primary: Emerald Green #10B981 */
-    --primary: 161 68% 40%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 168 47% 18%;
+    /* #163d34 forest */
+    --primary-foreground: 37 72% 89%;
+    /* #f7e7ce cream */
 
-    /* Secondary: Navy #0F172A */
-    --secondary: 222 47% 11%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 168 25% 35%;
+    --secondary-foreground: 37 72% 89%;
 
-    /* Muted */
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 37 40% 92%;
+    --muted-foreground: 168 20% 40%;
 
-    /* Accent: Light Emerald #DCFCE7 / #10B981 */
-    --accent: 142 70% 95%;
-    --accent-foreground: 161 68% 40%;
+    --accent: 37 60% 88%;
+    --accent-foreground: 168 47% 12%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 161 68% 40%;
+    --border: 168 20% 80%;
+    --input: 168 20% 80%;
+    --ring: 168 47% 18%;
 
-    --radius: 0.75rem;
+    --radius: 0.875rem;
 
-    /* Sidebar - Navy Theme */
-    --sidebar-background: 222 47% 11%;
-    /* #0F172A */
-    --sidebar-foreground: 210 40% 98%;
-    /* #F8FAFC */
-    --sidebar-primary: 161 68% 40%;
-    /* Emerald */
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 217 33% 17%;
-    /* #1E293B */
-    --sidebar-accent-foreground: 161 68% 40%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 161 68% 40%;
+    --sidebar-background: 168 47% 12%;
+    --sidebar-foreground: 37 72% 89%;
+    --sidebar-primary: 37 72% 89%;
+    --sidebar-primary-foreground: 168 47% 12%;
+    --sidebar-accent: 166 38% 17%;
+    --sidebar-accent-foreground: 37 72% 89%;
+    --sidebar-border: 165 35% 20%;
+    --sidebar-ring: 37 72% 89%;
   }
 
   .dark {
-    /* Dark Elegance Theme */
-    --background: 146 17% 8%;
-    /* #111814 */
-    --foreground: 210 40% 98%;
+    /* Forest & Cream — Futuristic Elegance */
+    --background: 166 47% 7%;
+    /* #091a17 very dark forest */
+    --foreground: 37 72% 89%;
+    /* #f7e7ce warm cream */
 
-    --card: 147 16% 13%;
-    /* surface #1c2721 */
-    --card-foreground: 210 40% 98%;
+    --card: 168 47% 12%;
+    /* #102c26 forest surface */
+    --card-foreground: 37 72% 89%;
 
-    --popover: 147 16% 13%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 168 47% 12%;
+    --popover-foreground: 37 72% 89%;
 
-    --primary: 150 86% 50%;
-    /* Emerald #13ec80 */
-    --primary-foreground: 146 17% 8%;
+    --primary: 37 72% 89%;
+    /* #f7e7ce cream as primary accent */
+    --primary-foreground: 166 47% 7%;
+    /* dark bg for text on cream buttons */
 
-    --secondary: 150 16% 66%;
-    /* text-secondary #9db9ab */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 165 18% 58%;
+    /* muted teal-gray for secondary text */
+    --secondary-foreground: 37 72% 89%;
 
-    --muted: 148 17% 19%;
-    /* border-dark */
-    --muted-foreground: 150 16% 66%;
+    --muted: 166 38% 16%;
+    /* #163830 dark muted surface */
+    --muted-foreground: 165 18% 58%;
 
-    --accent: 148 17% 19%;
-    --accent-foreground: 150 86% 50%;
+    --accent: 166 38% 16%;
+    --accent-foreground: 37 72% 89%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 40%;
+    --destructive-foreground: 37 72% 89%;
 
-    --border: 148 17% 19%;
-    /* border-dark #283930 */
-    --input: 148 17% 19%;
-    --ring: 150 86% 50%;
+    --border: 165 35% 18%;
+    /* #1c3d35 subtle border */
+    --input: 165 35% 18%;
+    --ring: 37 72% 89%;
+    /* cream focus ring */
 
-    /* Sidebar matching the surface */
-    --sidebar-background: 146 17% 8%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 150 86% 50%;
-    --sidebar-primary-foreground: 146 17% 8%;
-    --sidebar-accent: 148 17% 19%;
-    --sidebar-accent-foreground: 150 86% 50%;
-    --sidebar-border: 148 17% 19%;
-    --sidebar-ring: 150 86% 50%;
+    /* Sidebar — same dark forest base */
+    --sidebar-background: 166 47% 7%;
+    --sidebar-foreground: 37 72% 89%;
+    --sidebar-primary: 37 72% 89%;
+    --sidebar-primary-foreground: 166 47% 7%;
+    --sidebar-accent: 166 38% 16%;
+    --sidebar-accent-foreground: 37 72% 89%;
+    --sidebar-border: 165 35% 18%;
+    --sidebar-ring: 37 72% 89%;
   }
 
   body {
@@ -130,6 +126,12 @@
 
 @layer components {
   .glass-panel {
-    @apply bg-surface-dark/40 backdrop-blur-md border border-border-dark/50;
+    @apply bg-surface-dark/50 backdrop-blur-md border border-border-dark/60;
+  }
+  .cream-glow {
+    box-shadow: 0 0 20px rgba(247, 231, 206, 0.08);
+  }
+  .cream-glow-sm {
+    box-shadow: 0 0 10px rgba(247, 231, 206, 0.12);
   }
 }
