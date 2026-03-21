@@ -5,7 +5,8 @@
       "Bash(npm install -D vitest @vitejs/plugin-react @testing-library/react @testing-library/user-event @testing-library/jest-dom jsdom)",
       "Bash(npm run test:run)",
       "Bash(npx vercel --version)",
-      "WebFetch(domain:talisto.cl)"
+      "WebFetch(domain:talisto.cl)",
+      "Skill(update-config)"
     ]
   }
 }

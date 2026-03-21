@@ -48,10 +48,15 @@ export async function transcribeAudio(fileId: string): Promise<string> {
  * Lógica principal del Agente. Toma un texto, usa LLaMA para saber qué hacer, ejecuta funciones y responde humanamente.
  */
 export async function processAgentMessage(text: string, companyId: string, companyName: string): Promise<AIMessageResponse> {
-    const systemPrompt = `Eres Tali, el asistente virtual inteligente de la empresa "${companyName}". 
-Tu trabajo es ayudar al dueño/administrador con información de su negocio (ventas, stock) de forma muy natural, amigable, concisa y usando emojis.
-Respetas el tono de un asistente senior, proactivo. NUNCA respondas con código ni estructuras extrañas. Simplemente habla como un amigo o un consultor contable amable.
-Si el usuario te envía un audio, esta entrada es la transcripción de su audio.`;
+    const systemPrompt = `Eres "Tali", el asistente virtual de la empresa "${companyName}".
+IMPORTANTE: Tú TIENES acceso directo a la base de datos del negocio a través de tus herramientas (tools). 
+NUNCA digas que no tienes acceso a los datos. SIEMPRE usa tus herramientas para consultar información real.
+- Si el usuario pregunta por ventas, USA la herramienta get_sales_today.
+- Si el usuario pregunta por stock o inventario, USA la herramienta get_critical_stock.
+- Si el usuario quiere registrar una venta, USA la herramienta add_sale.
+- Si el usuario pide un gráfico o resumen visual, USA la herramienta get_sales_chart_last_7_days.
+- Si el usuario solo saluda o hace una pregunta general que no requiere datos, USA la herramienta chat_with_user.
+Responde siempre de forma amigable, concisa y con emojis. Habla como un asistente profesional pero cercano.`;
 
     // Herramientas que la IA puede decidir llamar
     const tools: any[] = [
@@ -59,7 +64,7 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
             type: "function",
             function: {
                 name: "get_sales_today",
-                description: "Obtiene el total de ventas y la cantidad de transacciones del día de hoy.",
+                description: "Consulta las ventas del día de hoy en la base de datos. ÚSALA siempre que el usuario pregunte por ventas, ingresos, cuánto se vendió, facturación, o cualquier tema de dinero del día.",
                 parameters: { type: "object", properties: {}, required: [] },
             },
         },
@@ -67,7 +72,7 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
             type: "function",
             function: {
                 name: "get_critical_stock",
-                description: "Busca los productos que están por debajo o igual a su stock mínimo, es decir, están escasos.",
+                description: "Consulta los productos con stock bajo o crítico en la base de datos. ÚSALA cuando pregunten por inventario, stock, productos que faltan, o qué hay que reponer.",
                 parameters: { type: "object", properties: {}, required: [] },
             },
         },
@@ -75,11 +80,11 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
             type: "function",
             function: {
                 name: "add_sale",
-                description: "Registra una venta rápida de un producto indicando su nombre (aproximado) y la cantidad o precio total pagado. Si no indica un producto específico, busca genérico o usa 'Venta rápida'.",
+                description: "Registra una venta nueva en la base de datos. ÚSALA cuando el usuario diga que vendió algo, que cobre algo, que anote una venta, o mencione un precio de producto vendido.",
                 parameters: {
                     type: "object",
                     properties: {
-                        product_name: { type: "string", description: "Nombre del producto vendido o servicio (ej: empanada, reparación, venta general)" },
+                        product_name: { type: "string", description: "Nombre del producto vendido o servicio" },
                         price: { type: "number", description: "El precio total pagado por el cliente" }
                     },
                     required: ["product_name", "price"]
@@ -90,8 +95,22 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
             type: "function",
             function: {
                 name: "get_sales_chart_last_7_days",
-                description: "Obtiene una URL con un gráfico de imagen (PNG) que muestra las ventas de los últimos 7 días. Usa esta herramienta si el usuario pide ver un gráfico o cómo van las ventas gráficamente.",
+                description: "Genera un gráfico visual (imagen PNG) con las ventas de los últimos 7 días. ÚSALA cuando el usuario pida gráficos, estadísticas visuales, o quiera ver cómo van las ventas.",
                 parameters: { type: "object", properties: {}, required: [] }
+            }
+        },
+        {
+            type: "function",
+            function: {
+                name: "chat_with_user",
+                description: "Responde de forma conversacional al usuario. ÚSALA SOLO cuando el usuario saluda, hace preguntas generales, o no necesita datos del negocio.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        response: { type: "string", description: "Tu respuesta amigable al usuario" }
+                    },
+                    required: ["response"]
+                }
             }
         }
     ];
@@ -104,7 +123,7 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
                 { role: "user", content: text }
             ],
             tools: tools,
-            tool_choice: "auto",
+            tool_choice: "required",
         });
 
         const responseMessage = chatCompletion.choices[0].message;
@@ -211,6 +230,11 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
                     const encodedChart = encodeURIComponent(JSON.stringify(chartConfig));
                     photoUrlToReturn = `https://quickchart.io/chart?c=${encodedChart}&w=600&h=400&bkg=white`;
                     resultObj = { status: 'success', chart_generated: true, data_summary: salesByDay };
+                }
+
+                if (toolName === 'chat_with_user') {
+                    // Respuesta conversacional directa, no necesita segunda llamada
+                    return { text: args.response || '¡Hola! ¿En qué te puedo ayudar? 😊' };
                 }
 
                 toolResults.push({
