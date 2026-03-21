@@ -247,9 +247,9 @@ export function SalesTable() {
                                 >
                                     Fecha <SortIcon col="created_at" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
-                                <TableHead className="text-secondary font-medium">Producto / Serv.</TableHead>
-                                <TableHead className="text-secondary font-medium">Cliente</TableHead>
-                                <TableHead className="text-secondary font-medium">Origen</TableHead>
+                                <TableHead className="text-secondary font-medium hidden sm:table-cell">Producto / Serv.</TableHead>
+                                <TableHead className="text-secondary font-medium hidden md:table-cell">Cliente</TableHead>
+                                <TableHead className="text-secondary font-medium hidden md:table-cell">Origen</TableHead>
                                 <TableHead className="text-secondary font-medium">Estado</TableHead>
                                 <TableHead
                                     className="text-right text-secondary font-medium cursor-pointer select-none hover:text-foreground transition-colors"
@@ -257,7 +257,7 @@ export function SalesTable() {
                                     onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('amount'))}
                                     role="button" tabIndex={0}
                                 >
-                                    Monto Total <SortIcon col="amount" sortKey={sortKey} sortDir={sortDir} />
+                                    Monto <SortIcon col="amount" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
@@ -272,14 +272,14 @@ export function SalesTable() {
                                         <TableCell className="font-medium text-foreground">
                                             {new Date(sale.created_at).toLocaleDateString('es-CL')}
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="hidden sm:table-cell">
                                             <span className="text-foreground font-medium">{description}</span>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="hidden md:table-cell">
                                             <div className="text-foreground">{sale.customer_name || 'Al Contado'}</div>
                                             <div className="text-xs text-secondary mt-0.5">{sale.customer_email || ''}</div>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="hidden md:table-cell">
                                             <Badge variant="outline" className="capitalize bg-transparent border-border-dark text-secondary font-normal">
                                                 {sale.source === 'manual' ? 'Manual' : sale.source || 'Manual'}
                                             </Badge>

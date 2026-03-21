@@ -1,5 +1,15 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, Check, BarChart3, Bot, Plug, Zap } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'CRM, Inventario y Ventas con IA para Chile',
+  description: 'Talisto te ayuda a gestionar clientes, inventario y ventas con inteligencia artificial. Prueba gratis 14 días.',
+  openGraph: {
+    title: 'Talisto — CRM + IA para empresas chilenas',
+    description: 'Gestión inteligente para tu negocio.',
+  },
+}
 
 export default function LandingPage() {
   return (
@@ -73,7 +83,7 @@ export default function LandingPage() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 mt-16 sm:mt-20 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mt-16 sm:mt-20 max-w-4xl mx-auto">
               {[
                 { value: '15+', label: 'Horas ahorradas/semana' },
                 { value: '10-30%', label: 'Aumento en ganancias' },
@@ -92,7 +102,7 @@ export default function LandingPage() {
       {/* ============ FEATURES SECTION ============ */}
       <section id="funcionalidades" className="py-20 sm:py-24 bg-background-dark">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               { icon: '📊', title: 'Dashboards Automáticos', desc: 'Conecta tus fuentes y genera reportes profesionales al instante' },
               { icon: '🤖', title: 'Recomendaciones IA', desc: 'La IA analiza tus datos y te dice exactamente qué hacer' },
@@ -119,7 +129,7 @@ export default function LandingPage() {
             <p className="text-lg sm:text-xl text-muted-foreground">De datos dispersos a decisiones claras en 4 pasos</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               { icon: '🔌', step: 1, title: 'Conectas', desc: 'Sube Excel, conecta Shopify, Mercado Libre, Bsale. Todo en 5 minutos.' },
               { icon: '📊', step: 2, title: 'Dashboard Automático', desc: 'Se crea solo según tu industria. Ventas, inventario, KPIs, todo listo.' },
@@ -160,7 +170,7 @@ export default function LandingPage() {
             <p className="text-lg sm:text-xl text-muted-foreground">Elige el plan perfecto para tu empresa</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Plan Básico */}
             <div className="glass-panel rounded-2xl p-8 hover:scale-105 transition-all duration-300">
               <div className="text-center mb-6">
@@ -186,7 +196,7 @@ export default function LandingPage() {
             </div>
 
             {/* Plan Pro - DESTACADO */}
-            <div className="relative bg-surface-dark rounded-2xl p-8 border-2 border-primary shadow-[0_0_20px_rgba(15,168,98,0.2)] hover:shadow-[0_0_30px_rgba(15,168,98,0.4)] hover:scale-105 transition-all duration-300 sm:-mt-4 sm:mb-0">
+            <div className="relative bg-surface-dark rounded-2xl p-8 border-2 border-primary shadow-[0_0_20px_rgba(15,168,98,0.2)] hover:shadow-[0_0_30px_rgba(15,168,98,0.4)] hover:scale-105 transition-all duration-300 md:-mt-4 md:mb-0">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                 <span className="bg-primary text-background-dark px-6 py-1.5 rounded-full font-bold text-sm whitespace-nowrap">
                   ⭐ MÁS POPULAR
@@ -278,7 +288,7 @@ export default function LandingPage() {
       {/* ============ FOOTER ============ */}
       <footer className="bg-background-dark text-muted-foreground py-16 border-t border-border-dark">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
             {/* Logo + Description */}
             <div className="sm:col-span-2 lg:col-span-1">
               <div className="text-3xl font-extrabold text-primary mb-4" style={{ fontFamily: "'Outfit', sans-serif" }}>
@@ -334,8 +344,8 @@ export default function LandingPage() {
               <h4 className="font-bold text-foreground text-lg mb-5" style={{ fontFamily: "'Outfit', sans-serif" }}>Legal & Soporte</h4>
               <ul className="space-y-3">
                 {[
-                  { label: 'Términos y Condiciones', href: 'mailto:hola@talisto.cl' },
-                  { label: 'Política de Privacidad', href: 'mailto:hola@talisto.cl' },
+                  { label: 'Términos y Condiciones', href: '/legal/terms' },
+                  { label: 'Política de Privacidad', href: '/legal/privacy' },
                   { label: 'Centro de Ayuda', href: 'mailto:hola@talisto.cl' },
                   { label: 'API Docs', href: 'mailto:hola@talisto.cl' },
                   { label: 'Estado del Sistema', href: '/login' },

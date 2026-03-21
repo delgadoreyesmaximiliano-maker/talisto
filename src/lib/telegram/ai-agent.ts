@@ -1,12 +1,28 @@
 import { createClient } from '@supabase/supabase-js';
 import Groq from 'groq-sdk';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
+// Lazy singletons: initialized on first use (inside request handlers), not at module load time.
+// This prevents build-time crashes when env vars are absent in the build environment.
+let _groq: Groq | null = null;
+function getGroq(): Groq {
+    if (!_groq) _groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
+    return _groq;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _supabase: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getSupabase(): any {
+    if (!_supabase) {
+        _supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+    }
+    return _supabase;
+}
+
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!
 
 export interface AIMessageResponse {
     text: string;
@@ -31,7 +47,7 @@ export async function transcribeAudio(fileId: string): Promise<string> {
         const file = new File([audioBlob], 'audio.ogg', { type: 'audio/ogg' });
 
         // 3. Transcribir con Whisper en Groq
-        const transcription = await groq.audio.transcriptions.create({
+        const transcription = await getGroq().audio.transcriptions.create({
             file: file,
             model: "whisper-large-v3",
             language: "es", // Forzar español para mayor asertividad
@@ -182,7 +198,7 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
     ];
 
     try {
-        const chatCompletion = await groq.chat.completions.create({
+        const chatCompletion = await getGroq().chat.completions.create({
             model: "llama-3.3-70b-versatile",
             messages: [
                 { role: "system", content: systemPrompt },
@@ -208,7 +224,7 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
                 // ───── VENTAS DE HOY ─────
                 if (toolName === 'get_sales_today') {
                     const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
-                    const { data } = await supabase.from('sales').select('amount').eq('company_id', companyId).gte('created_at', todayStart.toISOString());
+                    const { data } = await getSupabase().from('sales').select('amount').eq('company_id', companyId).gte('created_at', todayStart.toISOString());
                     const totalAmount = data?.reduce((acc: number, item: any) => acc + (item.amount || 0), 0) || 0;
                     resultObj = { cant_ventas: data?.length || 0, monto_total_ganado: totalAmount };
                 }
@@ -220,8 +236,8 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
                     const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
                     const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
                     
-                    const { data: thisMonth } = await supabase.from('sales').select('amount').eq('company_id', companyId).gte('created_at', monthStart.toISOString());
-                    const { data: lastMonth } = await supabase.from('sales').select('amount').eq('company_id', companyId).gte('created_at', prevMonthStart.toISOString()).lte('created_at', prevMonthEnd.toISOString());
+                    const { data: thisMonth } = await getSupabase().from('sales').select('amount').eq('company_id', companyId).gte('created_at', monthStart.toISOString());
+                    const { data: lastMonth } = await getSupabase().from('sales').select('amount').eq('company_id', companyId).gte('created_at', prevMonthStart.toISOString()).lte('created_at', prevMonthEnd.toISOString());
                     
                     const thisTotal = thisMonth?.reduce((a: number, s: any) => a + (s.amount || 0), 0) || 0;
                     const lastTotal = lastMonth?.reduce((a: number, s: any) => a + (s.amount || 0), 0) || 0;
@@ -236,40 +252,41 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
 
                 // ───── STOCK CRÍTICO ─────
                 if (toolName === 'get_critical_stock') {
-                    const { data } = await supabase.from('products').select('name, stock_current, stock_minimum').eq('company_id', companyId);
+                    const { data } = await getSupabase().from('products').select('name, stock_current, stock_minimum').eq('company_id', companyId);
                     const critical = (data || []).filter((p: any) => p.stock_current <= p.stock_minimum);
                     resultObj = { productos_criticos: critical.slice(0, 10), total_productos_criticos: critical.length };
                 }
 
                 // ───── TODOS LOS PRODUCTOS ─────
                 if (toolName === 'get_all_products') {
-                    const { data } = await supabase.from('products').select('name, price, stock_current, stock_minimum').eq('company_id', companyId).order('name').limit(25);
+                    const { data } = await getSupabase().from('products').select('name, price, stock_current, stock_minimum').eq('company_id', companyId).order('name').limit(25);
                     resultObj = { productos: data || [], total: data?.length || 0 };
                 }
 
                 // ───── CLIENTES ─────
                 if (toolName === 'get_customers') {
-                    const { data } = await supabase.from('customers').select('name, email, phone, status').eq('company_id', companyId).order('name').limit(25);
+                    const { data } = await getSupabase().from('customers').select('name, email, phone, status').eq('company_id', companyId).order('name').limit(25);
                     resultObj = { clientes: data || [], total: data?.length || 0 };
                 }
 
                 // ───── AGREGAR VENTA ─────
                 if (toolName === 'add_sale') {
-                    const { data: prods } = await supabase.from('products').select('id, name').eq('company_id', companyId).ilike('name', `%${args.product_name}%`).limit(1);
-                    const prodId = prods && prods.length > 0 ? prods[0].id : null;
-                    const insertedName = prods && prods.length > 0 ? prods[0].name : args.product_name;
+                    const { data: prods } = await getSupabase().from('products').select('id, name').eq('company_id', companyId).ilike('name', `%${args.product_name}%`).limit(1);
+                    const prodsTyped = prods as { id: string; name: string }[] | null;
+                    const prodId = prodsTyped && prodsTyped.length > 0 ? prodsTyped[0].id : null;
+                    const insertedName = prodsTyped && prodsTyped.length > 0 ? prodsTyped[0].name : args.product_name;
 
                     const saleRow: any = { company_id: companyId, amount: args.price, payment_method: 'Efectivo', created_at: new Date().toISOString() };
-                    const { data: saleData } = await supabase.from('sales').insert([saleRow]).select('id').single();
+                    const { data: saleData } = await getSupabase().from('sales').insert([saleRow]).select('id').single();
                     
                     if (saleData && prodId) {
-                        await supabase.from('sale_items').insert([{ sale_id: saleData.id, product_id: prodId, quantity: 1, unit_price: args.price, subtotal: args.price }]);
-                        const { data: currentStockObj } = await supabase.from('products').select('stock_current').eq('id', prodId).single();
+                        await getSupabase().from('sale_items').insert([{ sale_id: saleData.id, product_id: prodId, quantity: 1, unit_price: args.price, subtotal: args.price }]);
+                        const { data: currentStockObj } = await getSupabase().from('products').select('stock_current').eq('id', prodId).single();
                         if (currentStockObj) {
-                            await supabase.from('products').update({ stock_current: currentStockObj.stock_current - 1 }).eq('id', prodId);
+                            await getSupabase().from('products').update({ stock_current: currentStockObj.stock_current - 1 }).eq('id', prodId);
                         }
                     } else if (saleData) {
-                        await supabase.from('sale_items').insert([{ sale_id: saleData.id, custom_product_name: args.product_name, quantity: 1, unit_price: args.price, subtotal: args.price }]);
+                        await getSupabase().from('sale_items').insert([{ sale_id: saleData.id, custom_product_name: args.product_name, quantity: 1, unit_price: args.price, subtotal: args.price }]);
                     }
                     resultObj = { status: 'success', producto: insertedName, monto_registrado: args.price };
                 }
@@ -283,7 +300,7 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
                         stock_current: args.stock ?? 0,
                         stock_minimum: args.stock_minimum ?? 5,
                     };
-                    const { data, error } = await supabase.from('products').insert([newProduct]).select('id, name').single();
+                    const { data, error } = await getSupabase().from('products').insert([newProduct]).select('id, name').single();
                     if (error) {
                         resultObj = { status: 'error', message: error.message };
                     } else {
@@ -301,7 +318,7 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
                     if (args.email) newCustomer.email = args.email;
                     if (args.phone) newCustomer.phone = args.phone;
 
-                    const { data, error } = await supabase.from('customers').insert([newCustomer]).select('id, name').single();
+                    const { data, error } = await getSupabase().from('customers').insert([newCustomer]).select('id, name').single();
                     if (error) {
                         resultObj = { status: 'error', message: error.message };
                     } else {
@@ -315,7 +332,7 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
                     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
                     sevenDaysAgo.setHours(0,0,0,0);
                     
-                    const { data } = await supabase.from('sales').select('amount, created_at').eq('company_id', companyId).gte('created_at', sevenDaysAgo.toISOString());
+                    const { data } = await getSupabase().from('sales').select('amount, created_at').eq('company_id', companyId).gte('created_at', sevenDaysAgo.toISOString());
                     
                     const salesByDay: Record<string, number> = {};
                     for (let i = 6; i >= 0; i--) {
@@ -374,7 +391,7 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
             }
 
             // Llamar a la IA nuevamente con la respuesta de las tools
-            const finalChat = await groq.chat.completions.create({
+            const finalChat = await getGroq().chat.completions.create({
                 model: "llama-3.3-70b-versatile",
                 messages: [
                     { role: "system", content: systemPrompt },

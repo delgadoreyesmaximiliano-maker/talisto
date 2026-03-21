@@ -7,6 +7,7 @@ import { headers } from "next/headers"
 import { Toaster } from "sonner"
 import { TrialWarningBanner } from '@/components/trial-warning-banner'
 import { getTrialStatus } from '@/lib/utils/trial'
+import { OnboardingTour } from '@/components/onboarding-tour'
 
 export default async function AppLayout({
     children,
@@ -53,6 +54,7 @@ export default async function AppLayout({
     }
     return (
         <>
+            <OnboardingTour />
             <SidebarProvider>
                 {hasCompany && <AppSidebar />}
                 <main className="flex-1 overflow-x-hidden w-full flex flex-col">

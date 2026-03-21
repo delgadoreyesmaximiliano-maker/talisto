@@ -189,10 +189,10 @@ export function CustomersTable() {
                                 >
                                     Cliente <SortIcon col="name" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
-                                <TableHead className="text-secondary font-medium">Estado</TableHead>
-                                <TableHead className="text-secondary font-medium">Suscripción</TableHead>
+                                <TableHead className="text-secondary font-medium hidden sm:table-cell">Estado</TableHead>
+                                <TableHead className="text-secondary font-medium hidden md:table-cell">Suscripción</TableHead>
                                 <TableHead
-                                    className="text-right text-secondary font-medium cursor-pointer select-none hover:text-foreground transition-colors"
+                                    className="text-right text-secondary font-medium cursor-pointer select-none hover:text-foreground transition-colors hidden md:table-cell"
                                     onClick={() => toggleSort('mrr')}
                                     onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('mrr'))}
                                     role="button" tabIndex={0}
@@ -205,7 +205,7 @@ export function CustomersTable() {
                                     onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggleSort('last_activity'))}
                                     role="button" tabIndex={0}
                                 >
-                                    Última Actividad <SortIcon col="last_activity" sortKey={sortKey} sortDir={sortDir} />
+                                    Últ. Actividad <SortIcon col="last_activity" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
@@ -216,7 +216,7 @@ export function CustomersTable() {
                                         <div>{customer.name}</div>
                                         <div className="text-xs text-secondary font-normal">{customer.email || 'Sin correo asociado'}</div>
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell className="hidden sm:table-cell">
                                         <Badge
                                             className={`font-medium ${customer.status === 'active'
                                                 ? 'bg-primary/20 text-primary border-primary/30'
@@ -226,8 +226,8 @@ export function CustomersTable() {
                                             {customer.status === 'active' ? 'Activo' : customer.status || 'Activo'}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell className="capitalize text-secondary text-sm">{customer.plan || '-'}</TableCell>
-                                    <TableCell className="text-right font-bold text-foreground">
+                                    <TableCell className="capitalize text-secondary text-sm hidden md:table-cell">{customer.plan || '-'}</TableCell>
+                                    <TableCell className="text-right font-bold text-foreground hidden md:table-cell">
                                         ${customer.mrr ? Number(customer.mrr).toLocaleString('es-CL') : '0'}
                                     </TableCell>
                                     <TableCell className="text-right text-sm text-secondary">

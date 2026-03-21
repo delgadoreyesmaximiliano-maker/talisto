@@ -282,8 +282,8 @@ export function ProductsTable() {
                                 >
                                     Nombre <SortIcon col="name" sortKey={sortKey} sortDir={sortDir} />
                                 </TableHead>
-                                <TableHead className="text-secondary font-medium">SKU</TableHead>
-                                <TableHead className="text-secondary font-medium">Categoría</TableHead>
+                                <TableHead className="text-secondary font-medium hidden md:table-cell">SKU</TableHead>
+                                <TableHead className="text-secondary font-medium hidden md:table-cell">Categoría</TableHead>
                                 <TableHead
                                     className="text-secondary font-medium text-right cursor-pointer select-none hover:text-foreground transition-colors"
                                     onClick={() => toggleSort('price_sale')}
@@ -314,8 +314,8 @@ export function ProductsTable() {
                             ) : pagedProducts.map((product) => (
                                 <TableRow key={product.id} className="border-border-dark hover:bg-muted/30 transition-colors">
                                     <TableCell className="font-medium text-foreground">{product.name}</TableCell>
-                                    <TableCell className="text-secondary">{product.sku || '-'}</TableCell>
-                                    <TableCell className="text-secondary">{product.category || '-'}</TableCell>
+                                    <TableCell className="text-secondary hidden md:table-cell">{product.sku || '-'}</TableCell>
+                                    <TableCell className="text-secondary hidden md:table-cell">{product.category || '-'}</TableCell>
                                     <TableCell className="text-right text-secondary">
                                         {product.price_sale ? `$${product.price_sale.toFixed(2)}` : '-'}
                                     </TableCell>

@@ -49,26 +49,37 @@ export default async function AppDashboard() {
     const industry = companyData?.industry ?? 'other'
 
     // FIX #5: Manejo de errores en queries críticas
-    // 1. Fetch Sales Data
-    const { data: salesData, error: salesError } = await supabase
-        .from('sales')
-        .select('amount, created_at')
-        .eq('company_id', companyId)
-        .returns<SaleRow[]>()
+    // Queries 1-3 son independientes: se ejecutan en paralelo para mejor performance
+    const [
+        { data: salesData, error: salesError },
+        { data: customersData, error: customersError },
+        { data: productsData, error: productsError },
+    ] = await Promise.all([
+        // 1. Fetch Sales Data — limitado al año actual para no traer datos históricos excesivos
+        supabase
+            .from('sales')
+            .select('amount, created_at')
+            .eq('company_id', companyId)
+            .gte('created_at', new Date(new Date().getFullYear(), 0, 1).toISOString())
+            .limit(1000)
+            .returns<SaleRow[]>(),
 
-    // 2. Fetch Customers Data
-    const { data: customersData, error: customersError } = await supabase
-        .from('customers')
-        .select('mrr, status')
-        .eq('company_id', companyId)
-        .returns<CustomerRow[]>()
+        // 2. Fetch Customers Data
+        supabase
+            .from('customers')
+            .select('mrr, status')
+            .eq('company_id', companyId)
+            .limit(500)
+            .returns<CustomerRow[]>(),
 
-    // 3. Fetch Inventory Data
-    const { data: productsData, error: productsError } = await supabase
-        .from('products')
-        .select('id, name, stock_current, stock_minimum')
-        .eq('company_id', companyId)
-        .returns<ProductRow[]>()
+        // 3. Fetch Inventory Data
+        supabase
+            .from('products')
+            .select('id, name, stock_current, stock_minimum')
+            .eq('company_id', companyId)
+            .limit(500)
+            .returns<ProductRow[]>(),
+    ])
 
     // Si alguna query crítica falla, mostramos error amigable
     const criticalError = salesError || customersError || productsError
@@ -280,11 +291,11 @@ export default async function AppDashboard() {
                 </div>
             </div>
 
-            {/* Main Layout: 3 Columns on lg screens */}
+            {/* Main Layout: 3 Columns on lg screens, stacked on mobile */}
             <div className="grid gap-6 lg:grid-cols-12 items-start">
 
                 {/* Left Column: KPIs (3 cols width) */}
-                <div className="lg:col-span-3 space-y-6 flex flex-col">
+                <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6 lg:flex lg:flex-col">
                     <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-2">Indicadores Clave</h3>
 
                     {/* Total Revenue */}
@@ -381,7 +392,7 @@ export default async function AppDashboard() {
                 </div>
 
                 {/* Center Column: Charts and Map (6 cols width) */}
-                <div className="lg:col-span-6 space-y-6">
+                <div className="lg:col-span-6 space-y-6 min-w-0">
                     {/* Performance Overview Chart */}
                     <Card className="glass-panel border-border-dark shadow-sm rounded-2xl overflow-hidden bg-surface-dark border">
                         <CardHeader className="border-b border-border-dark/50 px-6 py-4 flex flex-row items-center justify-between">
@@ -467,7 +478,7 @@ export default async function AppDashboard() {
                 </div>
 
                 {/* Right Column: Other Stats & Activity (3 cols width) */}
-                <div className="lg:col-span-3 space-y-6">
+                <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6 lg:space-y-0 lg:flex lg:flex-col">
                     {/* Top Selling Products proxy or Inventory Status */}
                     {!['saas', 'services', 'marketing'].includes(industry) && (
                         <div className="glass-panel p-5 rounded-2xl border border-border-dark">

@@ -4,10 +4,20 @@ import { processAgentMessage, transcribeAudio } from '@/lib/telegram/ai-agent';
 
 export const dynamic = 'force-dynamic';
 
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy singleton — initialized inside request handlers to avoid build-time crashes
+// when env vars are absent in the local build environment.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _supabase: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getSupabase(): any {
+    if (!_supabase) {
+        _supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+    }
+    return _supabase;
+}
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
 
@@ -77,7 +87,7 @@ export async function POST(request: Request) {
             if (parts.length > 1) {
                 const code = parts[1];
                 // Intentar enlazar la cuenta
-                const { data: pairingRecord } = await supabase
+                const { data: pairingRecord } = await getSupabase()
                     .from('telegram_pairing_codes')
                     .select('company_id')
                     .eq('code', code)
@@ -88,19 +98,19 @@ export async function POST(request: Request) {
                     const companyId = pairingRecord.company_id;
                     
                     // Actualizar la compañía con el chatId
-                    await supabase
+                    await getSupabase()
                         .from('companies')
                         .update({ telegram_chat_id: chatId })
                         .eq('id', companyId);
-                    
+
                     // Eliminar el código de emparejamiento para que no se use de nuevo
-                    await supabase
+                    await getSupabase()
                         .from('telegram_pairing_codes')
                         .delete()
                         .eq('code', code);
                     
                     // Obtener nombre de la empresa
-                    const { data: comp } = await supabase.from('companies').select('name').eq('id', companyId).single();
+                    const { data: comp } = await getSupabase().from('companies').select('name').eq('id', companyId).single();
 
                     await sendTelegramMessage(chatId, `✅ <b>¡Cuenta Enlazada!</b>\n\nTu número ahora está vinculado con la empresa <b>${comp?.name || 'Talisto'}</b>.\n\nPuedes usar comandos como:\n/sales - Ventas de hoy\n/critical - Stock crítico`);
                 } else {
@@ -113,7 +123,7 @@ export async function POST(request: Request) {
         }
 
         // Comprobar si este chat_id está autorizado
-        const { data: company } = await supabase
+        const { data: company } = await getSupabase()
             .from('companies')
             .select('id, name')
             .eq('telegram_chat_id', chatId)

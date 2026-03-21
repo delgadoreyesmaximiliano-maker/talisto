@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+export const metadata: Metadata = {
+  title: 'Precios y Planes',
+  description: 'Planes flexibles para empresas chilenas. Empieza gratis por 14 días.',
+}
 
 export default function PricingPage() {
     return (

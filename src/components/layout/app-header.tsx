@@ -90,13 +90,26 @@ export function AppHeader() {
 
             const notifs: Notification[] = []
 
-            // Check critical stock
-            const { data: lowStock } = await supabase
-                .from('products')
-                .select('name, stock_current, stock_minimum')
-                .eq('company_id', companyId)
-            // Filter client-side since Supabase doesn't support comparing column vs column easily without RPC
+            // Ambas queries son independientes: se ejecutan en paralelo
+            const today = new Date()
+            today.setHours(0, 0, 0, 0)
 
+            const [{ data: lowStock }, { data: todaySales }] = await Promise.all([
+                // Check critical stock — solo las columnas necesarias, limitado a 100
+                supabase
+                    .from('products')
+                    .select('name, stock_current, stock_minimum')
+                    .eq('company_id', companyId)
+                    .limit(100),
+                // Check today's sales
+                supabase
+                    .from('sales')
+                    .select('amount')
+                    .eq('company_id', companyId)
+                    .gte('created_at', today.toISOString()),
+            ])
+
+            // Filter client-side since Supabase doesn't support comparing column vs column easily without RPC
             const criticalProducts = (lowStock || []).filter((p: any) => p.stock_current <= p.stock_minimum)
             setCriticalProductsList(criticalProducts)
 
@@ -110,15 +123,6 @@ export function AppHeader() {
                     href: '/app/inventory',
                 })
             }
-
-            // Check today's sales
-            const today = new Date()
-            today.setHours(0, 0, 0, 0)
-            const { data: todaySales } = await supabase
-                .from('sales')
-                .select('amount')
-                .eq('company_id', companyId)
-                .gte('created_at', today.toISOString())
 
             if (todaySales && todaySales.length > 0) {
                 const totalToday = todaySales.reduce((acc: number, s: any) => acc + Number(s.amount), 0)
