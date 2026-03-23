@@ -23,17 +23,26 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
 
 async function sendTelegramMessage(chatId: string, text: string, photoUrl?: string) {
     if (photoUrl) {
+        // Telegram caption limit is 1024 chars — truncate if needed
+        const caption = text.length > 1000 ? text.slice(0, 997) + '...' : text;
         const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
         const payload = {
             chat_id: chatId,
             photo: photoUrl,
-            caption: text,
+            caption,
             parse_mode: 'HTML'
         };
         try {
-            await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const body = await res.json();
+            if (!body.ok) {
+                console.error('sendPhoto failed:', body.description, '| photo URL length:', photoUrl.length);
+                // Fallback: send text + photo URL separately
+                await sendTelegramMessage(chatId, text);
+            }
         } catch (e) {
-            console.error(e);
+            console.error('sendPhoto error:', e);
+            await sendTelegramMessage(chatId, text);
         }
         return;
     }

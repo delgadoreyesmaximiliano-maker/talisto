@@ -372,9 +372,21 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
                         }
                     };
 
-                    const encodedChart = encodeURIComponent(JSON.stringify(chartConfig));
-                    photoUrlToReturn = `https://quickchart.io/chart?c=${encodedChart}&w=600&h=400&bkg=white`;
-                    resultObj = { status: 'success', chart_generated: true, data_summary: salesByDay };
+                    // Use QuickChart short URL API to avoid long URL issues
+                    try {
+                        const shortRes = await fetch('https://quickchart.io/chart/create', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ chart: chartConfig, width: 600, height: 400, backgroundColor: 'white' })
+                        });
+                        const shortData = await shortRes.json();
+                        if (shortData.success && shortData.url) {
+                            photoUrlToReturn = shortData.url;
+                        }
+                    } catch (chartErr) {
+                        console.error('QuickChart error:', chartErr);
+                    }
+                    resultObj = { status: 'success', chart_generated: !!photoUrlToReturn, data_summary: salesByDay };
                 }
 
                 // ───── CHAT CONVERSACIONAL ─────
