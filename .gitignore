@@ -53,3 +53,6 @@ next-env.d.ts
 
 .vercel
 .env*.local
+.env.vercel.prod
+.env.vercel
+.env.local
