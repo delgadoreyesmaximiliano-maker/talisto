@@ -119,7 +119,7 @@ export default function SettingsPage() {
         
         setDisconnectingTelegram(true)
         try {
-            const { error } = await supabase
+            const { error } = await (supabase as any)
                 .from('companies')
                 .update({ telegram_chat_id: null })
                 .eq('id', company.id)
@@ -141,7 +141,7 @@ export default function SettingsPage() {
         
         setSavingTelegramBotToken(true)
         try {
-            const { error } = await supabase
+            const { error } = await (supabase as any)
                 .from('companies')
                 .update({ telegram_bot_token: telegramBotToken })
                 .eq('id', company.id)
