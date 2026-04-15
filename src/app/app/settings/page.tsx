@@ -27,6 +27,7 @@ export default function SettingsPage() {
     // Telegram State
     const [telegramCode, setTelegramCode] = useState<string | null>(null)
     const [telegramLoading, setTelegramLoading] = useState(false)
+    const [disconnectingTelegram, setDisconnectingTelegram] = useState(false)
 
     useEffect(() => {
         async function loadProfile() {
@@ -106,6 +107,29 @@ export default function SettingsPage() {
             toast.error('Error al generar código')
         } finally {
             setTelegramLoading(false)
+        }
+    }
+
+    const disconnectTelegram = async () => {
+        if (!company?.id) return
+        if (!confirm('¿Seguro que quieres desconectar Telegram?')) return
+        
+        setDisconnectingTelegram(true)
+        try {
+            const { error } = await supabase
+                .from('companies')
+                .update({ telegram_chat_id: null })
+                .eq('id', company.id)
+            
+            if (error) throw error
+            
+            setCompany({ ...company, telegram_chat_id: null })
+            toast.success('Telegram desconectado')
+        } catch (error) {
+            console.error(error)
+            toast.error('Error al desconectar')
+        } finally {
+            setDisconnectingTelegram(false)
         }
     }
 
@@ -310,9 +334,17 @@ export default function SettingsPage() {
                                     <p className="text-sm text-foreground font-medium mb-3">✅ Tu cuenta ya está vinculada al bot.</p>
                                     <Button 
                                         onClick={() => window.open(`https://t.me/Talistbot`, '_blank')}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold"
+                                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold mb-2"
                                     >
                                         Ir al Chat de Telegram
+                                    </Button>
+                                    <Button 
+                                        onClick={disconnectTelegram}
+                                        variant="outline"
+                                        className="w-full border-red-500/50 text-red-400 hover:bg-red-500/10"
+                                        disabled={disconnectingTelegram}
+                                    >
+                                        {disconnectingTelegram ? 'Desconectando...' : 'Desconectar Telegram'}
                                     </Button>
                                 </div>
                             )}
