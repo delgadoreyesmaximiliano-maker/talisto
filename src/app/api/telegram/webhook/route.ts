@@ -19,12 +19,12 @@ const TELEGRAM_IPS = [
 function isValidTelegramIP(ip: string): boolean {
     const ipParts = ip.split('.').map(Number);
     if (ipParts.length !== 4) return false;
-    
+
     return TELEGRAM_IPS.some(range => {
         const [base, bits] = range.split('/');
         const baseParts = base.split('.').map(Number);
         const prefixLen = parseInt(bits);
-        
+
         for (let i = 0; i < 4; i++) {
             const bitsInOctet = Math.min(8, Math.max(0, prefixLen - i * 8));
             const mask = bitsInOctet === 8 ? 255 : (256 - (1 << (8 - bitsInOctet)));
@@ -32,15 +32,6 @@ function isValidTelegramIP(ip: string): boolean {
         }
         return true;
     });
-}
-
-function verifySecret(secret: string | null): boolean {
-    const expected = process.env.TELEGRAM_WEBHOOK_SECRET;
-    if (!expected) {
-        console.warn('[Telegram webhook] TELEGRAM_WEBHOOK_SECRET no configurado');
-        return false;
-    }
-    return secret === expected;
 }
 
 // Lazy singleton — initialized inside request handlers to avoid build-time crashes
@@ -63,9 +54,8 @@ async function sendTelegramMessage(chatId: string, text: string, photoUrl?: stri
         console.error('[Telegram] No token available');
         return;
     }
-    
+
     if (photoUrl) {
-        // Telegram caption limit is 1024 chars — truncate if needed
         const caption = text.length > 1000 ? text.slice(0, 997) + '...' : text;
         const url = `https://api.telegram.org/bot${token}/sendPhoto`;
         const payload = {
@@ -79,12 +69,11 @@ async function sendTelegramMessage(chatId: string, text: string, photoUrl?: stri
             const body = await res.json();
             if (!body.ok) {
                 console.error('sendPhoto failed:', body.description, '| photo URL length:', photoUrl.length);
-                // Fallback: send text + photo URL separately
-                await sendTelegramMessage(chatId, text);
+                await sendTelegramMessage(chatId, text, undefined, botToken);
             }
         } catch (e) {
             console.error('sendPhoto error:', e);
-            await sendTelegramMessage(chatId, text);
+            await sendTelegramMessage(chatId, text, undefined, botToken);
         }
         return;
     }
@@ -93,7 +82,7 @@ async function sendTelegramMessage(chatId: string, text: string, photoUrl?: stri
     const payload = {
         chat_id: chatId,
         text: text,
-        parse_mode: 'HTML' // Usaremos HTML para formatear
+        parse_mode: 'HTML'
     };
 
     try {
@@ -109,34 +98,43 @@ async function sendTelegramMessage(chatId: string, text: string, photoUrl?: stri
 
 export async function POST(request: Request) {
     try {
-        // Security: Verify request is from Telegram servers
-        const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() 
+        if (!process.env.TELEGRAM_BOT_TOKEN) {
+            console.error('[Telegram Webhook] TELEGRAM_BOT_TOKEN is not configured');
+            return NextResponse.json({ error: 'Bot not configured' }, { status: 500 });
+        }
+
+        // Security: Verify request origin
+        const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
             || request.headers.get('cf-connecting-ip')
             || request.headers.get('x-real-ip')
             || '';
-        
-        // Verify secret first
-        const secretHeader = request.headers.get('x-telegram-secret');
-        if (!verifySecret(secretHeader)) {
-            console.warn('[Telegram webhook] Solicitud con secret inválido o ausente:', clientIP);
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+        // Verify webhook secret only if configured (optional security layer)
+        const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
+        if (webhookSecret) {
+            const secretHeader = request.headers.get('x-telegram-bot-api-secret-token');
+            if (secretHeader !== webhookSecret) {
+                console.warn('[Telegram webhook] Secret invalido:', clientIP);
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            }
         }
 
-        // Verify IP is from Telegram
-        if (!isValidTelegramIP(clientIP) && clientIP !== '') {
+        // Verify IP is from Telegram (skip if IP is empty/unavailable)
+        if (clientIP && !isValidTelegramIP(clientIP)) {
             console.warn('[Telegram webhook] IP no permitida:', clientIP);
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         // Rate limiting
-        const { success: rateOk } = await rateLimit.limit(clientIP || 'unknown');
+        const { success: rateOk } = await rateLimit.limit(clientIP || 'telegram-webhook');
         if (!rateOk) {
             console.warn('[Telegram webhook] Rate limit excedido:', clientIP);
             return NextResponse.json({ error: 'Too Many Requests' }, { status: 429 });
         }
 
         const body = await request.json();
-        
+        console.log('[Telegram Webhook] Received update:', JSON.stringify(body).slice(0, 300));
+
         const message = body?.message;
         if (!message || !message.chat?.id) {
             return NextResponse.json({ status: 'ok' });
@@ -146,7 +144,6 @@ export async function POST(request: Request) {
         let text: string = '';
 
         if (message.voice) {
-            // Process audio with Whisper
             text = await transcribeAudio(message.voice.file_id);
             if (!text || text.trim() === '') {
                 await sendTelegramMessage(chatId, 'No pude transcribir tu mensaje de voz.');
@@ -158,21 +155,20 @@ export async function POST(request: Request) {
             return NextResponse.json({ status: 'ok' });
         }
 
-        // Obtener bot token según el chat_id
+        // Obtener bot token segun el chat_id
         const { data: companyData } = await getSupabase()
             .from('companies')
             .select('id, name, telegram_bot_token')
             .eq('telegram_chat_id', chatId)
             .maybeSingle();
-        
+
         const botToken = companyData?.telegram_bot_token;
 
-        // Si el usuario envía /start <code>
+        // Si el usuario envia /start <code>
         if (text.startsWith('/start')) {
             const parts = text.split(' ');
             if (parts.length > 1) {
                 const code = parts[1];
-                // Intentar enlazar la cuenta
                 const { data: pairingRecord } = await getSupabase()
                     .from('telegram_pairing_codes')
                     .select('company_id')
@@ -182,20 +178,17 @@ export async function POST(request: Request) {
 
                 if (pairingRecord) {
                     const companyId = pairingRecord.company_id;
-                    
-                    // Actualizar la compañía con el chatId
+
                     await getSupabase()
                         .from('companies')
                         .update({ telegram_chat_id: chatId })
                         .eq('id', companyId);
 
-                    // Eliminar el código de emparejamiento para que no se use de nuevo
                     await getSupabase()
                         .from('telegram_pairing_codes')
                         .delete()
                         .eq('code', code);
-                    
-                    // Obtener nombre de la empresa
+
                     const { data: comp } = await getSupabase().from('companies').select('name').eq('id', companyId).single();
 
                     await sendTelegramMessage(chatId, `✅ <b>¡Cuenta Enlazada!</b>\n\nTu número ahora está vinculado con la empresa <b>${comp?.name || 'Talisto'}</b>.\n\nPuedes usar comandos como:\n/sales - Ventas de hoy\n/critical - Stock crítico`, undefined, botToken);
@@ -208,7 +201,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ status: 'ok' });
         }
 
-        // Comprobar si este chat_id está autorizado
+        // Comprobar si este chat_id esta autorizado
         const { data: company } = await getSupabase()
             .from('companies')
             .select('id, name, telegram_bot_token')
@@ -220,7 +213,6 @@ export async function POST(request: Request) {
             return NextResponse.json({ status: 'ok' });
         }
 
-        // --- DELEGACIÓN DEL MENSAJE AL AGENTE IA (Groq/LLaMA + Whisper) ---
         const agentResponse = await processAgentMessage(text, company.id, company.name, company.telegram_bot_token);
         await sendTelegramMessage(chatId, agentResponse.text, agentResponse.photoUrl, botToken);
 

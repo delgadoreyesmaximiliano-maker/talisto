@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { User, Lock, Building2, Save, MessageSquareMore, CheckCircle2, CreditCard } from 'lucide-react'
+import { User, Lock, Building2, Save, MessageSquareMore, CheckCircle2, CreditCard, AlertTriangle, Wifi, WifiOff } from 'lucide-react'
 import { UpgradeButton } from '@/components/upgrade-button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
@@ -30,6 +30,39 @@ export default function SettingsPage() {
     const [disconnectingTelegram, setDisconnectingTelegram] = useState(false)
     const [telegramBotToken, setTelegramBotToken] = useState<string | null>(null)
     const [savingTelegramBotToken, setSavingTelegramBotToken] = useState(false)
+    const [webhookStatus, setWebhookStatus] = useState<any>(null)
+    const [webhookLoading, setWebhookLoading] = useState(false)
+
+    const checkWebhookStatus = async () => {
+        setWebhookLoading(true)
+        try {
+            const res = await fetch('/api/telegram/status')
+            const data = await res.json()
+            setWebhookStatus(data)
+        } catch {
+            setWebhookStatus({ error: 'Error al verificar' })
+        } finally {
+            setWebhookLoading(false)
+        }
+    }
+
+    const registerWebhook = async () => {
+        setWebhookLoading(true)
+        try {
+            const res = await fetch('/api/telegram/status', { method: 'POST' })
+            const data = await res.json()
+            if (data.success) {
+                toast.success('Webhook registrado correctamente')
+                setWebhookStatus({ configured: true, webhook_set: true, webhook_url: data.webhook_url })
+            } else {
+                toast.error(data.telegram_response?.description || 'Error al registrar webhook')
+            }
+        } catch {
+            toast.error('Error de conexion')
+        } finally {
+            setWebhookLoading(false)
+        }
+    }
 
     useEffect(() => {
         async function loadProfile() {
@@ -86,23 +119,39 @@ export default function SettingsPage() {
         setLoading(false)
     }
 
+    const ensureWebhookRegistered = async () => {
+        try {
+            const res = await fetch('/api/telegram/status')
+            const data = await res.json()
+            if (data.configured && !data.webhook_set) {
+                await fetch('/api/telegram/status', { method: 'POST' })
+            }
+            setWebhookStatus(data)
+        } catch {
+            // Silent - don't block the user flow
+        }
+    }
+
     const generateTelegramCode = async () => {
         if (!company?.id) return
         setTelegramLoading(true)
-        
+
+        // Auto-register webhook if needed (silent, non-blocking)
+        ensureWebhookRegistered()
+
         const arr = new Uint32Array(1)
         crypto.getRandomValues(arr)
         const code = (100000 + (arr[0] % 900000)).toString()
 
         try {
             await supabase.from('telegram_pairing_codes').delete().eq('company_id', company.id)
-            
+
             const { error } = await (supabase as any)
                 .from('telegram_pairing_codes')
                 .insert([{ company_id: company.id, code, expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString() }])
-            
+
             if (error) throw error
-            
+
             setTelegramCode(code)
             toast.success('Código generado con éxito')
         } catch (error) {
@@ -116,16 +165,16 @@ export default function SettingsPage() {
     const disconnectTelegram = async () => {
         if (!company?.id) return
         if (!confirm('¿Seguro que quieres desconectar Telegram?')) return
-        
+
         setDisconnectingTelegram(true)
         try {
             const { error } = await (supabase as any)
                 .from('companies')
                 .update({ telegram_chat_id: null })
                 .eq('id', company.id)
-            
+
             if (error) throw error
-            
+
             setCompany({ ...company, telegram_chat_id: null })
             toast.success('Telegram desconectado')
         } catch (error) {
@@ -138,16 +187,16 @@ export default function SettingsPage() {
 
     const saveTelegramBotToken = async () => {
         if (!company?.id || !telegramBotToken) return
-        
+
         setSavingTelegramBotToken(true)
         try {
             const { error } = await (supabase as any)
                 .from('companies')
                 .update({ telegram_bot_token: telegramBotToken })
                 .eq('id', company.id)
-            
+
             if (error) throw error
-            
+
             setCompany({ ...company, telegram_bot_token: telegramBotToken })
             toast.success('Token guardado')
         } catch (error) {
@@ -324,18 +373,18 @@ export default function SettingsPage() {
                             <p className="text-sm text-secondary mb-4">
                                 Conecta tu cuenta corporativa con tu bot de Telegram. Crea un bot en @BotFather y pega el token aquí.
                             </p>
-                            
+
                             {/* Bot Token Input */}
                             <div className="mb-4">
                                 <label className="text-xs text-secondary block mb-1">Token del Bot (@BotFather)</label>
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     value={telegramBotToken || ''}
                                     onChange={(e) => setTelegramBotToken(e.target.value)}
                                     placeholder="123456:ABC-DEF1234ghIkl-0x1y2z"
                                     className="w-full bg-background-dark border border-border-dark/50 rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
                                 />
-                                <Button 
+                                <Button
                                     onClick={saveTelegramBotToken}
                                     disabled={!telegramBotToken || savingTelegramBotToken}
                                     variant="outline"
@@ -350,14 +399,14 @@ export default function SettingsPage() {
                                 <div className="bg-background-dark p-4 rounded-lg border border-border-dark/50 space-y-3">
                                     <h4 className="text-sm font-bold text-foreground">1. Genera tu código</h4>
                                     <p className="text-xs text-secondary">Genera un código único temporal para enlazar tu cuenta con tu perfil de Telegram de forma rápida y segura.</p>
-                                    
+
                                     {telegramCode ? (
                                         <div className="space-y-3 mt-2">
                                             <div className="bg-surface-dark p-3 rounded text-center border border-primary/30">
                                                 <span className="text-2xl font-mono font-bold tracking-widest text-primary">{telegramCode}</span>
                                             </div>
                                             <div className="flex items-center justify-center gap-2">
-                                                <Button 
+                                                <Button
                                                     onClick={() => window.open(`https://t.me/Talistbot?start=${telegramCode}`, '_blank')}
                                                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold w-full"
                                                 >
@@ -366,8 +415,8 @@ export default function SettingsPage() {
                                             </div>
                                         </div>
                                     ) : (
-                                        <Button 
-                                            onClick={generateTelegramCode} 
+                                        <Button
+                                            onClick={generateTelegramCode}
                                             disabled={telegramLoading}
                                             variant="outline"
                                             className="w-full bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 hover:text-primary"
@@ -378,23 +427,85 @@ export default function SettingsPage() {
                                 </div>
                             ) : (
                                 <div className="bg-background-dark p-4 rounded-lg border border-border-dark/50">
-                                    <p className="text-sm text-foreground font-medium mb-3">✅ Tu cuenta ya está vinculada al bot.</p>
-                                    <Button 
-                                        onClick={() => window.open(`https://t.me/Talistbot`, '_blank')}
-                                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold mb-2"
-                                    >
-                                        Ir al Chat de Telegram
-                                    </Button>
-                                    <Button 
-                                        onClick={disconnectTelegram}
-                                        variant="outline"
-                                        className="w-full border-red-500/50 text-red-400 hover:bg-red-500/10"
-                                        disabled={disconnectingTelegram}
-                                    >
-                                        {disconnectingTelegram ? 'Desconectando...' : 'Desconectar Telegram'}
-                                    </Button>
+                                    <p className="text-sm text-foreground font-medium mb-3">Tu cuenta ya está vinculada al bot.</p>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            onClick={() => window.open(`https://t.me/Talistbot`, '_blank')}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold"
+                                        >
+                                            Ir al Chat de Telegram
+                                        </Button>
+                                        <Button
+                                            onClick={disconnectTelegram}
+                                            variant="outline"
+                                            className="text-red-500 border-red-500/20 hover:bg-red-500/10"
+                                            disabled={disconnectingTelegram}
+                                        >
+                                            {disconnectingTelegram ? 'Desconectando...' : 'Desconectar Telegram'}
+                                        </Button>
+                                    </div>
                                 </div>
                             )}
+
+                            {/* Webhook Diagnostics */}
+                            <div className="bg-background-dark p-4 rounded-lg border border-border-dark/50 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <h4 className="text-sm font-bold text-foreground">Diagnostico del Bot</h4>
+                                    <Button
+                                        onClick={checkWebhookStatus}
+                                        disabled={webhookLoading}
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-xs"
+                                    >
+                                        {webhookLoading ? 'Verificando...' : 'Verificar conexion'}
+                                    </Button>
+                                </div>
+
+                                {webhookStatus && (
+                                    <div className="space-y-2 text-xs">
+                                        <div className="flex items-center gap-2">
+                                            {webhookStatus.configured ? (
+                                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                                            ) : (
+                                                <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+                                            )}
+                                            <span className="text-secondary">
+                                                Token: {webhookStatus.configured ? 'Configurado' : 'No configurado'}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {webhookStatus.webhook_set ? (
+                                                <Wifi className="w-3.5 h-3.5 text-emerald-500" />
+                                            ) : (
+                                                <WifiOff className="w-3.5 h-3.5 text-red-500" />
+                                            )}
+                                            <span className="text-secondary">
+                                                Webhook: {webhookStatus.webhook_set ? 'Activo' : 'No registrado'}
+                                            </span>
+                                        </div>
+                                        {webhookStatus.last_error_message && (
+                                            <div className="flex items-start gap-2 text-amber-500">
+                                                <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                                                <span>Ultimo error: {webhookStatus.last_error_message}</span>
+                                            </div>
+                                        )}
+                                        {webhookStatus.error && !webhookStatus.configured && (
+                                            <p className="text-red-400">{webhookStatus.error}</p>
+                                        )}
+                                        {!webhookStatus.webhook_set && webhookStatus.configured && (
+                                            <Button
+                                                onClick={registerWebhook}
+                                                disabled={webhookLoading}
+                                                className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs"
+                                                size="sm"
+                                            >
+                                                {webhookLoading ? 'Registrando...' : 'Registrar Webhook'}
+                                            </Button>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

@@ -41,6 +41,31 @@ export async function GET(request: Request) {
     }
 
     try {
+        // Auto-heal: ensure webhook is registered on every cron run
+        const botToken = process.env.TELEGRAM_BOT_TOKEN;
+        if (botToken) {
+            const appUrl =
+                process.env.NEXT_PUBLIC_APP_URL ||
+                (process.env.VERCEL_PROJECT_PRODUCTION_URL
+                    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+                    : null);
+            if (appUrl) {
+                try {
+                    const info = await fetch(`https://api.telegram.org/bot${botToken}/getWebhookInfo`).then(r => r.json());
+                    if (!info.result?.url) {
+                        await fetch(`https://api.telegram.org/bot${botToken}/setWebhook`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ url: `${appUrl}/api/telegram/webhook`, allowed_updates: ['message'] }),
+                        });
+                        console.log('[CRON] Telegram webhook auto-registered');
+                    }
+                } catch (e) {
+                    console.error('[CRON] Webhook auto-register failed:', e);
+                }
+            }
+        }
+
         // Usar service_role_key para bypass RLS ya que es un cron (no hay usuario logueado)
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
