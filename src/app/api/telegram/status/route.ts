@@ -3,20 +3,42 @@ import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
+/** Resolve the bot token: prefer per-company token, fall back to env var. */
+async function resolveBotToken(supabase: Awaited<ReturnType<typeof createClient>>, userId: string): Promise<string | null> {
+    const { data: profile } = await supabase
+        .from('users')
+        .select('company_id')
+        .eq('id', userId)
+        .single();
+
+    if ((profile as any)?.company_id) {
+        const { data: company } = await supabase
+            .from('companies')
+            .select('telegram_bot_token')
+            .eq('id', (profile as any).company_id)
+            .single();
+
+        if ((company as any)?.telegram_bot_token) {
+            return (company as any).telegram_bot_token;
+        }
+    }
+
+    return process.env.TELEGRAM_BOT_TOKEN || null;
+}
+
 export async function GET() {
-    // Verify the user is authenticated
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const botToken = await resolveBotToken(supabase, user.id);
     if (!botToken) {
         return NextResponse.json({
             configured: false,
             webhook_set: false,
-            error: 'TELEGRAM_BOT_TOKEN no esta configurado en el servidor',
+            error: 'No hay token de bot configurado. Pega tu token de @BotFather en la sección de Telegram.',
         });
     }
 
@@ -53,16 +75,15 @@ export async function GET() {
 }
 
 export async function POST() {
-    // Register webhook - authenticated users only
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const botToken = await resolveBotToken(supabase, user.id);
     if (!botToken) {
-        return NextResponse.json({ error: 'TELEGRAM_BOT_TOKEN not configured' }, { status: 500 });
+        return NextResponse.json({ error: 'No hay token de bot configurado' }, { status: 500 });
     }
 
     const appUrl =

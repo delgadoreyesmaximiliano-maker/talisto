@@ -6,14 +6,15 @@ import { rateLimit } from '@/lib/rate-limit';
 export const dynamic = 'force-dynamic';
 
 const TELEGRAM_IPS = [
-    '149.154.160.0/22',
+    '149.154.160.0/20',
     '91.108.4.0/22',
     '91.108.8.0/22',
     '91.108.12.0/22',
     '91.108.16.0/22',
     '91.108.20.0/22',
     '91.108.24.0/22',
-    '91.108.28.0/22'
+    '91.108.28.0/22',
+    '91.108.56.0/22',
 ];
 
 function isValidTelegramIP(ip: string): boolean {
@@ -98,11 +99,6 @@ async function sendTelegramMessage(chatId: string, text: string, photoUrl?: stri
 
 export async function POST(request: Request) {
     try {
-        if (!process.env.TELEGRAM_BOT_TOKEN) {
-            console.error('[Telegram Webhook] TELEGRAM_BOT_TOKEN is not configured');
-            return NextResponse.json({ error: 'Bot not configured' }, { status: 500 });
-        }
-
         // Security: Verify request origin
         const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
             || request.headers.get('cf-connecting-ip')
@@ -119,10 +115,9 @@ export async function POST(request: Request) {
             }
         }
 
-        // Verify IP is from Telegram (skip if IP is empty/unavailable)
+        // Log IP validation (warning only — webhook secret is the primary auth)
         if (clientIP && !isValidTelegramIP(clientIP)) {
-            console.warn('[Telegram webhook] IP no permitida:', clientIP);
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            console.warn('[Telegram webhook] IP fuera de rango conocido:', clientIP);
         }
 
         // Rate limiting
