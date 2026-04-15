@@ -1,12 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
-import Groq from 'groq-sdk';
+import OpenAI from 'openai';
 
-// Lazy singletons: initialized on first use (inside request handlers), not at module load time.
-// This prevents build-time crashes when env vars are absent in the build environment.
-let _groq: Groq | null = null;
-function getGroq(): Groq {
-    if (!_groq) _groq = new Groq({ apiKey: process.env.GROQ_API_KEY! });
-    return _groq;
+let _kyma: OpenAI | null = null;
+function getKyma(): OpenAI {
+    if (!_kyma) {
+        _kyma = new OpenAI({
+            baseURL: 'https://kymaapi.com/v1',
+            apiKey: process.env.KYMA_API_KEY!,
+        });
+    }
+    return _kyma;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -199,8 +202,8 @@ Si el usuario te envía un audio, esta entrada es la transcripción de su audio.
     ];
 
     try {
-        const chatCompletion = await getGroq().chat.completions.create({
-            model: "llama-3.3-70b-versatile",
+        const chatCompletion = await getKyma().chat.completions.create({
+            model: "gemma-4-31b",
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: text }
