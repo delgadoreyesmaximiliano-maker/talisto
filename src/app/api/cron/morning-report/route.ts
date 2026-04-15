@@ -27,11 +27,17 @@ async function sendTelegramMessage(token: string, chatId: string, text: string) 
 }
 
 export async function GET(request: Request) {
-    // 1. Verificar autorización de Vercel Cron (opcional pero recomendado)
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Security: CRON_SECRET is required
+    const cronSecret = process.env.CRON_SECRET
+    if (!cronSecret) {
+        console.error('[CRON morning-report] CRON_SECRET no está configurado - endpoint bloqueado')
+        return NextResponse.json({ error: 'Configuration error' }, { status: 500 })
+    }
+    
+    const authHeader = request.headers.get('authorization')
+    if (!authHeader || authHeader !== `Bearer ${cronSecret}`) {
+        console.warn('[CRON morning-report] Intento de acceso no autorizado')
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     try {

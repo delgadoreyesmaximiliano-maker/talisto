@@ -5,10 +5,16 @@ import { resend, getTrialWarningEmailHtml } from '@/lib/email/resend'
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
-  // Verificar autorización de Vercel Cron
-  const authHeader = request.headers.get('authorization')
+  // Security: CRON_SECRET is required
   const cronSecret = process.env.CRON_SECRET
-  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret) {
+    console.error('[CRON trial-warnings] CRON_SECRET no está configurado - endpoint bloqueado')
+    return NextResponse.json({ error: 'Configuration error' }, { status: 500 })
+  }
+  
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader || authHeader !== `Bearer ${cronSecret}`) {
+    console.warn('[CRON trial-warnings] Intento de acceso no autorizado')
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

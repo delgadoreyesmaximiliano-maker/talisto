@@ -1,11 +1,41 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import { processAgentMessage, transcribeAudio } from '@/lib/telegram/ai-agent';
+import { rateLimit } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
+const TELEGRAM_IPS = [
+    '149.154.160.0/22',
+    '91.108.4.0/22',
+    '91.108.8.0/22',
+    '91.108.12.0/22',
+    '91.108.16.0/22',
+    '91.108.20.0/22',
+    '91.108.24.0/22',
+    '91.108.28.0/22'
+];
+
+function isValidTelegramIP(ip: string): boolean {
+    return TELEGRAM_IPS.some(range => {
+        const [base, bits] = range.split('/');
+        const mask = ~((1 << (32 - parseInt(bits))) - 1;
+        const ipNum = ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet), 0) >>> 0;
+        const baseNum = base.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet), 0) >>> 0;
+        return (ipNum & mask) === (baseNum & mask);
+    });
+}
+
+function verifySecret(secret: string | null): boolean {
+    const expected = process.env.TELEGRAM_WEBHOOK_SECRET;
+    if (!expected) {
+        console.warn('[Telegram webhook] TELEGRAM_WEBHOOK_SECRET no configurado');
+        return false;
+    }
+    return secret === expected;
+}
+
 // Lazy singleton — initialized inside request handlers to avoid build-time crashes
-// when env vars are absent in the local build environment.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _supabase: any = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,6 +97,32 @@ async function sendTelegramMessage(chatId: string, text: string, photoUrl?: stri
 
 export async function POST(request: Request) {
     try {
+        // Security: Verify request is from Telegram servers
+        const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() 
+            || request.headers.get('cf-connecting-ip')
+            || request.headers.get('x-real-ip')
+            || '';
+        
+        // Verify secret first
+        const secretHeader = request.headers.get('x-telegram-secret');
+        if (!verifySecret(secretHeader)) {
+            console.warn('[Telegram webhook] Solicitud con secret inválido o ausente:', clientIP);
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Verify IP is from Telegram
+        if (!isValidTelegramIP(clientIP) && clientIP !== '') {
+            console.warn('[Telegram webhook] IP no permitida:', clientIP);
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Rate limiting
+        const { success: rateOk } = await rateLimit.limit(clientIP || 'unknown');
+        if (!rateOk) {
+            console.warn('[Telegram webhook] Rate limit excedido:', clientIP);
+            return NextResponse.json({ error: 'Too Many Requests' }, { status: 429 });
+        }
+
         const body = await request.json();
         
         const message = body?.message;
