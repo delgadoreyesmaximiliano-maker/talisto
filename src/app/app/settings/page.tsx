@@ -407,7 +407,7 @@ export default function SettingsPage() {
                                             </div>
                                             <div className="flex items-center justify-center gap-2">
                                                 <Button
-                                                    onClick={() => window.open(`https://t.me/Talistbot?start=${telegramCode}`, '_blank')}
+                                                    onClick={() => window.open(`https://t.me/talisto_bot?start=${telegramCode}`, '_blank')}
                                                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold w-full"
                                                 >
                                                     Abrir Telegram y Vincular
@@ -430,7 +430,7 @@ export default function SettingsPage() {
                                     <p className="text-sm text-foreground font-medium mb-3">Tu cuenta ya está vinculada al bot.</p>
                                     <div className="flex gap-2">
                                         <Button
-                                            onClick={() => window.open(`https://t.me/Talistbot`, '_blank')}
+                                            onClick={() => window.open(`https://t.me/talisto_bot`, '_blank')}
                                             className="bg-blue-600 hover:bg-blue-700 text-white font-bold"
                                         >
                                             Ir al Chat de Telegram
