@@ -120,11 +120,15 @@ export async function POST(request: Request) {
             console.warn('[Telegram webhook] IP fuera de rango conocido:', clientIP);
         }
 
-        // Rate limiting
-        const { success: rateOk } = await rateLimit.limit(clientIP || 'telegram-webhook');
-        if (!rateOk) {
-            console.warn('[Telegram webhook] Rate limit excedido:', clientIP);
-            return NextResponse.json({ error: 'Too Many Requests' }, { status: 429 });
+        // Rate limiting (optional — skip if Redis not configured)
+        try {
+            const { success: rateOk } = await rateLimit.limit(clientIP || 'telegram-webhook');
+            if (!rateOk) {
+                console.warn('[Telegram webhook] Rate limit excedido:', clientIP);
+                return NextResponse.json({ error: 'Too Many Requests' }, { status: 429 });
+            }
+        } catch (e) {
+            console.warn('[Telegram webhook] Rate limit skipped (Redis unavailable):', e);
         }
 
         const body = await request.json();
