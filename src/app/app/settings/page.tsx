@@ -28,6 +28,8 @@ export default function SettingsPage() {
     const [telegramCode, setTelegramCode] = useState<string | null>(null)
     const [telegramLoading, setTelegramLoading] = useState(false)
     const [disconnectingTelegram, setDisconnectingTelegram] = useState(false)
+    const [telegramBotToken, setTelegramBotToken] = useState<string | null>(null)
+    const [savingTelegramBotToken, setSavingTelegramBotToken] = useState(false)
 
     useEffect(() => {
         async function loadProfile() {
@@ -44,12 +46,13 @@ export default function SettingsPage() {
                 if ((profile as any)?.company_id) {
                     const { data: companyData } = await supabase
                         .from('companies')
-                        .select('id, name, industry, plan, plan_status, telegram_chat_id')
+                        .select('id, name, industry, plan, plan_status, telegram_chat_id, telegram_bot_token')
                         .eq('id', (profile as any).company_id)
                         .single()
 
                     const cData: any = companyData
                     setCompany(cData)
+                    setTelegramBotToken(cData?.telegram_bot_token || null)
                 }
             }
             setProfileLoading(false)
@@ -130,6 +133,28 @@ export default function SettingsPage() {
             toast.error('Error al desconectar')
         } finally {
             setDisconnectingTelegram(false)
+        }
+    }
+
+    const saveTelegramBotToken = async () => {
+        if (!company?.id || !telegramBotToken) return
+        
+        setSavingTelegramBotToken(true)
+        try {
+            const { error } = await supabase
+                .from('companies')
+                .update({ telegram_bot_token: telegramBotToken })
+                .eq('id', company.id)
+            
+            if (error) throw error
+            
+            setCompany({ ...company, telegram_bot_token: telegramBotToken })
+            toast.success('Token guardado')
+        } catch (error) {
+            console.error(error)
+            toast.error('Error al guardar token')
+        } finally {
+            setSavingTelegramBotToken(false)
         }
     }
 
@@ -297,8 +322,30 @@ export default function SettingsPage() {
                     <CardContent>
                         <div className="space-y-4">
                             <p className="text-sm text-secondary mb-4">
-                                Conecta tu cuenta corporativa con nuestro Bot oficial de Telegram para consultar tus ventas del día, ver stock crítico y recibir notificaciones.
+                                Conecta tu cuenta corporativa con tu bot de Telegram. Crea un bot en @BotFather y pega el token aquí.
                             </p>
+                            
+                            {/* Bot Token Input */}
+                            <div className="mb-4">
+                                <label className="text-xs text-secondary block mb-1">Token del Bot (@BotFather)</label>
+                                <input 
+                                    type="text" 
+                                    value={telegramBotToken || ''}
+                                    onChange={(e) => setTelegramBotToken(e.target.value)}
+                                    placeholder="123456:ABC-DEF1234ghIkl-0x1y2z"
+                                    className="w-full bg-background-dark border border-border-dark/50 rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                                />
+                                <Button 
+                                    onClick={saveTelegramBotToken}
+                                    disabled={!telegramBotToken || savingTelegramBotToken}
+                                    variant="outline"
+                                    size="sm"
+                                    className="mt-2"
+                                >
+                                    {savingTelegramBotToken ? 'Guardando...' : 'Guardar Token'}
+                                </Button>
+                            </div>
+
                             {!company.telegram_chat_id ? (
                                 <div className="bg-background-dark p-4 rounded-lg border border-border-dark/50 space-y-3">
                                     <h4 className="text-sm font-bold text-foreground">1. Genera tu código</h4>

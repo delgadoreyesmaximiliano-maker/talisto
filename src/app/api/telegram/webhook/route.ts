@@ -49,13 +49,17 @@ function getSupabase(): any {
     return _supabase;
 }
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
-
-async function sendTelegramMessage(chatId: string, text: string, photoUrl?: string) {
+async function sendTelegramMessage(chatId: string, text: string, photoUrl?: string, botToken?: string) {
+    const token = botToken || process.env.TELEGRAM_BOT_TOKEN || '';
+    if (!token) {
+        console.error('[Telegram] No token available');
+        return;
+    }
+    
     if (photoUrl) {
         // Telegram caption limit is 1024 chars — truncate if needed
         const caption = text.length > 1000 ? text.slice(0, 997) + '...' : text;
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+        const url = `https://api.telegram.org/bot${token}/sendPhoto`;
         const payload = {
             chat_id: chatId,
             photo: photoUrl,
@@ -146,6 +150,15 @@ export async function POST(request: Request) {
             return NextResponse.json({ status: 'ok' });
         }
 
+        // Obtener bot token según el chat_id
+        const { data: companyData } = await getSupabase()
+            .from('companies')
+            .select('id, name, telegram_bot_token')
+            .eq('telegram_chat_id', chatId)
+            .maybeSingle();
+        
+        const botToken = companyData?.telegram_bot_token;
+
         // Si el usuario envía /start <code>
         if (text.startsWith('/start')) {
             const parts = text.split(' ');
@@ -177,12 +190,12 @@ export async function POST(request: Request) {
                     // Obtener nombre de la empresa
                     const { data: comp } = await getSupabase().from('companies').select('name').eq('id', companyId).single();
 
-                    await sendTelegramMessage(chatId, `✅ <b>¡Cuenta Enlazada!</b>\n\nTu número ahora está vinculado con la empresa <b>${comp?.name || 'Talisto'}</b>.\n\nPuedes usar comandos como:\n/sales - Ventas de hoy\n/critical - Stock crítico`);
+                    await sendTelegramMessage(chatId, `✅ <b>¡Cuenta Enlazada!</b>\n\nTu número ahora está vinculado con la empresa <b>${comp?.name || 'Talisto'}</b>.\n\nPuedes usar comandos como:\n/sales - Ventas de hoy\n/critical - Stock crítico`, undefined, botToken);
                 } else {
-                    await sendTelegramMessage(chatId, `❌ El código de enlace es inválido o ha expirado. Por favor genera uno nuevo desde Talisto.`);
+                    await sendTelegramMessage(chatId, `❌ El código de enlace es inválido o ha expirado. Por favor genera uno nuevo desde Talisto.`, undefined, botToken);
                 }
             } else {
-                await sendTelegramMessage(chatId, `👋 <b>¡Hola! Soy TaliBot.</b>\n\nPara vincular tu cuenta, por favor presiona el botón "Conectar Telegram" dentro de tu panel en Talisto.`);
+                await sendTelegramMessage(chatId, `👋 <b>¡Hola! Soy TaliBot.</b>\n\nPara vincular tu cuenta, por favor presiona el botón "Conectar Telegram" dentro de tu panel en Talisto.`, undefined, botToken);
             }
             return NextResponse.json({ status: 'ok' });
         }
@@ -190,18 +203,18 @@ export async function POST(request: Request) {
         // Comprobar si este chat_id está autorizado
         const { data: company } = await getSupabase()
             .from('companies')
-            .select('id, name')
+            .select('id, name, telegram_bot_token')
             .eq('telegram_chat_id', chatId)
             .single();
 
         if (!company) {
-            await sendTelegramMessage(chatId, `❌ Tu cuenta de Telegram no está vinculada a ninguna empresa.\nGenera un código de vinculación en tu panel de Talisto e inicia el bot con ese código.`);
+            await sendTelegramMessage(chatId, `❌ Tu cuenta de Telegram no está vinculada a ninguna empresa.\nGenera un código de vinculación en tu panel de Talisto e inicia el bot con ese código.`, undefined, botToken);
             return NextResponse.json({ status: 'ok' });
         }
 
         // --- DELEGACIÓN DEL MENSAJE AL AGENTE IA (Groq/LLaMA + Whisper) ---
-        const agentResponse = await processAgentMessage(text, company.id, company.name);
-        await sendTelegramMessage(chatId, agentResponse.text, agentResponse.photoUrl);
+        const agentResponse = await processAgentMessage(text, company.id, company.name, company.telegram_bot_token);
+        await sendTelegramMessage(chatId, agentResponse.text, agentResponse.photoUrl, botToken);
 
         return NextResponse.json({ status: 'ok' });
     } catch (error) {

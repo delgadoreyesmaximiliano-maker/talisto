@@ -63,7 +63,7 @@ export async function transcribeAudio(fileId: string): Promise<string> {
 /**
  * Lógica principal del Agente. Toma un texto, usa LLaMA para saber qué hacer, ejecuta funciones y responde humanamente.
  */
-export async function processAgentMessage(text: string, companyId: string, companyName: string): Promise<AIMessageResponse> {
+export async function processAgentMessage(text: string, companyId: string, companyName: string, botToken?: string): Promise<AIMessageResponse> {
     const systemPrompt = `Eres "Tali", el asistente virtual de la empresa "${companyName}".
 IMPORTANTE: Tú TIENES acceso directo a TODA la base de datos del negocio a través de tus herramientas (tools). 
 NUNCA digas que no tienes acceso a los datos. SIEMPRE usa tus herramientas para consultar información real.
