@@ -77,10 +77,11 @@ export default function CompanySetupPage() {
         name: '',
         industry: '',
         actividad: '',
-        tamano_equipo: ''
+        tamano_equipo: '',
+        description: ''
     })
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
     }
 
@@ -130,6 +131,7 @@ export default function CompanySetupPage() {
             const settings = {
                 actividad: formData.actividad,
                 tamano_equipo: formData.tamano_equipo,
+                description: formData.description,
                 onboarding_completado: true
             }
 
@@ -173,7 +175,8 @@ export default function CompanySetupPage() {
                     companyId,
                     industry: formData.industry,
                     actividad: formData.actividad,
-                    tamano_equipo: formData.tamano_equipo
+                    tamano_equipo: formData.tamano_equipo,
+                    description: formData.description
                 })
             })
 
@@ -225,15 +228,18 @@ export default function CompanySetupPage() {
 
                 {/* Loading State Overlay */}
                 {loading && (
-                    <div className="absolute inset-0 bg-card/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center p-8 text-center animate-in fade-in">
-                        <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mb-6 relative">
-                            <div className="absolute inset-0 border-4 border-emerald-500/30 rounded-full border-t-emerald-500 animate-spin" />
-                            <Sparkles className="w-8 h-8 text-emerald-500 animate-pulse" />
+                    <div className="absolute inset-0 bg-background/95 backdrop-blur-2xl z-[100] flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-500">
+                        <div className="relative w-32 h-32 mb-10">
+                            <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+                            <div className="absolute inset-0 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Sparkles className="w-12 h-12 text-primary animate-pulse" />
+                            </div>
                         </div>
-                        <h3 className="text-2xl font-black text-foreground mb-2" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                        <h3 className="text-3xl font-black gradient-text-shine mb-4" style={{ fontFamily: "'Outfit', sans-serif" }}>
                             {loadingMessage}
                         </h3>
-                        <p className="text-muted-foreground font-medium">Estamos configurando tu panel de control personalizado.</p>
+                        <p className="text-secondary font-medium animate-pulse">Personalizando cada pixel para tu negocio...</p>
                     </div>
                 )}
 
@@ -269,50 +275,64 @@ export default function CompanySetupPage() {
                         </div>}
 
                         {step === 1 && (
-                            <div className="space-y-8 animate-in slide-in-from-right duration-300 flex-1 flex flex-col">
-                                <div className="space-y-3">
-                                    <h3 className="text-2xl font-black text-foreground lg:hidden" style={{ fontFamily: "'Outfit', sans-serif" }}>Tu Negocio</h3>
-                                    <Label htmlFor="name" className="text-foreground font-bold uppercase text-[11px] tracking-widest block">Nombre de la Empresa</Label>
-                                    <Input
-                                        id="name"
-                                        name="name"
-                                        placeholder="Ej: Tienda Max, Consultora XYZ"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        className="h-14 bg-muted border-border rounded-2xl focus:ring-emerald-500/20 text-lg font-medium"
-                                        autoFocus
-                                    />
-                                </div>
+                                <div className="space-y-8 animate-in slide-in-from-right duration-500 flex-1 flex flex-col">
+                                    <div className="space-y-6">
+                                        <div className="space-y-3">
+                                            <h3 className="text-2xl font-black text-foreground lg:hidden" style={{ fontFamily: "'Outfit', sans-serif" }}>Tu Negocio</h3>
+                                            <Label htmlFor="name" className="text-primary font-black uppercase text-[10px] tracking-[0.2em] ml-1">Nombre de la Empresa</Label>
+                                            <Input
+                                                id="name"
+                                                name="name"
+                                                placeholder="Tienda Max, Consultora XYZ..."
+                                                value={formData.name}
+                                                onChange={handleChange}
+                                                className="h-16 bg-muted/30 border-2 border-transparent focus:border-primary/30 rounded-2xl px-6 text-xl font-bold transition-all shadow-inner glass-input"
+                                                autoFocus
+                                            />
+                                        </div>
+                                        <div className="space-y-3">
+                                            <Label htmlFor="description" className="text-primary font-black uppercase text-[10px] tracking-[0.2em] ml-1">¿Qué hace tu negocio? (Opcional)</Label>
+                                            <textarea
+                                                id="description"
+                                                name="description"
+                                                placeholder="Cuéntale a Tali para que personalice tu experiencia..."
+                                                value={formData.description}
+                                                onChange={handleChange}
+                                                className="w-full min-h-[120px] p-6 bg-muted/30 border-2 border-transparent focus:border-primary/30 rounded-2xl text-lg font-medium resize-none transition-all shadow-inner glass-input"
+                                            />
+                                            <p className="text-[11px] text-muted-foreground italic px-2">✨ Tali usará esto para bautizar tus indicadores clave y el tono del dashboard.</p>
+                                        </div>
+                                    </div>
                                 <div className="space-y-4 flex-1">
-                                    <Label className="text-foreground font-bold uppercase text-[11px] tracking-widest block">Rubro Principal</Label>
-                                    <div className="grid grid-cols-2 gap-3 max-h-[280px] overflow-y-auto pr-2 custom-scrollbar">
+                                    <Label className="text-primary font-black uppercase text-[10px] tracking-[0.2em] ml-1">Rubro Principal</Label>
+                                    <div className="grid grid-cols-2 gap-4 max-h-[320px] overflow-y-auto pr-3 custom-scrollbar">
                                         {industries.map((ind) => (
                                             <button
                                                 key={ind.id}
                                                 type="button"
                                                 onClick={() => setFormData({ ...formData, industry: ind.id, actividad: '' })}
-                                                className={`flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-200 ${formData.industry === ind.id
-                                                    ? 'border-emerald-500 bg-emerald-50 shadow-lg shadow-emerald-500/10 scale-[0.98]'
-                                                    : 'border-border bg-muted hover:border-border/80 hover:bg-background'
+                                                className={`flex flex-col items-center gap-3 p-5 rounded-3xl border-2 transition-all duration-300 card-3d ${formData.industry === ind.id
+                                                    ? 'border-primary bg-primary/5 shadow-lg scale-[0.98] glow-primary-sm'
+                                                    : 'border-border/50 bg-muted/20 hover:border-primary/40 hover:bg-muted/30'
                                                     }`}
                                             >
-                                                <div className={`p-2.5 rounded-xl ${formData.industry === ind.id ? 'bg-emerald-500 text-white' : 'bg-background text-muted-foreground group-hover:text-emerald-500 shadow-sm'}`}>
-                                                    <ind.icon className="w-5 h-5" />
+                                                <div className={`p-3 rounded-2xl transition-all duration-300 ${formData.industry === ind.id ? 'bg-primary text-white shadow-lg' : 'bg-background text-muted-foreground shadow-sm'}`}>
+                                                    <ind.icon className="w-6 h-6" />
                                                 </div>
-                                                <span className={`text-[11px] font-black uppercase tracking-tight text-center leading-tight ${formData.industry === ind.id ? 'text-emerald-700' : 'text-muted-foreground'}`}>
+                                                <span className={`text-[12px] font-black uppercase tracking-tight text-center leading-tight transition-colors ${formData.industry === ind.id ? 'text-primary' : 'text-muted-foreground'}`}>
                                                     {ind.label}
                                                 </span>
                                             </button>
                                         ))}
                                     </div>
                                 </div>
-                                <div className="pt-4 mt-auto">
+                                <div className="pt-6 mt-auto">
                                     <Button
                                         onClick={nextStep}
                                         disabled={!formData.name || !formData.industry}
-                                        className="w-full h-14 bg-surface-dark hover:bg-surface-dark/90 text-foreground font-bold rounded-2xl shadow-xl shadow-slate-900/10 group transition-all"
+                                        className="w-full h-16 bg-primary text-white font-black text-lg rounded-2xl shadow-xl shadow-primary/20 hover:glow-primary group transition-all btn-3d"
                                     >
-                                        Siguiente Paso <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                        Siguiente Paso <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                     </Button>
                                 </div>
                             </div>

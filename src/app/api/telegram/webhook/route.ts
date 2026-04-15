@@ -203,7 +203,7 @@ export async function POST(request: Request) {
         // Comprobar si este chat_id esta autorizado
         const { data: company } = await getSupabase()
             .from('companies')
-            .select('id, name, telegram_bot_token')
+            .select('id, name, settings, telegram_bot_token')
             .eq('telegram_chat_id', chatId)
             .single();
 
@@ -212,7 +212,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ status: 'ok' });
         }
 
-        const agentResponse = await processAgentMessage(text, company.id, company.name, company.telegram_bot_token);
+        const agentResponse = await processAgentMessage(text, company.id, company.name, company.settings);
         await sendTelegramMessage(chatId, agentResponse.text, agentResponse.photoUrl, botToken);
 
         return NextResponse.json({ status: 'ok' });

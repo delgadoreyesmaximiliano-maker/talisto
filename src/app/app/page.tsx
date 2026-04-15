@@ -266,26 +266,57 @@ export default async function AppDashboard() {
         default: '✨ Recomendaciones de IA',
     }
 
-    const currentKpi = kpiConfig[industry] ?? kpiConfig.default
-    const welcomeSubtitle = welcomeMessages[industry] ?? welcomeMessages.other
+    const currentKpiConfig = kpiConfig[industry] ?? kpiConfig.default
+    const currentWelcomeMessage = welcomeMessages[industry] ?? welcomeMessages.other
     const currentAiTitle = aiSectionTitle[industry] ?? aiSectionTitle.default
+
+    // OVERRIDE dinámico por IA si existe config previa
+    const dashboardConfig = (companyData?.settings as any)?.dashboard_config
+    const kpi_1_label = dashboardConfig?.kpi_1_label ?? currentKpiConfig.label
+    const kpi_2_label = dashboardConfig?.kpi_2_label ?? currentKpiConfig.secondaryLabel
+    const welcomeSubtitle = dashboardConfig?.welcome_message ?? currentWelcomeMessage
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500 max-w-[1600px] mx-auto">
             {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
-                        Dashboard Principal
-                    </h1>
-                    <p className="text-muted-foreground text-sm font-medium">
-                        {welcomeSubtitle}
-                    </p>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-surface-dark/40 p-1 rounded-[32px] border border-border-dark/20 backdrop-blur-md">
+                <div className="flex flex-col md:flex-row md:items-center gap-6 p-4">
+                    <div className="w-16 h-16 rounded-[22px] bg-primary/10 flex items-center justify-center border border-primary/20 glow-primary-sm shrink-0">
+                        <ShoppingBag className="w-8 h-8 text-primary" />
+                    </div>
+                    <div>
+                        <h1 className="text-4xl font-black tracking-tighter text-foreground mb-1" style={{ fontFamily: "'Outfit', sans-serif" }}>
+                            Portal de Mando
+                        </h1>
+                        <p className="text-secondary font-bold text-lg gradient-text-shine">
+                            {welcomeSubtitle}
+                        </p>
+                    </div>
+
+                    {companyData?.settings?.integrations && Object.keys(companyData.settings.integrations).length > 0 && (
+                        <div className="flex items-center gap-4 bg-primary/5 border border-primary/20 px-5 py-3 rounded-2xl animate-in fade-in slide-in-from-left-4 ml-2">
+                            <div className="flex -space-x-3">
+                                {Object.keys(companyData.settings.integrations).map(key => (
+                                    <div key={key} className="w-10 h-10 rounded-full bg-surface-dark border-2 border-primary/30 shadow-xl flex items-center justify-center text-[11px] font-black uppercase overflow-hidden ring-4 ring-background-dark">
+                                        {key.slice(0, 2)}
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex flex-col">
+                                <div className="flex items-center gap-1.5">
+                                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(19,236,128,0.8)]" />
+                                    <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] leading-none mb-0.5">Live Sync</span>
+                                </div>
+                                <span className="text-xs text-secondary font-black leading-none">{Object.keys(companyData.settings.integrations).length} conectadas</span>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                <div className="flex gap-3">
+
+                <div className="flex gap-4 p-4 pr-6">
                     <DownloadReportButton sales={recentSales} />
-                    <Link href="/app/ai" className="px-4 py-2 bg-primary/10 border border-primary text-primary rounded-xl font-bold text-sm hover:bg-primary/20 transition-all flex items-center gap-2">
-                        Preguntar a IA
+                    <Link href="/app/ai" className="h-12 px-6 bg-primary text-white rounded-xl font-black text-sm hover:glow-primary transition-all flex items-center gap-2 btn-3d shadow-xl">
+                        Preguntar a Tali
                         <Sparkles className="w-4 h-4" />
                     </Link>
                 </div>
@@ -296,12 +327,13 @@ export default async function AppDashboard() {
 
                 {/* Left Column: KPIs (3 cols width) */}
                 <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6 lg:flex lg:flex-col">
-                    <h3 className="text-sm font-bold text-foreground uppercase tracking-wider mb-2">Indicadores Clave</h3>
-
+                    <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-2 ml-1">HUD Operativo</h3>
+                    
                     {/* Total Revenue */}
-                    <div className="relative overflow-hidden group glass-panel p-5 rounded-2xl">
+                    <div className="relative overflow-hidden group glass-card card-3d p-6 rounded-[24px]">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none" />
                         <div className="flex items-center justify-between mb-2">
-                            <p className="text-xs font-bold text-secondary">{currentKpi.label}</p>
+                            <p className="text-xs font-bold text-secondary">{kpi_1_label}</p>
                             {revenueChangePercent !== null && (
                                 <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-sm ${revenueChangePercent >= 0 ? 'text-primary bg-primary/10' : 'text-red-400 bg-red-400/10'}`}>
                                     {revenueChangePercent >= 0
@@ -336,7 +368,7 @@ export default async function AppDashboard() {
                     {['saas', 'services', 'marketing'].includes(industry) ? (
                         <div className="relative overflow-hidden group glass-panel p-5 rounded-2xl">
                             <div className="flex items-center justify-between mb-2">
-                                <p className="text-xs font-bold text-secondary">MRR</p>
+                                <p className="text-xs font-bold text-secondary">{kpi_2_label}</p>
                             </div>
                             <h2 className="text-3xl font-black text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
                                 ${totalMrr.toLocaleString('es-CL')}
@@ -350,7 +382,7 @@ export default async function AppDashboard() {
                     ) : (
                         <div className="relative overflow-hidden group glass-panel p-5 rounded-2xl">
                             <div className="flex items-center justify-between mb-2">
-                                <p className="text-xs font-bold text-secondary">Ticket Promedio</p>
+                                <p className="text-xs font-bold text-secondary">{kpi_2_label}</p>
                             </div>
                             <h2 className="text-3xl font-black text-foreground" style={{ fontFamily: "'Outfit', sans-serif" }}>
                                 ${sales.length > 0 ? Math.round(totalRevenue / sales.length).toLocaleString('es-CL') : '0'}
@@ -429,47 +461,51 @@ export default async function AppDashboard() {
                     </Card>
 
                     {/* AI Recommendations */}
-                    <Card className="glass-panel border-border-dark shadow-sm rounded-2xl overflow-hidden bg-surface-dark border relative group">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-[50px] -mr-16 -mt-16 pointer-events-none" />
-                        <CardHeader className="border-b border-border-dark/50 px-6 py-4 flex flex-row items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-primary" />
-                            <CardTitle className="text-sm font-bold text-foreground uppercase tracking-wider" style={{ fontFamily: "'Outfit', sans-serif" }}>Insights e IA</CardTitle>
+                    <Card className="glass-card card-3d border-primary/10 shadow-sm rounded-[24px] overflow-hidden relative group border-0">
+                        <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 rounded-full blur-[60px] -mr-20 -mt-20 pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary/5 rounded-full blur-[60px] -ml-20 -mb-20 pointer-events-none" />
+                        <CardHeader className="border-b border-border/50 px-8 py-6 flex flex-row items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center glow-primary-sm">
+                                <Sparkles className="w-5 h-5 text-primary animate-pulse" />
+                            </div>
+                            <CardTitle className="text-lg font-black text-foreground tracking-tight" style={{ fontFamily: "'Outfit', sans-serif" }}>{currentAiTitle}</CardTitle>
                         </CardHeader>
-                        <CardContent className="p-6 grid sm:grid-cols-2 gap-4">
+                        <CardContent className="p-8 grid sm:grid-cols-2 gap-6 relative z-10">
                             {dynamicRecommendations.length > 0 ? (
                                 dynamicRecommendations.map((rec) => (
-                                    <div key={rec.id} className={`bg-background-dark border border-border-dark p-4 rounded-xl border-l-[3px] shadow-sm ${rec.type === 'opportunity' ? 'border-l-primary' : 'border-l-amber-500'}`}>
-                                        <div className="flex justify-between mb-2">
-                                            <span className={`text-[10px] font-bold uppercase ${rec.type === 'opportunity' ? 'text-primary' : 'text-amber-500'}`}>{rec.label}</span>
+                                    <div key={rec.id} className={`glass-panel card-3d border-0 p-6 rounded-2xl shadow-xl transition-all duration-300 ${rec.type === 'opportunity' ? 'bg-primary/5 hover:bg-primary/10' : 'bg-amber-500/5 hover:bg-amber-500/10'}`}>
+                                        <div className="flex justify-between mb-3">
+                                            <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${rec.type === 'opportunity' ? 'text-primary bg-primary/10' : 'text-amber-500 bg-amber-500/10'}`}>{rec.label}</span>
                                         </div>
-                                        <h3 className="font-bold text-foreground text-sm mb-1">{rec.title}</h3>
-                                        <p className="text-xs text-muted-foreground mb-3">{rec.description}</p>
-                                        <Link href={rec.actionHref} className={`text-xs font-bold flex items-center gap-1 ${rec.type === 'opportunity' ? 'text-primary' : 'text-amber-500'}`}>
-                                            {rec.actionLabel} <ArrowRight className="w-3 h-3" />
+                                        <h3 className="font-black text-foreground text-base mb-2 tracking-tight">{rec.title}</h3>
+                                        <p className="text-xs text-secondary leading-relaxed mb-5 font-medium">{rec.description}</p>
+                                        <Link href={rec.actionHref} className={`text-xs font-black flex items-center gap-2 group/btn ${rec.type === 'opportunity' ? 'text-primary' : 'text-amber-500'}`}>
+                                            {rec.actionLabel} 
+                                            <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
                                         </Link>
                                     </div>
                                 ))
                             ) : dbRecommendations.length > 0 ? (
                                 dbRecommendations.map((rec) => (
-                                    <div key={rec.id} className={`bg-background-dark border border-border-dark p-4 rounded-xl border-l-[3px] shadow-sm ${rec.type === 'opportunity' ? 'border-l-primary' : 'border-l-amber-500'}`}>
-                                        <div className="flex justify-between mb-2">
-                                            <span className={`text-[10px] font-bold uppercase ${rec.type === 'opportunity' ? 'text-primary' : 'text-amber-500'}`}>{rec.type === 'opportunity' ? 'Oportunidad' : 'Atención'}</span>
+                                    <div key={rec.id} className={`glass-panel card-3d border-0 p-6 rounded-2xl shadow-xl transition-all duration-300 ${rec.type === 'opportunity' ? 'bg-primary/5 hover:bg-primary/10' : 'bg-amber-500/5 hover:bg-amber-500/10'}`}>
+                                        <div className="flex justify-between mb-3">
+                                            <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${rec.type === 'opportunity' ? 'text-primary bg-primary/10' : 'text-amber-500 bg-amber-500/10'}`}>{rec.type === 'opportunity' ? 'Oportunidad' : 'Atención'}</span>
                                         </div>
-                                        <h3 className="font-bold text-foreground text-sm mb-1">{rec.title}</h3>
-                                        <p className="text-xs text-muted-foreground mb-3">{rec.description}</p>
+                                        <h3 className="font-black text-foreground text-base mb-2 tracking-tight">{rec.title}</h3>
+                                        <p className="text-xs text-secondary leading-relaxed font-medium">{rec.description}</p>
                                     </div>
                                 ))
                             ) : (
-                                <div className="col-span-2 flex flex-col items-center gap-4 py-6 text-center">
-                                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                                        <Sparkles className="w-5 h-5 text-primary" />
+                                <div className="col-span-2 flex flex-col items-center gap-6 py-10 text-center">
+                                    <div className="w-16 h-16 rounded-3xl bg-primary/10 flex items-center justify-center border border-primary/20 animate-float">
+                                        <Sparkles className="w-8 h-8 text-primary" />
                                     </div>
-                                    <div>
-                                        <p className="text-sm font-bold text-foreground mb-1">Todo bajo control</p>
-                                        <p className="text-xs text-muted-foreground">Sin alertas activas. ¿Quieres analizar tu negocio en profundidad?</p>
+                                    <div className="max-w-xs">
+                                        <p className="text-lg font-black text-foreground mb-2">Todo bajo control</p>
+                                        <p className="text-sm text-secondary font-medium leading-relaxed">Sin alertas activas en órbitas cercanas. ¿Quieres proyectar el próximo trimestre?</p>
                                     </div>
-                                    <Link href="/app/ai" className="text-xs font-bold text-primary hover:text-foreground transition-colors flex items-center gap-1">
-                                        Preguntar a Tali <ArrowRight className="w-3 h-3" />
+                                    <Link href="/app/ai" className="h-12 px-6 rounded-xl bg-primary/10 text-primary hover:bg-primary text-sm font-black transition-all flex items-center gap-2 hover:text-white glow-primary-sm">
+                                        Consultar Oráculo <ArrowRight className="w-4 h-4" />
                                     </Link>
                                 </div>
                             )}

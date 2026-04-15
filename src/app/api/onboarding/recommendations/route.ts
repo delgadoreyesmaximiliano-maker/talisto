@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        const { companyId, industry, actividad, tamano_equipo } = body;
+        const { companyId, industry, actividad, tamano_equipo, description } = body;
 
         if (!companyId || !industry) {
             return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
@@ -56,12 +56,15 @@ export async function POST(req: Request) {
       - Rubro: ${industry}
       - Actividad principal: ${actividad || 'No especificada'}
       - Tamaño del equipo: ${tamano_equipo || 'No especificado'}
+      - Descripción propia del usuario: ${description || 'No proporcionada'}
       
       Las recomendaciones deben ser extremadamente específicas para este tipo de negocio.
       Usa español chileno profesional pero directo. No uses saludos.
 
-      MUY IMPORTANTE: Tu respuesta final debe ser EXCLUSIVAMENTE un bloque JSON válido con el siguiente formato exacto. No incluyas markdown (como \`\`\`json), ni saludos, ni ningún otro texto antes o después. 
-
+      MUY IMPORTANTE: Tu respuesta final debe ser EXCLUSIVAMENTE un bloque JSON válido con el siguiente formato exacto. 
+      Debes incluir un objeto "dashboard_config" que personalice la interfaz según la descripción del negocio.
+      
+      Formato exacto:
       {
         "recommendations": [
           {
@@ -69,11 +72,15 @@ export async function POST(req: Request) {
             "title": "título corto de máximo 6 palabras",
             "description": "descripción detallada de máximo 2 oraciones"
           }
-        ]
+        ],
+        "dashboard_config": {
+          "kpi_1_label": "Nombre personalizado del KPI principal (ej: 'Ventas de Pan', 'Citas Médicas')",
+          "kpi_2_label": "Nombre personalizado del segundo KPI (ej: 'Ticket Promedio', 'Satisfacción')",
+          "welcome_message": "Un mensaje de bienvenida corto y motivador (ej: '¡A hornear se ha dicho!', '¡Listos para curar!')"
+        }
       }
     `;
 
-        // BUG #4 FIX: Wrap Groq call with a 15-second timeout to avoid infinite spinners.
         const timeoutPromise = new Promise<never>((_, reject) =>
             setTimeout(() => reject(new Error('Groq timeout after 15s')), 15000)
         );
@@ -84,7 +91,7 @@ export async function POST(req: Request) {
                 generateText({
                     model: groq('llama-3.3-70b-versatile'),
                     system: systemPrompt,
-                    prompt: "Genera el JSON de recomendaciones estratégicas ahora.",
+                    prompt: "Genera el JSON de recomendaciones y configuración de dashboard ahora.",
                 }),
                 timeoutPromise,
             ]);
@@ -101,9 +108,11 @@ export async function POST(req: Request) {
             throw timeoutErr;
         }
 
-        // Limpiar posible markdown wrapper de la respuesta de Groq
         const cleanJson = text.replace(/```json\n?/, '').replace(/```/, '').trim();
-        let parsedResult: { recommendations: Array<{ type: string; title: string; description: string }> };
+        let parsedResult: { 
+            recommendations: Array<{ type: string; title: string; description: string }>,
+            dashboard_config?: any 
+        };
 
         try {
             parsedResult = JSON.parse(cleanJson);
@@ -112,18 +121,27 @@ export async function POST(req: Request) {
             throw new Error("Invalid output format from AI");
         }
 
-        // Validar el array
         if (!parsedResult.recommendations || parsedResult.recommendations.length === 0) {
             throw new Error('No recommendations generated');
         }
 
-        // BUG #2 FIX: Use service role key to bypass RLS, with explicit fallback warning above.
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         );
 
-        // Insertar en la BD
+        // Actualizar la empresa con el dashboard_config si existe
+        if (parsedResult.dashboard_config) {
+            const { data: currentCompany } = await supabase.from('companies').select('settings').eq('id', companyId).single();
+            const currentSettings = currentCompany?.settings || {};
+            await supabase.from('companies').update({
+                settings: {
+                    ...currentSettings,
+                    dashboard_config: parsedResult.dashboard_config
+                }
+            }).eq('id', companyId);
+        }
+
         const recommendationsToInsert = parsedResult.recommendations.map((rec) => ({
             company_id: companyId,
             type: rec.type,
@@ -141,7 +159,7 @@ export async function POST(req: Request) {
             throw new Error('Failed to save recommendations');
         }
 
-        return new Response(JSON.stringify({ success: true, count: parsedResult.recommendations.length }), {
+        return new Response(JSON.stringify({ success: true, count: parsedResult.recommendations.length, has_config: !!parsedResult.dashboard_config }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         });
