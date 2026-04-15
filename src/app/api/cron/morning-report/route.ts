@@ -56,7 +56,7 @@ export async function GET(request: Request) {
                         await fetch(`https://api.telegram.org/bot${botToken}/setWebhook`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ url: `${appUrl}/api/telegram/webhook`, allowed_updates: ['message'] }),
+                            body: JSON.stringify({ url: `${appUrl.replace(/\/+$/, '')}/api/telegram/webhook`, allowed_updates: ['message'] }),
                         });
                         console.log('[CRON] Telegram webhook auto-registered');
                     }

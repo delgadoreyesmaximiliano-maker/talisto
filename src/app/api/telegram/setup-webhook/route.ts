@@ -30,7 +30,7 @@ export async function GET(request: Request) {
         );
     }
 
-    const webhookUrl = `${appUrl}/api/telegram/webhook`;
+    const webhookUrl = `${appUrl.replace(/\/+$/, '')}/api/telegram/webhook`;
 
     try {
         // First, get current webhook info

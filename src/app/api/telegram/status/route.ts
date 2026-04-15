@@ -96,7 +96,7 @@ export async function POST() {
         return NextResponse.json({ error: 'APP URL not configured' }, { status: 500 });
     }
 
-    const webhookUrl = `${appUrl}/api/telegram/webhook`;
+    const webhookUrl = `${appUrl.replace(/\/+$/, '')}/api/telegram/webhook`;
 
     try {
         const res = await fetch(`https://api.telegram.org/bot${botToken}/setWebhook`, {
