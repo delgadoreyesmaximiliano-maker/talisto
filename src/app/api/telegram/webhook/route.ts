@@ -17,12 +17,20 @@ const TELEGRAM_IPS = [
 ];
 
 function isValidTelegramIP(ip: string): boolean {
+    const ipParts = ip.split('.').map(Number);
+    if (ipParts.length !== 4) return false;
+    
     return TELEGRAM_IPS.some(range => {
         const [base, bits] = range.split('/');
-        const mask = ~((1 << (32 - parseInt(bits))) - 1;
-        const ipNum = ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet), 0) >>> 0;
-        const baseNum = base.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet), 0) >>> 0;
-        return (ipNum & mask) === (baseNum & mask);
+        const baseParts = base.split('.').map(Number);
+        const prefixLen = parseInt(bits);
+        
+        for (let i = 0; i < 4; i++) {
+            const bitsInOctet = Math.min(8, Math.max(0, prefixLen - i * 8));
+            const mask = bitsInOctet === 8 ? 255 : (256 - (1 << (8 - bitsInOctet)));
+            if ((ipParts[i] & mask) !== (baseParts[i] & mask)) return false;
+        }
+        return true;
     });
 }
 
@@ -81,7 +89,7 @@ async function sendTelegramMessage(chatId: string, text: string, photoUrl?: stri
         return;
     }
 
-    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
     const payload = {
         chat_id: chatId,
         text: text,
