@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import Groq from 'groq-sdk';
+import { Redis } from '@upstash/redis';
 
 // Lazy singletons: initialized on first use (inside request handlers), not at module load time.
 // This prevents build-time crashes when env vars are absent in the build environment.
@@ -23,6 +24,33 @@ function getSupabase(): any {
 }
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!
+
+let _redis: Redis | null = null;
+function getRedis(): Redis {
+    if (!_redis) _redis = new Redis({ url: process.env.UPSTASH_REDIS_REST_URL!, token: process.env.UPSTASH_REDIS_REST_TOKEN! });
+    return _redis;
+}
+
+const HISTORY_TTL = 1800;
+const MAX_HISTORY = 10;
+
+type HistoryMessage = { role: 'user' | 'assistant'; content: string };
+
+async function getHistory(chatId: string): Promise<HistoryMessage[]> {
+    if (!chatId) return [];
+    try {
+        const raw = await getRedis().get<string>(`talisto:tghistory:${chatId}`);
+        return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+}
+
+async function saveHistory(chatId: string, messages: HistoryMessage[]) {
+    if (!chatId) return;
+    try {
+        const trimmed = messages.slice(-MAX_HISTORY);
+        await getRedis().set(`talisto:tghistory:${chatId}`, JSON.stringify(trimmed), { ex: HISTORY_TTL });
+    } catch { /* non-fatal */ }
+}
 
 export interface AIMessageResponse {
     text: string;
@@ -64,7 +92,7 @@ export async function transcribeAudio(fileId: string): Promise<string> {
 /**
  * Lógica principal del Agente. Toma un texto, usa LLaMA para saber qué hacer, ejecuta funciones y responde humanamente.
  */
-export async function processAgentMessage(text: string, companyId: string, companyName: string, settings: any = {}): Promise<AIMessageResponse> {
+export async function processAgentMessage(text: string, companyId: string, companyName: string, settings: any = {}, chatId: string = ''): Promise<AIMessageResponse> {
     const dashboardConfig = settings?.dashboard_config || {};
     const businessContext = settings?.business_description ? `Contexto del negocio: ${settings.business_description}` : '';
 
@@ -308,12 +336,16 @@ Responde SIEMPRE de forma profesional, usando emojis de negocios (📊, 💰, �
     ];
 
     try {
+        const history = await getHistory(chatId);
+        const messagesWithHistory = [
+            { role: "system" as const, content: systemPrompt },
+            ...history,
+            { role: "user" as const, content: text }
+        ];
+
         const chatCompletion = await getGroq().chat.completions.create({
             model: "llama-3.3-70b-versatile",
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: text }
-            ],
+            messages: messagesWithHistory,
             tools: tools,
             tool_choice: "required",
         });
@@ -567,7 +599,9 @@ Responde SIEMPRE de forma profesional, usando emojis de negocios (📊, 💰, �
 
                 // ───── CHAT CONVERSACIONAL ─────
                 if (toolName === 'chat_with_user') {
-                    return { text: args.response || '¡Hola! ¿En qué te puedo ayudar? 😊' };
+                    const replyText = args.response || '¡Hola! ¿En qué te puedo ayudar? 😊';
+                    await saveHistory(chatId, [...history, { role: 'user', content: text }, { role: 'assistant', content: replyText }]);
+                    return { text: replyText };
                 }
 
                 toolResults.push({
@@ -579,28 +613,30 @@ Responde SIEMPRE de forma profesional, usando emojis de negocios (📊, 💰, �
             }
 
             const safeResponseMessage = { ...responseMessage, content: responseMessage.content || "" };
-            
+
             // Re-evaluar response
             try {
                 const finalChat = await getGroq().chat.completions.create({
                     model: "llama-3.3-70b-versatile",
                     messages: [
-                        { role: "system", content: systemPrompt },
-                        { role: "user", content: text },
+                        ...messagesWithHistory,
                         safeResponseMessage,
                         ...toolResults
                     ] as any,
-                    tools: tools
                 });
-                
-                return { text: finalChat.choices[0].message.content || 'Hubo un error armando la respuesta final.', photoUrl: photoUrlToReturn };
+
+                const finalText = finalChat.choices[0].message.content || 'Hubo un error armando la respuesta final.';
+                await saveHistory(chatId, [...history, { role: 'user', content: text }, { role: 'assistant', content: finalText }]);
+                return { text: finalText, photoUrl: photoUrlToReturn };
             } catch(nestedErr) {
                 console.error("Nested LLM err:", nestedErr);
                 return { text: "Operación realizada, pero tuve problemas al formatear el texto final.", photoUrl: photoUrlToReturn };
             }
         }
 
-        return { text: responseMessage.content || 'No sé cómo responder a eso 🤔' };
+        const fallbackText = responseMessage.content || 'No sé cómo responder a eso 🤔';
+        await saveHistory(chatId, [...history, { role: 'user', content: text }, { role: 'assistant', content: fallbackText }]);
+        return { text: fallbackText };
     } catch (error) {
         console.error('Error invoking LLM:', error);
         return { text: '¡Ups! Ha ocurrido un error interno consultando mis circuitos. 🤖💥' };

@@ -212,7 +212,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ status: 'ok' });
         }
 
-        const agentResponse = await processAgentMessage(text, company.id, company.name, company.settings);
+        const agentResponse = await processAgentMessage(text, company.id, company.name, company.settings, chatId);
         await sendTelegramMessage(chatId, agentResponse.text, agentResponse.photoUrl, botToken);
 
         return NextResponse.json({ status: 'ok' });
