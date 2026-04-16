@@ -687,7 +687,12 @@ Responde SIEMPRE de forma profesional, usando emojis de negocios (📊, 💰, �
         await saveHistory(chatId, companyId, [...history, { role: 'user', content: text }, { role: 'assistant', content: fallbackText }]);
         return { text: fallbackText };
     } catch (error) {
-        console.error('Error invoking LLM:', error);
-        return { text: '¡Ups! Ha ocurrido un error interno consultando mis circuitos. 🤖💥' };
+        const errStatus = (error as any)?.status;
+        const errMsg = (error as any)?.message || String(error);
+        console.error('[Agent] LLM error status:', errStatus, '| msg:', errMsg.slice(0, 400));
+        const userMsg = errStatus === 429
+            ? '⏱️ Límite de consultas alcanzado. Espera unos segundos e intenta de nuevo.'
+            : '¡Ups! Ha ocurrido un error interno consultando mis circuitos. 🤖💥';
+        return { text: userMsg };
     }
 }
