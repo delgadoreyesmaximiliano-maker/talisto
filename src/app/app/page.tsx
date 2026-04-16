@@ -293,10 +293,10 @@ export default async function AppDashboard() {
                         </p>
                     </div>
 
-                    {companyData?.settings?.integrations && Object.keys(companyData.settings.integrations).length > 0 && (
+                    {(companyData?.settings as any)?.integrations && Object.keys((companyData?.settings as any).integrations).length > 0 && (
                         <div className="flex items-center gap-4 bg-primary/5 border border-primary/20 px-5 py-3 rounded-2xl animate-in fade-in slide-in-from-left-4 ml-2">
                             <div className="flex -space-x-3">
-                                {Object.keys(companyData.settings.integrations).map(key => (
+                                {Object.keys((companyData?.settings as any).integrations).map(key => (
                                     <div key={key} className="w-10 h-10 rounded-full bg-surface-dark border-2 border-primary/30 shadow-xl flex items-center justify-center text-[11px] font-black uppercase overflow-hidden ring-4 ring-background-dark">
                                         {key.slice(0, 2)}
                                     </div>
@@ -307,7 +307,7 @@ export default async function AppDashboard() {
                                     <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(19,236,128,0.8)]" />
                                     <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] leading-none mb-0.5">Live Sync</span>
                                 </div>
-                                <span className="text-xs text-secondary font-black leading-none">{Object.keys(companyData.settings.integrations).length} conectadas</span>
+                                <span className="text-xs text-secondary font-black leading-none">{Object.keys((companyData?.settings as any).integrations).length} conectadas</span>
                             </div>
                         </div>
                     )}

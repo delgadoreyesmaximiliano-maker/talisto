@@ -76,23 +76,22 @@ export default function IntegrationsPage() {
             const { data: { user } } = await supabase.auth.getUser()
             if (!user) return
 
-            const { data: userData } = await supabase.from('users').select('company_id').eq('id', user.id).single()
+            const { data: userData } = await (supabase.from('users') as any).select('company_id').eq('id', user.id).single()
             if (!userData?.company_id) return
 
             setCompanyId(userData.company_id)
 
-            const { data: companyData } = await supabase
-                .from('companies')
+            const { data: companyData } = await (supabase.from('companies') as any)
                 .select('settings')
                 .eq('id', userData.company_id)
-                .single()
+                .single() as any
 
             const activeIntegrations = (companyData?.settings as any)?.integrations || {}
             setConnected(new Set(Object.keys(activeIntegrations)))
             setLoading(false)
         }
         loadIntegrations()
-    }, [])
+    }, [supabase])
 
     const handleOpenConnect = (integration: typeof integrations[0]) => {
         if (connected.has(integration.id)) {
@@ -108,14 +107,13 @@ export default function IntegrationsPage() {
         if (!companyId) return
 
         try {
-            const { data: companyData } = await supabase.from('companies').select('settings').eq('id', companyId).single()
+            const { data: companyData } = await (supabase.from('companies') as any).select('settings').eq('id', companyId).single()
             const currentSettings = companyData?.settings as any || {}
             const integrationsData = currentSettings.integrations || {}
             delete integrationsData[id]
 
-            const { error } = await supabase
-                .from('companies')
-                .update({ settings: { ...currentSettings, integrations: integrationsData } })
+            const { error } = await (supabase.from('companies') as any)
+                .update({ settings: { ...currentSettings, integrations: integrationsData } } as any)
                 .eq('id', companyId)
 
             if (error) throw error
@@ -181,7 +179,7 @@ export default function IntegrationsPage() {
 
         setIsConnecting(true)
         try {
-            const { data: companyData } = await supabase.from('companies').select('settings').eq('id', companyId).single()
+            const { data: companyData } = await (supabase.from('companies') as any).select('settings').eq('id', companyId).single()
             const currentSettings = companyData?.settings as any || {}
             const integrationsData = currentSettings.integrations || {}
             
@@ -190,9 +188,8 @@ export default function IntegrationsPage() {
                 ...creds
             }
 
-            const { error } = await supabase
-                .from('companies')
-                .update({ settings: { ...currentSettings, integrations: integrationsData } })
+            const { error } = await (supabase.from('companies') as any)
+                .update({ settings: { ...currentSettings, integrations: integrationsData } } as any)
                 .eq('id', companyId)
 
             if (error) throw error

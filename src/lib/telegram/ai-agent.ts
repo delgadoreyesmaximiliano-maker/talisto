@@ -355,7 +355,7 @@ Responde SIEMPRE de forma profesional, usando emojis de negocios (📊, 💰, �
                 
                 // ───── ELIMINAR VENTA ─────
                 if (toolName === 'delete_sale') {
-                    let query = getSupabase().from('sales').select('id, amount, created_at').eq('company_id', companyId).eq('amount', args.amount).order('created_at', { ascending: false }).limit(1);
+                    const query = getSupabase().from('sales').select('id, amount, created_at').eq('company_id', companyId).eq('amount', args.amount).order('created_at', { ascending: false }).limit(1);
                     const { data } = await query;
                     
                     if (data && data.length > 0) {
