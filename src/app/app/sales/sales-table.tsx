@@ -117,6 +117,15 @@ export function SalesTable() {
 
     useEffect(() => {
         fetchSales()
+
+        const channel = supabase
+            .channel('sales-realtime')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'sales' }, () => {
+                fetchSales()
+            })
+            .subscribe()
+
+        return () => { supabase.removeChannel(channel) }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
@@ -150,7 +159,7 @@ export function SalesTable() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const items = Array.isArray(sale.items) ? sale.items : []
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const itemMatch = items.some((item: any) => (item.name || '').toLowerCase().includes(q))
+            const itemMatch = items.some((item: any) => (item.custom_product_name || item.name || '').toLowerCase().includes(q))
             if (!customerMatch && !emailMatch && !itemMatch) return false
         }
         return true
@@ -266,7 +275,8 @@ export function SalesTable() {
                             {pagedSales.map((sale) => {
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 const items = Array.isArray(sale.items) ? sale.items : [];
-                                const description = items.length > 0 ? items[0].name : 'Venta Manual';
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                const description = items.length > 0 ? (items[0].custom_product_name || items[0].name || 'Venta Manual') : 'Venta Manual';
 
                                 return (
                                     <TableRow key={sale.id} className="border-border-dark hover:bg-muted/20">

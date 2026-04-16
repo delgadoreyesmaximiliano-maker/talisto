@@ -159,12 +159,16 @@ TERMINOLOGÍA PERSONALIZADA:
 ACCESO A DATOS:
 - Tú TIENES acceso directo a TODA la base de datos a través de herramientas. NUNCA digas que no puedes ver algo.
 
+MANEJO DE NÚMEROS:
+- Convierte SIEMPRE abreviaciones a valores exactos antes de llamar herramientas.
+- "4 millones" → 4000000, "2.5 millones" → 2500000, "500 mil" → 500000, "1 millón" → 1000000.
+
 REGLAS DE HERRAMIENTAS:
 - Ventas/Fechas (ayer, hoy, rangos) → get_sales_by_date
 - Gráficos (barra, torta, líneas, HISTOGRAMA) → generate_dynamic_chart
 - Resumen mes → get_monthly_summary
 - Stock crítico → get_critical_stock
-- Registrar venta → add_sale (price = precio UNITARIO por unidad)
+- Registrar venta → add_sale (price = precio UNITARIO por unidad, ya convertido a número exacto)
 - Chat general → chat_with_user (SOLO para pedir datos faltantes, saludar, o cuando no hay acción que ejecutar)
 
 Responde SIEMPRE de forma profesional, usando emojis de negocios (📊, 💰, 📈) y manteniendo la seriedad de un contador de confianza.`;
@@ -610,8 +614,8 @@ Responde SIEMPRE de forma profesional, usando emojis de negocios (📊, 💰, �
                         const prodId = prodsTyped && prodsTyped.length > 0 ? prodsTyped[0].id : null;
                         const insertedName = prodsTyped && prodsTyped.length > 0 ? prodsTyped[0].name : args.product_name;
 
-                        const itemsJson = [{ product_id: prodId, custom_product_name: insertedName, quantity: qty, unit_price: args.price, subtotal: subtotal, payment_method: args.payment_method }];
-                        const saleRow: any = { company_id: companyId, amount: subtotal, source: 'telegram_bot', items: itemsJson, created_at: new Date().toISOString() };
+                        const itemsJson = [{ name: insertedName, product_id: prodId, quantity: qty, price: args.price, payment_method: args.payment_method }];
+                        const saleRow: any = { company_id: companyId, amount: subtotal, status: 'completed', source: 'telegram_bot', items: itemsJson, created_at: new Date().toISOString() };
                         const { error: saleError } = await getSupabase().from('sales').insert([saleRow]).select('id').single();
 
                         if (saleError) {
