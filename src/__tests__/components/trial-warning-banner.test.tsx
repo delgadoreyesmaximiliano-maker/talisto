@@ -55,9 +55,9 @@ describe('TrialWarningBanner', () => {
             expect(screen.getByText(/Mi Empresa/)).toBeInTheDocument()
         })
 
-        it('muestra el botón de Hablar con Ventas', () => {
+        it('muestra el botón de Activar Plan Ahora', () => {
             render(<TrialWarningBanner status={expiredStatus} companyName="Mi Empresa" />)
-            expect(screen.getByText('Hablar con Ventas')).toBeInTheDocument()
+            expect(screen.getByText('Activar Plan Ahora')).toBeInTheDocument()
         })
 
         it('muestra el enlace Ver Planes y Precios', () => {
@@ -84,9 +84,9 @@ describe('TrialWarningBanner', () => {
             expect(screen.getByText('Tu prueba expira en 3 días')).toBeInTheDocument()
         })
 
-        it('muestra el botón Contactar Ventas', () => {
+        it('muestra el botón Activar Plan', () => {
             render(<TrialWarningBanner status={expiringSoonStatus} companyName="Empresa Test" />)
-            expect(screen.getByText('Contactar Ventas')).toBeInTheDocument()
+            expect(screen.getByText('Activar Plan')).toBeInTheDocument()
         })
 
         it('muestra el enlace Ver Planes', () => {

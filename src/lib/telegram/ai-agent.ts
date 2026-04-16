@@ -40,8 +40,13 @@ async function getHistory(chatId: string): Promise<HistoryMessage[]> {
     if (!chatId) return [];
     try {
         const raw = await getRedis().get<string>(`talisto:tghistory:${chatId}`);
-        return raw ? JSON.parse(raw) : [];
-    } catch { return []; }
+        const parsed = raw ? JSON.parse(raw) : [];
+        console.log(`[TgHistory] GET ${chatId}: ${parsed.length} messages`);
+        return parsed;
+    } catch (e) {
+        console.error('[TgHistory] GET error:', e);
+        return [];
+    }
 }
 
 async function saveHistory(chatId: string, messages: HistoryMessage[]) {
@@ -49,7 +54,10 @@ async function saveHistory(chatId: string, messages: HistoryMessage[]) {
     try {
         const trimmed = messages.slice(-MAX_HISTORY);
         await getRedis().set(`talisto:tghistory:${chatId}`, JSON.stringify(trimmed), { ex: HISTORY_TTL });
-    } catch { /* non-fatal */ }
+        console.log(`[TgHistory] SAVED ${chatId}: ${trimmed.length} messages`);
+    } catch (e) {
+        console.error('[TgHistory] SAVE error:', e);
+    }
 }
 
 export interface AIMessageResponse {
@@ -96,13 +104,15 @@ export async function processAgentMessage(text: string, companyId: string, compa
     const dashboardConfig = settings?.dashboard_config || {};
     const businessContext = settings?.business_description ? `Contexto del negocio: ${settings.business_description}` : '';
 
-    const systemPrompt = `Eres "Tali", el asistente de elite y contador digital de "${companyName}". 
+    const systemPrompt = `Eres "Tali", el asistente de elite y contador digital de "${companyName}".
 ${businessContext}
 
 POLÍTICA DE RIGOR CONTABLE (CRÍTICO):
-1. NUNCA registres una venta, producto o cliente si faltan datos MANDATORIOS. 
-2. Si el usuario dice algo incompleto (ej: "vendí un café"), NO LLAMES a la herramienta de registro aún. Responde educadamente pidiendo los detalles faltantes: "¿A qué precio?", "¿Cuántos?" y "¿Qué método de pago?".
-3. Tu objetivo es que la contabilidad sea PERFECTA. No asumas NADA.
+1. NUNCA registres una venta si faltan datos MANDATORIOS: product_name, price (unitario), quantity, payment_method.
+2. Si falta UN SOLO dato, pide SOLO ese dato (no pidas todo de nuevo).
+3. CONVERSACIÓN MULTI-TURNO: Si en mensajes anteriores ya tienes datos parciales y el usuario responde con el dato que pediste, úsalo inmediatamente para completar el registro. NO vuelvas a preguntar datos que ya tienes.
+4. PRECIOS: Si el usuario menciona un monto total y una cantidad, calcula el precio unitario (precio_unitario = total / cantidad). Si solo menciona un monto sin cantidad, ese monto ES el precio unitario.
+5. Tu objetivo es que la contabilidad sea PERFECTA. No asumas datos que no se han dado, pero NUNCA ignores datos que ya fueron proporcionados.
 
 TERMINOLOGÍA PERSONALIZADA:
 - El usuario puede referirse a sus KPIs como: ${dashboardConfig.kpi_1_label || 'Ventas'}, ${dashboardConfig.kpi_2_label || 'Clientes'}, ${dashboardConfig.kpi_3_label || 'Inventario'}.
@@ -112,11 +122,11 @@ ACCESO A DATOS:
 
 REGLAS DE HERRAMIENTAS:
 - Ventas/Fechas (ayer, hoy, rangos) → get_sales_by_date
-- Gráficos (barra, torta, líneas, HISTOGRAMA) → generate_dynamic_chart. (Para histogramas, usa chart_type="bar" con muchas etiquetas o pide bins).
+- Gráficos (barra, torta, líneas, HISTOGRAMA) → generate_dynamic_chart
 - Resumen mes → get_monthly_summary
 - Stock crítico → get_critical_stock
-- Registrar venta → add_sale. (REQUERIDO: product_name, price, quantity, payment_method).
-- Chat general → chat_with_user (Úsala para pedir datos faltantes o saludar).
+- Registrar venta → add_sale (price = precio UNITARIO por unidad)
+- Chat general → chat_with_user (SOLO para pedir datos faltantes, saludar, o cuando no hay acción que ejecutar)
 
 Responde SIEMPRE de forma profesional, usando emojis de negocios (📊, 💰, 📈) y manteniendo la seriedad de un contador de confianza.`;
 

@@ -154,14 +154,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ status: 'ok' });
         }
 
-        // Obtener bot token segun el chat_id
-        const { data: companyData } = await getSupabase()
-            .from('companies')
-            .select('id, name, telegram_bot_token')
-            .eq('telegram_chat_id', chatId)
-            .maybeSingle();
-
-        const botToken = companyData?.telegram_bot_token;
+        // botToken se actualizará después del company query; undefined aquí usa env var como fallback
+        let botToken: string | undefined = undefined;
 
         // Si el usuario envia /start <code>
         if (text.startsWith('/start')) {
@@ -206,6 +200,8 @@ export async function POST(request: Request) {
             .select('id, name, settings, telegram_bot_token')
             .eq('telegram_chat_id', chatId)
             .single();
+
+        botToken = company?.telegram_bot_token;
 
         if (!company) {
             await sendTelegramMessage(chatId, `❌ Tu cuenta de Telegram no está vinculada a ninguna empresa.\nGenera un código de vinculación en tu panel de Talisto e inicia el bot con ese código.`, undefined, botToken);

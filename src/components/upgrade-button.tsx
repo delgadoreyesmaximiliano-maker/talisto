@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Loader2, Zap } from 'lucide-react'
 import { toast } from 'sonner'
@@ -20,7 +19,6 @@ export function UpgradeButton({
     size = 'default',
 }: UpgradeButtonProps) {
     const [loading, setLoading] = useState(false)
-    const router = useRouter()
 
     const defaultLabels = { basico: 'Activar Plan Básico', pro: 'Activar Plan Pro' }
     const buttonLabel = label ?? defaultLabels[plan]
