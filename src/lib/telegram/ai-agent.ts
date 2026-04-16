@@ -25,36 +25,75 @@ function getSupabase(): any {
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!
 
+// Redis opcional — se usa si las env vars están configuradas
 let _redis: Redis | null = null;
-function getRedis(): Redis {
-    if (!_redis) _redis = new Redis({ url: process.env.UPSTASH_REDIS_REST_URL!, token: process.env.UPSTASH_REDIS_REST_TOKEN! });
-    return _redis;
+function getRedisOptional(): Redis | null {
+    if (_redis) return _redis;
+    const url = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+    if (!url || !token) return null;
+    try {
+        _redis = new Redis({ url, token });
+        return _redis;
+    } catch { return null; }
 }
 
-const HISTORY_TTL = 1800;
 const MAX_HISTORY = 10;
 
 type HistoryMessage = { role: 'user' | 'assistant'; content: string };
 
-async function getHistory(chatId: string): Promise<HistoryMessage[]> {
+// Obtiene historial: Redis primero, luego Supabase como fallback
+async function getHistory(chatId: string, companyId: string): Promise<HistoryMessage[]> {
     if (!chatId) return [];
+
+    // 1. Intentar Redis
+    const redis = getRedisOptional();
+    if (redis) {
+        try {
+            const raw = await redis.get<string>(`talisto:tghistory:${chatId}`);
+            const parsed = raw ? JSON.parse(raw) : [];
+            if (parsed.length > 0) {
+                console.log(`[TgHistory] Redis GET ${chatId}: ${parsed.length} msgs`);
+                return parsed;
+            }
+        } catch { /* fall through */ }
+    }
+
+    // 2. Fallback: Supabase (settings.tg_history[chatId])
     try {
-        const raw = await getRedis().get<string>(`talisto:tghistory:${chatId}`);
-        const parsed = raw ? JSON.parse(raw) : [];
-        console.log(`[TgHistory] GET ${chatId}: ${parsed.length} messages`);
-        return parsed;
+        const { data } = await getSupabase().from('companies').select('settings').eq('id', companyId).single();
+        const history = (data?.settings as any)?.tg_history?.[chatId] || [];
+        console.log(`[TgHistory] Supabase GET ${chatId}: ${history.length} msgs`);
+        return history;
     } catch (e) {
         console.error('[TgHistory] GET error:', e);
         return [];
     }
 }
 
-async function saveHistory(chatId: string, messages: HistoryMessage[]) {
+// Guarda historial: Redis si disponible, siempre Supabase
+async function saveHistory(chatId: string, companyId: string, messages: HistoryMessage[]) {
     if (!chatId) return;
+    const trimmed = messages.slice(-MAX_HISTORY);
+
+    // 1. Redis (opcional)
+    const redis = getRedisOptional();
+    if (redis) {
+        try {
+            await redis.set(`talisto:tghistory:${chatId}`, JSON.stringify(trimmed), { ex: 1800 });
+        } catch { /* non-fatal */ }
+    }
+
+    // 2. Supabase (siempre)
     try {
-        const trimmed = messages.slice(-MAX_HISTORY);
-        await getRedis().set(`talisto:tghistory:${chatId}`, JSON.stringify(trimmed), { ex: HISTORY_TTL });
-        console.log(`[TgHistory] SAVED ${chatId}: ${trimmed.length} messages`);
+        const { data } = await getSupabase().from('companies').select('settings').eq('id', companyId).single();
+        const currentSettings = (data?.settings as any) || {};
+        const currentHistories = currentSettings.tg_history || {};
+        currentHistories[chatId] = trimmed;
+        await getSupabase().from('companies').update({
+            settings: { ...currentSettings, tg_history: currentHistories }
+        }).eq('id', companyId);
+        console.log(`[TgHistory] Supabase SAVED ${chatId}: ${trimmed.length} msgs`);
     } catch (e) {
         console.error('[TgHistory] SAVE error:', e);
     }
@@ -346,7 +385,7 @@ Responde SIEMPRE de forma profesional, usando emojis de negocios (📊, 💰, �
     ];
 
     try {
-        const history = await getHistory(chatId);
+        const history = await getHistory(chatId, companyId);
         const messagesWithHistory = [
             { role: "system" as const, content: systemPrompt },
             ...history,
@@ -610,7 +649,7 @@ Responde SIEMPRE de forma profesional, usando emojis de negocios (📊, 💰, �
                 // ───── CHAT CONVERSACIONAL ─────
                 if (toolName === 'chat_with_user') {
                     const replyText = args.response || '¡Hola! ¿En qué te puedo ayudar? 😊';
-                    await saveHistory(chatId, [...history, { role: 'user', content: text }, { role: 'assistant', content: replyText }]);
+                    await saveHistory(chatId, companyId, [...history, { role: 'user', content: text }, { role: 'assistant', content: replyText }]);
                     return { text: replyText };
                 }
 
@@ -636,7 +675,7 @@ Responde SIEMPRE de forma profesional, usando emojis de negocios (📊, 💰, �
                 });
 
                 const finalText = finalChat.choices[0].message.content || 'Hubo un error armando la respuesta final.';
-                await saveHistory(chatId, [...history, { role: 'user', content: text }, { role: 'assistant', content: finalText }]);
+                await saveHistory(chatId, companyId, [...history, { role: 'user', content: text }, { role: 'assistant', content: finalText }]);
                 return { text: finalText, photoUrl: photoUrlToReturn };
             } catch(nestedErr) {
                 console.error("Nested LLM err:", nestedErr);
@@ -645,7 +684,7 @@ Responde SIEMPRE de forma profesional, usando emojis de negocios (📊, 💰, �
         }
 
         const fallbackText = responseMessage.content || 'No sé cómo responder a eso 🤔';
-        await saveHistory(chatId, [...history, { role: 'user', content: text }, { role: 'assistant', content: fallbackText }]);
+        await saveHistory(chatId, companyId, [...history, { role: 'user', content: text }, { role: 'assistant', content: fallbackText }]);
         return { text: fallbackText };
     } catch (error) {
         console.error('Error invoking LLM:', error);
